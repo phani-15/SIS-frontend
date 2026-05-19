@@ -1,10 +1,14 @@
-import React from 'react'
+import React from 'react';
+import './index.css';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './components/AppRoutes';
 
 export default function App() {
   return (
-    <div >
-      <h1 className='font-bold text-4xl font-serif'>Hello!!</h1>
-      <h2 className='text-blue-700 text-2xl font-semibold font-serif'>Student Information System</h2>
+    <div className='flex flex-col min-h-screen'>
+      <BrowserRouter>
+        <AppRoutes/>
+      </BrowserRouter>
     </div>
-  )
+  );
 }
