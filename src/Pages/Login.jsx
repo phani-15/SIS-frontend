@@ -295,13 +295,13 @@ const StudentLogin = () => {
         bg-[#0f0a1a] font-['DM_Sans'] relative overflow-hidden">
 
         {/* Ambient orbs */}
-        <div className="orb-1 absolute w-[500px] h-[500px] rounded-full pointer-events-none
-          -top-[120px] -left-[100px]"
+        <div className="orb-1 absolute w-125 h-125 rounded-full pointer-events-none
+          -top-30 -left-25"
           style={{ background: 'radial-gradient(circle, rgba(138,46,136,0.35) 0%, transparent 70%)', filter: 'blur(80px)' }} />
-        <div className="orb-2 absolute w-[400px] h-[400px] rounded-full pointer-events-none
-          -bottom-[100px] -right-[80px]"
+        <div className="orb-2 absolute w-100 h-100 rounded-full pointer-events-none
+          -bottom-25 -right-20"
           style={{ background: 'radial-gradient(circle, rgba(99,40,180,0.25) 0%, transparent 70%)', filter: 'blur(80px)' }} />
-        <div className="orb-3 absolute w-[250px] h-[250px] rounded-full pointer-events-none
+        <div className="orb-3 absolute w-62.5 h-62.5 rounded-full pointer-events-none
           top-1/2 left-[60%]"
           style={{ background: 'radial-gradient(circle, rgba(200,100,210,0.18) 0%, transparent 70%)', filter: 'blur(80px)' }} />
 
@@ -315,14 +315,14 @@ const StudentLogin = () => {
 
         {/* ── Card ── */}
         <div
-          className={`relative w-full max-w-[460px] rounded-[28px] overflow-hidden
+          className={`relative w-full max-w-115 rounded-[28px] overflow-hidden
             border border-[#8A2E88]/25
             shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset,0_32px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(138,46,136,0.12)]
             ${mounted ? 'card-in' : 'opacity-0'}`}
           style={{ background: 'rgba(20,10,35,0.75)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}
         >
           {/* Shimmer top bar */}
-          <div className="shimmer-bar h-[3px] w-full" />
+          <div className="shimmer-bar h-0.75 w-full" />
 
           {/* Body */}
           <div className="px-10 pt-10 pb-8">
@@ -330,8 +330,8 @@ const StudentLogin = () => {
             {/* ── Header ── */}
             <div className="flex items-center gap-3.5 mb-7">
               <div
-                className="badge-pulse w-[52px] h-[52px] flex-shrink-0 flex items-center justify-center
-                  rounded-2xl bg-gradient-to-br from-[#8A2E88] to-[#C084C8]"
+                className="badge-pulse w-13 h-13 shrink-0 flex items-center justify-center
+                  rounded-2xl bg-linear-to-br from-[#8A2E88] to-[#C084C8]"
                 style={{ boxShadow: '0 4px 20px rgba(138,46,136,0.4), 0 0 0 1px rgba(255,255,255,0.08) inset' }}
               >
                 <Lock size={24} color="#fff" />
@@ -350,21 +350,21 @@ const StudentLogin = () => {
             {error && (
               <div className="alert-in flex items-center gap-2 px-3.5 py-3 mb-5 rounded-xl
                 bg-red-500/10 border border-red-500/25 text-red-400 text-[0.84rem] font-medium">
-                <AlertCircle size={16} className="flex-shrink-0" />
+                <AlertCircle size={16} className="shrink-0" />
                 {error}
               </div>
             )}
             {success && (
               <div className="alert-in flex items-center gap-2 px-3.5 py-3 mb-5 rounded-xl
                 bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[0.84rem] font-medium">
-                <CheckCircle size={16} className="flex-shrink-0" />
+                <CheckCircle size={16} className="shrink-0" />
                 {success}
               </div>
             )}
 
             {/* ── Tabs ── */}
-            <div className="flex gap-1.5 p-[5px] rounded-2xl mb-7
-              bg-white/[0.04] border border-white/[0.06]">
+            <div className="flex gap-1.5 p-1.25 rounded-2xl mb-7
+              bg-white/4 border border-white/6">
               {[
                 { key: 'phone', icon: <Phone size={15} />, label: 'Phone Number' },
                 { key: 'email', icon: <Mail  size={15} />, label: 'Email ID'     },
@@ -373,11 +373,11 @@ const StudentLogin = () => {
                   key={key}
                   type="button"
                   onClick={() => setActiveTab(key)}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-[11px] rounded-xl
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2.75 rounded-xl
                     font-['DM_Sans'] text-[0.84rem] font-medium border-none cursor-pointer
                     transition-all duration-250
                     ${activeTab === key
-                      ? 'bg-gradient-to-br from-[#8A2E88] to-[#B060B8] text-white shadow-[0_4px_16px_rgba(138,46,136,0.35)]'
+                      ? 'bg-linear-to-br from-[#8A2E88] to-[#B060B8] text-white shadow-[0_4px_16px_rgba(138,46,136,0.35)]'
                       : 'bg-transparent text-[#B48AC2]/70 hover:bg-[#8A2E88]/10 hover:text-[#D2AAE0]/90'
                     }`}
                 >
@@ -410,8 +410,8 @@ const StudentLogin = () => {
                     onBlur={() => setFocused('')}
                     maxLength={activeTab === 'phone' ? 10 : undefined}
                     autoComplete={activeTab === 'phone' ? 'tel' : 'email'}
-                    className="w-full pl-11 pr-4 py-[14px] rounded-[14px]
-                      bg-white/[0.04] border border-[#8A2E88]/20
+                    className="w-full pl-11 pr-4 py-3.5 rounded-3.5
+                      bg-white/4 border border-[#8A2E88]/20
                       font-['DM_Sans'] text-[0.92rem] text-white
                       placeholder:text-[#AA80BA]/40
                       outline-none transition-all duration-200
@@ -441,8 +441,8 @@ const StudentLogin = () => {
                     onFocus={() => setFocused('password')}
                     onBlur={() => setFocused('')}
                     autoComplete="current-password"
-                    className="w-full pl-11 pr-12 py-[14px] rounded-[14px]
-                      bg-white/[0.04] border border-[#8A2E88]/20
+                    className="w-full pl-11 pr-12 py-3.5 rounded-3.5
+                      bg-white/4 border border-[#8A2E88]/20
                       font-['DM_Sans'] text-[0.92rem] text-white
                       placeholder:text-[#AA80BA]/40
                       outline-none transition-all duration-200
@@ -483,8 +483,8 @@ const StudentLogin = () => {
               <button
                 type="submit"
                 disabled={isLoading || !!success}
-                className="w-full flex items-center justify-center gap-2 py-[15px] rounded-[14px]
-                  bg-gradient-to-br from-[#8A2E88] via-[#B060B8] to-[#C880D0]
+                className="w-full flex items-center justify-center gap-2 py-3.75 rounded-3.5
+                  bg-linear-to-br from-[#8A2E88] via-[#B060B8] to-[#C880D0]
                   font-['DM_Sans'] text-[1rem] font-semibold text-white tracking-[0.01em]
                   border-none cursor-pointer transition-all duration-250
                   shadow-[0_4px_24px_rgba(138,46,136,0.4),0_1px_0_rgba(255,255,255,0.12)_inset]
@@ -494,7 +494,7 @@ const StudentLogin = () => {
               >
                 {isLoading ? (
                   <>
-                    <svg className="animate-spin w-[18px] h-[18px] text-white flex-shrink-0"
+                    <svg className="animate-spin w-4.5 h-4.5 text-white shrink-0"
                       xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10"
                         stroke="currentColor" strokeWidth="4" />
@@ -522,7 +522,7 @@ const StudentLogin = () => {
             </div>
 
             {/* ── Footer ── */}
-            <div className="flex items-center justify-between pt-5 border-t border-white/[0.06]">
+            <div className="flex items-center justify-between pt-5 border-t border-white/6">
               <div className="flex items-center gap-1.5 text-[0.72rem] text-[#967AA5]/50">
                 <Shield size={12} />
                 256-bit SSL encrypted

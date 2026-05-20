@@ -10,7 +10,7 @@ export default function Header() {
     const menuItems = [
         { label: 'Student', path: '/login' },
         { label: 'HOD', path: '/hod' },
-        { label: 'Administrators', path: '/ofc' },
+        { label: 'Administrators', path: '/administrator' },
         { label: 'Admin', path: '/admin' },
         { label: 'About Us', path: '/about' },
     ];
