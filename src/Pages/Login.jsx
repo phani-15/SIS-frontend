@@ -216,6 +216,7 @@ import {
   Eye, EyeOff, Phone, Mail, Lock,
   KeyRound, CheckCircle, AlertCircle, ArrowRight, Shield
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const StudentLogin = () => {
   const [activeTab, setActiveTab]     = useState('phone');
@@ -235,6 +236,8 @@ const StudentLogin = () => {
     setFormData({ ...formData, [name]: value });
     setError('');
   };
+
+  const navigate  = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -258,6 +261,8 @@ const StudentLogin = () => {
       setIsLoading(false);
       setSuccess('Login successful! Redirecting to dashboard…');
     }, 1800);
+    
+    navigate('/profile')
   };
 
   return (

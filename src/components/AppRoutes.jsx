@@ -5,6 +5,7 @@ import Header from './Header';
 import Login from '../Pages/Login';
 import HodLogin from '../Pages/HodLogin';
 import Admin from '../Pages/Admin';
+import Profile from '../Pages/Profile'
 import NotFound from '../Pages/NotFound';
 import AdministratorsLogin from '../Pages/AdministratorsLogin';
 
@@ -29,6 +30,7 @@ function AppRoutes() {
                     <Route path='/' element={<Home />} />
                     
                     <Route path='/login' element={<Login />} />
+                    <Route path='/profile' element={<Profile />} />
 
                     <Route path='/hod' element={<HodLogin />} />
 
