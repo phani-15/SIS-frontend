@@ -4,6 +4,7 @@ import {
     KeyRound, CheckCircle, AlertCircle, ArrowRight, Shield
 } from 'lucide-react';
 import { depts } from '../assets/Data';
+import {useNavigate} from 'react-router-dom'
 
 const HodLogin = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -27,6 +28,8 @@ const HodLogin = () => {
         setError('');
     };
 
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -36,6 +39,8 @@ const HodLogin = () => {
             setIsLoading(false);
             setSuccess('Login successful! Redirecting to dashboard…');
         }, 1800);
+        navigate('/hod/board');
+
     };
 
     return (
