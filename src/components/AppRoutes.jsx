@@ -34,7 +34,7 @@ function AppRoutes() {
                     <Route path='/profile' element={<Profile />} />
 
                     <Route path='/hod' element={<HodLogin />} />
-                    <Route path = "/hod/board" element= {<HodDashboard />} />
+                    <Route path = "/hodboard" element= {<HodDashboard />} />
 
                     <Route path='/administrator' element={<AdministratorsLogin />} />
                     

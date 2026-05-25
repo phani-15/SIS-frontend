@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
+import ResumeGenerator from '../components/ResumeGenerator';
 import {
   Mail, Phone, MapPin, Calendar, Award, BookOpen, FileText,
   Edit2, Download, Share2, LogOut, ChevronRight, User, GraduationCap
@@ -9,6 +10,7 @@ export default function Profile() {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [isEditing, setIsEditing] = useState(false);
+  const [showResumeModal, setShowResumeModal] = useState(false);
 
   const [studentData, setStudentData] = useState({
     fullName: 'Srinivas',
@@ -28,6 +30,7 @@ export default function Profile() {
     religion: 'Hindu',
     hasDisability: false,
     disabilityType: '',
+    profiles:{Linkedin:"linkedin.com/in/srinivas",Github:"github.com/srinivas"},
     phoneNumber: '9876543210',
     email: 'srinivas@jntugvcev.in',
     apaaId: 'APAA12345',
@@ -88,15 +91,6 @@ export default function Profile() {
       `}</style>
 
       <div className="min-h-screen bg-[#0f0a1a] font-['DM_Sans'] relative overflow-hidden">
-
-        {/* Orbs */}
-        <div className="orb-1 absolute w-[600px] h-[600px] rounded-full pointer-events-none -top-[160px] -left-[140px]"
-          style={{ background:'radial-gradient(circle,rgba(138,46,136,0.3) 0%,transparent 70%)', filter:'blur(100px)' }} />
-        <div className="orb-2 absolute w-[500px] h-[500px] rounded-full pointer-events-none bottom-0 -right-[100px]"
-          style={{ background:'radial-gradient(circle,rgba(99,40,180,0.22) 0%,transparent 70%)', filter:'blur(100px)' }} />
-
-        {/* Grid */}
-
 
         {/* ── Main content ── */}
         <div className="relative z-10 max-w-[1400px] mx-auto px-6 py-12">
@@ -163,14 +157,17 @@ export default function Profile() {
                 {/* Action buttons */}
                 <div className="flex flex-wrap gap-2.5">
                   {[
-                    { icon: <Download size={16} />, label: 'Resume' },
-                    { icon: <FileText size={16} />, label: 'Transcript' },
-                    { icon: <Share2 size={16} />, label: 'Share' }
+                    { icon: <Download size={16} />, label: 'Resume', action: () => setShowResumeModal(true) },
+                    { icon: <FileText size={16} />, label: 'Transcript', action: () => {} },
+                    { icon: <Share2 size={16} />, label: 'Share', action: () => {} }
                   ].map((btn, i) => (
-                    <button key={i} className="flex items-center gap-2 px-4 py-2 rounded-[10px]
-                      bg-[#8A2E88]/15 border border-[#8A2E88]/30
-                      text-[0.8rem] font-medium text-[#C8A0D7]/80
-                      hover:bg-[#8A2E88]/25 hover:border-[#C084C8]/45 transition-all">
+                    <button
+                      key={i}
+                      onClick={btn.action}
+                      className="flex items-center gap-2 px-4 py-2 rounded-[10px]
+                        bg-[#8A2E88]/15 border border-[#8A2E88]/30
+                        text-[0.8rem] font-medium text-[#C8A0D7]/80
+                        hover:bg-[#8A2E88]/25 hover:border-[#C084C8]/45 transition-all">
                       {btn.icon}
                       {btn.label}
                     </button>
@@ -406,6 +403,14 @@ export default function Profile() {
             © 2026 JNTU-GV Vizianagaram. All rights reserved.
           </p>
         </div>
+
+        {/* Resume Generator Modal */}
+        {showResumeModal && (
+          <ResumeGenerator
+            studentData={studentData}
+            onClose={() => setShowResumeModal(false)}
+          />
+        )}
 
       </div>
     </>

@@ -9,7 +9,6 @@ const HODDashboard = () => {
     const [mounted, setMounted] = useState(false);
     const [selectedMetric, setSelectedMetric] = useState('batch');
 
-    // Mock data structure
     const dashboardData = {
         department: 'Computer Science & Engineering (CSE)',
         totalStudents: 285,

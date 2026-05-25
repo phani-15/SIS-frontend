@@ -115,7 +115,7 @@ const Admin = () => {
               </div>
               <div className="flex flex-col leading-[1.15]">
                 <span className="font-['Comfortaa'] font-bold text-[1.5rem] text-white tracking-[-0.02em]">
-                  Student Portal
+                  Admin Login
                 </span>
                 <span className="text-[0.72rem] font-light text-[#C8A0D7]/60 tracking-[0.03em] mt-0.5">
                   JNTU-GV Vizianagaram
