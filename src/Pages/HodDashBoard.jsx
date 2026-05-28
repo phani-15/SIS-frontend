@@ -189,7 +189,7 @@ const HODDashboard = () => {
                                             <span className="text-[0.9rem] font-semibold text-white">Batch {batch.batch}</span>
                                             <span className="text-[0.8rem] text-[#C8A0D7]/60">{batch.total} students</span>
                                         </div>
-                                        <div className="h-8 rounded-[10px] overflow-hidden bg-white/[0.04] border border-white/[0.06] flex">
+                                        <div className="h-8 rounded-[10px] overflow-hidden bg-white/4 border border-white/6 flex">
                                             <div
                                                 className="bar-animate bg-linear-to-r from-[#8A2E88] to-[#C084C8] h-full flex items-center justify-center relative"
                                                 style={{ width: `${(batch.pursuing / batch.total) * 100}%` }}>
@@ -232,13 +232,13 @@ const HODDashboard = () => {
                                             {grade}
                                         </div>
                                         <div className="flex-1">
-                                            <div className="h-6 rounded-[8px] bg-white/[0.04] overflow-hidden">
+                                            <div className="h-6 rounded-lg bg-white/4 overflow-hidden">
                                                 <div
                                                     className="bar-animate h-full bg-linear-to-r from-[#8A2E88]/60 to-[#C084C8]/60"
                                                     style={{ width: `${(count / totalGradeCount) * 100}%` }} />
                                             </div>
                                         </div>
-                                        <span className="text-[0.85rem] font-semibold text-[#C8A0D7]/70 min-w-[40px] text-right">
+                                        <span className="text-[0.85rem] font-semibold text-[#C8A0D7]/70 min-w-10 text-right">
                                             {count}
                                         </span>
                                     </div>
@@ -267,7 +267,7 @@ const HODDashboard = () => {
                                                 {skill.count} ({skill.percentage}%)
                                             </span>
                                         </div>
-                                        <div className="h-6 rounded-[10px] bg-white/[0.04] border border-white/[0.06] overflow-hidden">
+                                        <div className="h-6 rounded-[10px] bg-white/4 border border-white/[0.06] overflow-hidden">
                                             <div
                                                 className="bar-animate h-full bg-linear-to-r from-[#8A2E88] via-[#B060B8] to-[#C084C8]"
                                                 style={{ width: `${skill.percentage}%` }} />
