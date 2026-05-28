@@ -267,7 +267,7 @@ const HODDashboard = () => {
                                                 {skill.count} ({skill.percentage}%)
                                             </span>
                                         </div>
-                                        <div className="h-6 rounded-[10px] bg-white/4 border border-white/[0.06] overflow-hidden">
+                                        <div className="h-6 rounded-[10px] bg-white/4 border border-white/6 overflow-hidden">
                                             <div
                                                 className="bar-animate h-full bg-linear-to-r from-[#8A2E88] via-[#B060B8] to-[#C084C8]"
                                                 style={{ width: `${skill.percentage}%` }} />
@@ -357,7 +357,7 @@ const HODDashboard = () => {
                                             ? 'bg-emerald-500/10 border-emerald-500/25'
                                             : 'bg-blue-500/10 border-blue-500/25'
                                     }`}>
-                                    <span className={`mt-0.5 flex-shrink-0
+                                    <span className={`mt-0.5 shrink-0
                     ${alert.type === 'warning'
                                             ? 'text-red-400'
                                             : alert.type === 'success'
