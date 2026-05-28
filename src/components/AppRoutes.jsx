@@ -8,7 +8,7 @@ import Admin from '../Pages/Admin';
 import Profile from '../Pages/Profile'
 import NotFound from '../Pages/NotFound';
 import AdministratorsLogin from '../Pages/AdministratorsLogin';
-import HodDashboard from '../Pages/HodDashboard';
+import HODDashboard from '../Pages/HODDashboard';
 
 function AppRoutes() {
     const location = useLocation()
@@ -34,7 +34,7 @@ function AppRoutes() {
                     <Route path='/profile' element={<Profile />} />
 
                     <Route path='/hod' element={<HodLogin />} />
-                    <Route path = "/hodboard" element= {<HodDashboard />} />
+                    <Route path = "/hodboard" element= {<HODDashboard />} />
 
                     <Route path='/administrator' element={<AdministratorsLogin />} />
                     
