@@ -24,7 +24,7 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
 
   const [studentData, setStudentData] = useState({
-    fullName: "Srinivas",
+    fullName: "Polavarapu phani durga mani Srinivas Rao",
     rollNumber: "23VV1A0548",
     department: "CSE",
     degreeCode: "BTECH",
