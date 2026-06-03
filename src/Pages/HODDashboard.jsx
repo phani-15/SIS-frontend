@@ -9,7 +9,6 @@ const HODDashboard = () => {
     const [mounted, setMounted] = useState(false);
     const [selectedMetric, setSelectedMetric] = useState('batch');
 
-    // Mock data structure
     const dashboardData = {
         department: 'Computer Science & Engineering (CSE)',
         totalStudents: 285,
@@ -98,34 +97,34 @@ const HODDashboard = () => {
             <div className="min-h-screen bg-[#0f0a1a] font-['DM_Sans'] relative overflow-hidden">
 
                 {/* ── Main content ── */}
-                <div className="relative z-10 max-w-[1600px] mx-auto px-6 py-12">
+                <div className="relative z-10 max-w-400 mx-auto px-6 py-12">
 
                     {/* ── Welcome Header ── */}
-                    <div className={`relative rounded-[24px] overflow-hidden border border-[#8A2E88]/22 mb-8
+                    <div className={`relative rounded-6 overflow-hidden border border-[#8A2E88]/22 mb-8
             shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset,0_32px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(138,46,136,0.1)]
             ${mounted ? 'page-in' : 'opacity-0'}`}
                         style={{ background: 'rgba(20,10,35,0.72)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}>
 
-                        <div className="shimmer-bar h-[3px] w-full" />
+                        <div className="shimmer-bar h-0.75 w-full" />
 
                         <div className="p-8 lg:p-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                             <div>
                                 <h1 className="font-['Comfortaa'] font-bold text-[2rem] text-white tracking-[-0.02em] mb-2">
                                     HOD Dashboard
                                 </h1>
-                                <p className="text-[0.95rem] text-[#C8A0D7]/60 max-w-[600px]">
+                                <p className="text-[0.95rem] text-[#C8A0D7]/60 max-w-150">
                                     {dashboardData.department}
                                 </p>
                             </div>
                             <div className="flex gap-3">
-                                <button className="flex items-center gap-2 px-4 py-2.5 rounded-[12px]
+                                <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl
                   bg-[#8A2E88]/20 border border-[#8A2E88]/35
                   text-[0.85rem] font-medium text-[#C084C8] hover:bg-[#8A2E88]/30 transition-all">
                                     <Filter size={16} />
                                     Filter
                                 </button>
-                                <button className="flex items-center gap-2 px-4 py-2.5 rounded-[12px]
-                  bg-gradient-to-br from-[#8A2E88] to-[#B060B8]
+                                <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl
+                  bg-linear-to-br from-[#8A2E88] to-[#B060B8]
                   text-[0.85rem] font-semibold text-white hover:shadow-[0_6px_20px_rgba(138,46,136,0.5)] transition-all">
                                     <Download size={16} />
                                     Export Report
@@ -157,7 +156,7 @@ const HODDashboard = () => {
                                 }}>
                                 <div className="flex items-start justify-between mb-3">
                                     <div className="badge-pulse w-10 h-10 flex items-center justify-center
-                    rounded-[11px] bg-gradient-to-br from-[#8A2E88] to-[#C084C8] text-white"
+                    rounded-[11px] bg-linear-to-br from-[#8A2E88] to-[#C084C8] text-white"
                                         style={{ boxShadow: '0 4px 14px rgba(138,46,136,0.35)' }}>
                                         {metric.icon}
                                     </div>
@@ -190,9 +189,9 @@ const HODDashboard = () => {
                                             <span className="text-[0.9rem] font-semibold text-white">Batch {batch.batch}</span>
                                             <span className="text-[0.8rem] text-[#C8A0D7]/60">{batch.total} students</span>
                                         </div>
-                                        <div className="h-8 rounded-[10px] overflow-hidden bg-white/[0.04] border border-white/[0.06] flex">
+                                        <div className="h-8 rounded-[10px] overflow-hidden bg-white/4 border border-white/6 flex">
                                             <div
-                                                className="bar-animate bg-gradient-to-r from-[#8A2E88] to-[#C084C8] h-full flex items-center justify-center relative"
+                                                className="bar-animate bg-linear-to-r from-[#8A2E88] to-[#C084C8] h-full flex items-center justify-center relative"
                                                 style={{ width: `${(batch.pursuing / batch.total) * 100}%` }}>
                                                 {batch.pursuing > 0 && (
                                                     <span className="text-[0.65rem] font-bold text-white/80">Pursuing</span>
@@ -229,17 +228,17 @@ const HODDashboard = () => {
                                 {Object.entries(dashboardData.performanceGrades).map(([grade, count], i) => (
                                     <div key={i} className="flex items-center gap-3">
                                         <div className="w-12 h-12 rounded-[10px] flex items-center justify-center
-                      bg-gradient-to-br from-[#8A2E88] to-[#C084C8] text-white font-bold text-[0.9rem]">
+                      bg-linear-to-br from-[#8A2E88] to-[#C084C8] text-white font-bold text-[0.9rem]">
                                             {grade}
                                         </div>
                                         <div className="flex-1">
-                                            <div className="h-6 rounded-[8px] bg-white/[0.04] overflow-hidden">
+                                            <div className="h-6 rounded-lg bg-white/4 overflow-hidden">
                                                 <div
-                                                    className="bar-animate h-full bg-gradient-to-r from-[#8A2E88]/60 to-[#C084C8]/60"
+                                                    className="bar-animate h-full bg-linear-to-r from-[#8A2E88]/60 to-[#C084C8]/60"
                                                     style={{ width: `${(count / totalGradeCount) * 100}%` }} />
                                             </div>
                                         </div>
-                                        <span className="text-[0.85rem] font-semibold text-[#C8A0D7]/70 min-w-[40px] text-right">
+                                        <span className="text-[0.85rem] font-semibold text-[#C8A0D7]/70 min-w-10 text-right">
                                             {count}
                                         </span>
                                     </div>
@@ -268,9 +267,9 @@ const HODDashboard = () => {
                                                 {skill.count} ({skill.percentage}%)
                                             </span>
                                         </div>
-                                        <div className="h-6 rounded-[10px] bg-white/[0.04] border border-white/[0.06] overflow-hidden">
+                                        <div className="h-6 rounded-[10px] bg-white/4 border border-white/6 overflow-hidden">
                                             <div
-                                                className="bar-animate h-full bg-gradient-to-r from-[#8A2E88] via-[#B060B8] to-[#C084C8]"
+                                                className="bar-animate h-full bg-linear-to-r from-[#8A2E88] via-[#B060B8] to-[#C084C8]"
                                                 style={{ width: `${skill.percentage}%` }} />
                                         </div>
                                     </div>
@@ -294,7 +293,7 @@ const HODDashboard = () => {
                             </div>
                             <div className="p-6 space-y-3">
                                 {dashboardData.certifications.map((cert, i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 rounded-[12px]
+                                    <div key={i} className="flex items-center justify-between p-3 rounded-xl
                     bg-[#8A2E88]/10 border border-[#8A2E88]/20 hover:bg-[#8A2E88]/15 transition-all">
                                         <div className="flex items-center gap-3">
                                             <span className="text-[1.4rem]">{cert.icon}</span>
@@ -326,7 +325,7 @@ const HODDashboard = () => {
                                 </div>
                                 <div className="p-6 grid grid-cols-2 gap-3">
                                     {dashboardData.departmentMetrics.map((metric, i) => (
-                                        <div key={i} className="p-3 rounded-[12px] bg-[#8A2E88]/10 border border-[#8A2E88]/20">
+                                        <div key={i} className="p-3 rounded-xl bg-[#8A2E88]/10 border border-[#8A2E88]/20">
                                             <p className="text-[0.75rem] text-[#C8A0D7]/60 uppercase tracking-[0.04em] mb-1">
                                                 {metric.label}
                                             </p>
@@ -351,14 +350,14 @@ const HODDashboard = () => {
                         </div>
                         <div className="p-6 space-y-3">
                             {dashboardData.recentAlerts.map((alert, i) => (
-                                <div key={i} className={`flex items-start gap-3 p-3 rounded-[12px] border
+                                <div key={i} className={`flex items-start gap-3 p-3 rounded-xl border
                   ${alert.type === 'warning'
                                         ? 'bg-red-500/10 border-red-500/25'
                                         : alert.type === 'success'
                                             ? 'bg-emerald-500/10 border-emerald-500/25'
                                             : 'bg-blue-500/10 border-blue-500/25'
                                     }`}>
-                                    <span className={`mt-0.5 flex-shrink-0
+                                    <span className={`mt-0.5 shrink-0
                     ${alert.type === 'warning'
                                             ? 'text-red-400'
                                             : alert.type === 'success'
