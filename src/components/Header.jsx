@@ -1,112 +1,136 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, GraduationCap } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+const navLinks = [
+  { label: 'Home',        path: '/'          },
+  { label: 'HOD',   path: '/hodboard'  },
+  { label: 'administrators',  path: '/administrator' },
+  { label: 'Admin',     path: '/admin'    },
+];
 
 export default function Header() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
-    const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled]     = useState(false);
+  const navigate  = useNavigate();
+  const location  = useLocation();
 
-    const menuItems = [
-        { label: 'Student', path: '/login' },
-        { label: 'HOD', path: '/hod' },
-        { label: 'Administrators', path: '/administrator' },
-        { label: 'Admin', path: '/admin' },
-        { label: 'About Us', path: '/about' },
-    ];
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-    useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 10);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+  const isActive = (path) => location.pathname === path;
 
-    return (
-        <>
-            {/* Font imports - consider moving to index.html or global CSS */}
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
-                @keyframes slideDown {
-                    from { opacity: 0; transform: translateY(-8px); }
-                    to   { opacity: 1; transform: translateY(0); }
-                }
-                .animate-slideDown {
-                    animation: slideDown 0.22s ease;
-                }
-            `}</style>
+  return (
+    <nav
+      className={`sticky top-0 z-50 w-full transition-shadow duration-300 ${
+        scrolled ? 'shadow-md' : 'shadow-sm'
+      }`}
+      style={{ backgroundColor: 'var(--surface)' }}
+    >
+      {/* Desktop bar */}
+      <div
+        className="flex justify-between items-center h-16 mx-auto"
+        style={{ maxWidth: '1280px', padding: '0 32px' }}
+      >
+        {/* Brand */}
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 cursor-pointer border-none bg-transparent p-0"
+        >
+          <span
+            className="material-symbols-outlined fill text-[28px]"
+            style={{ color: 'var(--primary)' }}
+          >
+            school
+          </span>
+          <span
+            className="text-[1.15rem] font-bold font-['Inter'] tracking-tight"
+            style={{ color: 'var(--primary)' }}
+          >
+            Student Information System
+          </span>
+        </button>
 
-            <nav className={`sticky top-0 z-50 transition-all duration-300 ${
-                scrolled 
-                    ? 'bg-purple-100/97 shadow-[0_4px_30px_rgba(138,46,136,0.08)]' 
-                    : 'bg-purple-100/92 backdrop-blur-xl border-b border-[#8A2E88]/10'
-            }`}>
-                <div className="max-w-7xl mx-auto px-6 h-18 md:h-18 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+        {/* Desktop nav links */}
+        <div className="hidden md:flex items-center gap-1 h-full">
+          {navLinks.map((item) => (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className="relative px-3 py-1 text-sm font-medium transition-colors duration-200 cursor-pointer border-none bg-transparent rounded"
+              style={{
+                color: isActive(item.path)
+                  ? 'var(--primary)'
+                  : 'var(--on-surface-variant)',
+                borderBottom: isActive(item.path)
+                  ? '2px solid var(--primary)'
+                  : '2px solid transparent',
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
 
-                    {/* Left — Logo */}
-                    <div 
-                        className="flex items-center gap-3 cursor-pointer select-none w-fit"
-                        onClick={() => navigate('/')}
-                    >
-                        <div className="w-11 h-11 bg-linear-to-br from-[#8A2E88] to-[#C084C8] rounded-xl flex items-center justify-center shadow-[0_4px_16px_rgba(138,46,136,0.28)] transition-all duration-250 hover:scale-108 hover:-rotate-3 hover:shadow-[0_6px_22px_rgba(138,46,136,0.38)] shrink-0">
-                            <GraduationCap size={22} color="#fff" />
-                        </div>
-                        <div className="flex flex-col leading-tight">
-                            <span className="font-['Comfortaa'] font-bold text-[1.15rem] text-[#7B2282] tracking-tight">
-                                Student InfoSys
-                            </span>
-                            <span className="font-['DM_Sans'] font-medium text-[0.72rem] text-[#9E7AAE] tracking-wide mt-0.5">
-                                JNTU-GV Vizianagaram
-                            </span>
-                        </div>
-                    </div>
+        {/* Desktop Sign In */}
+        <div className="hidden md:flex items-center gap-3">
+          <button
+            onClick={() => navigate('/login')}
+            className="px-5 py-2 text-sm font-semibold rounded-lg cursor-pointer border-none transition-all duration-200 hover:opacity-90 active:scale-95"
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: 'var(--on-primary)',
+            }}
+          >
+            Sign In
+          </button>
+        </div>
 
-                    {/* Center — Nav Items (Desktop) */}
-                    <ul className="hidden md:flex items-center gap-0.5 justify-center list-none m-0 p-0">
-                        {menuItems.map((item) => (
-                            <li key={item.path}>
-                                <button
-                                    className="relative font-['DM_Sans'] font-medium text-[0.9rem] text-[#4A3360] px-4 py-2 bg-transparent cursor-pointer rounded-lg transition-colors duration-200 whitespace-nowrap tracking-wide hover:text-[#8A2E88] hover:bg-[#8A2E88]/6 group"
-                                    onClick={() => navigate(item.path)}
-                                >
-                                    {item.label}
-                                    <span className="absolute bottom-1 left-4 right-4 h-0.5 rounded bg-linear-to-r from-[#8A2E88] to-[#C084C8] scale-x-0 origin-left transition-transform duration-280 ease-in-out group-hover:scale-x-100" />
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
+        {/* Mobile hamburger */}
+        <button
+          className="md:hidden p-2 rounded-lg border-none bg-transparent cursor-pointer"
+          style={{ color: 'var(--primary)' }}
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle menu"
+        >
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+      </div>
 
-                    {/* Right — Placeholder (Desktop) */}
-                    <div className="hidden md:flex justify-end items-center" />
-
-                    {/* Mobile Hamburger Toggle */}
-                    <button
-                        className="md:hidden bg-transparent border-none p-2 rounded-lg text-[#8A2E88] cursor-pointer transition-colors duration-200 hover:bg-[#8A2E88]/8 flex items-center justify-center"
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        aria-label="Toggle menu"
-                    >
-                        {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-                    </button>
-                </div>
-
-                {/* Mobile Drawer */}
-                <div className={`md:hidden flex flex-col bg-white border-t border-[#8A2E88]/10 px-4 pb-4 pt-3 gap-1 shadow-[0_12px_30px_rgba(138,46,136,0.08)] overflow-hidden transition-all duration-200 ${
-                    mobileMenuOpen ? 'max-h-96 opacity-100 animate-slideDown' : 'max-h-0 opacity-0'
-                }`}>
-                    {menuItems.map((item) => (
-                        <button
-                            key={item.path}
-                            className="flex items-center gap-2.5 px-3.5 py-3 bg-transparent border-none rounded-xl font-['DM_Sans'] font-medium text-[0.92rem] text-[#4A3360] cursor-pointer text-left transition-all duration-200 hover:bg-linear-to-br hover:from-[#8A2E88]/9 hover:to-[#C084C8]/9 hover:text-[#8A2E88] hover:translate-x-1"
-                            onClick={() => {
-                                navigate(item.path);
-                                setMobileMenuOpen(false);
-                            }}
-                        >
-                            <span className="w-1.5 h-1.5 rounded-full bg-linear-to-br from-[#8A2E88] to-[#C084C8] shrink-0 opacity-70" />
-                            {item.label}
-                        </button>
-                    ))}
-                </div>
-            </nav>
-        </>
-    );
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div
+          className="md:hidden flex flex-col px-4 pb-4 pt-2 gap-1 slide-down"
+          style={{
+            borderTop: '1px solid var(--outline-variant)',
+            backgroundColor: 'var(--surface)',
+          }}
+        >
+          {navLinks.map((item) => (
+            <button
+              key={item.path}
+              onClick={() => { navigate(item.path); setMobileOpen(false); }}
+              className="text-left px-4 py-3 rounded-lg text-sm font-medium border-none cursor-pointer transition-colors"
+              style={{
+                color: isActive(item.path) ? 'var(--primary)' : 'var(--on-surface-variant)',
+                backgroundColor: isActive(item.path) ? 'var(--surface-container)' : 'transparent',
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+          <button
+            onClick={() => { navigate('/login'); setMobileOpen(false); }}
+            className="mt-2 px-4 py-2.5 rounded-lg text-sm font-semibold border-none cursor-pointer"
+            style={{ backgroundColor: 'var(--primary)', color: 'var(--on-primary)' }}
+          >
+            Sign In
+          </button>
+        </div>
+      )}
+    </nav>
+  );
 }

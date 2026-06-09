@@ -13,17 +13,23 @@ import {
   Edit2,
   Download,
   Share2,
-  LogOut,
-  ChevronRight,
   User,
   GraduationCap,
+  ExternalLink,
+  Code,
+  Cpu,
+  Briefcase,
+  Milestone,
+  Target
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
-  const [isEditing, setIsEditing] = useState(false);
   const [showResumeModal, setShowResumeModal] = useState(false);
+  const [showSkillModal, setShowSkillModal] = useState(false);
+  const [newSkillValue, setNewSkillValue] = useState("");
 
   const [studentData, setStudentData] = useState({
     fullName: "Srinivas",
@@ -43,7 +49,7 @@ export default function Profile() {
     religion: "Hindu",
     hasDisability: false,
     disabilityType: '',
-    profiles:{Linkedin:"linkedin.com/in/srinivas",Github:"github.com/srinivas"},
+    profiles: { Linkedin: "linkedin.com/in/srinivas", Github: "github.com/srinivas" },
     phoneNumber: '9876543210',
     email: 'srinivas@jntugvcev.in',
     apaaId: 'APAA12345',
@@ -51,6 +57,7 @@ export default function Profile() {
     aadharNumber: '1234-5678-9012',
     batchYear: 2023,
     cgpa: 8.5,
+    cgpaTarget: 10.0,
     graduationStatus: "Pursuing",
     graduationDate: "2027-06-30",
     joiningDate: "2023-08-01",
@@ -76,12 +83,8 @@ export default function Profile() {
       },
     ],
     skills: [
-      "Python",
-      "Java",
-      "Web Development",
-      "Data Structures",
-      "Database Design",
-      "Cloud Computing",
+      "Python", "Java", "Web Development", "Data Structures",
+      "Database Design", "Cloud Computing", "React.js", "Tailwind CSS"
     ],
     certifications: [
       {
@@ -98,13 +101,15 @@ export default function Profile() {
     projects: [
       {
         title: "Student Information System",
-        description: "Centralized platform for managing student data",
+        description: "Centralized platform for managing student data with modern UI and secure access.",
         year: 2024,
+        type: "Full Stack"
       },
       {
         title: "E-Commerce Platform",
-        description: "Full-stack web application with payment integration",
+        description: "Full-stack web application with payment integration and optimized performance.",
         year: 2023,
+        type: "Web Application"
       },
     ],
   });
@@ -113,516 +118,493 @@ export default function Profile() {
     setMounted(true);
   }, []);
 
+  const handleSkillSubmit = (e) => {
+    e.preventDefault();
+    if (!newSkillValue.trim()) return;
+    const payload = {
+      type : "skill",
+      skill: newSkillValue.trim(),
+    };
+    console.log(payload);
+    setStudentData((prev) => ({
+      ...prev,
+      skills: [...prev.skills, newSkillValue.trim()],
+    }));
+    setNewSkillValue("");
+    setShowSkillModal(false);
+  };
+
   const tabs = [
-    { key: "overview", label: "Overview" },
-    { key: "academic", label: "Academic" },
-    { key: "skills", label: "Skills & Certs" },
+    { key: "overview", label: "Overview", icon: <User size={18} /> },
+    { key: "academic", label: "Academic", icon: <GraduationCap size={18} /> },
+    { key: "skills", label: "Skills & Certs", icon: <Award size={18} /> },
   ];
+  
+  const navigate = useNavigate()
+
+  const cgpaPct = Math.round((studentData.cgpa / (studentData.cgpaTarget || 10.0)) * 100);
 
   return (
-    <>
+    <div className="min-h-screen bg-slate-50 font-['DM_Sans'] text-slate-800">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+                
+                .font-comfortaa { font-family: 'Comfortaa', cursive; }
+                
+                .illustration-bg {
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-position: right bottom;
+                    opacity: 0.1;
+                    pointer-events: none;
+                }
+            `}</style>
 
-        @keyframes orbFloat1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,40px)} }
-        @keyframes orbFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,-30px)} }
-        @keyframes orbFloat3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,-20px)} }
-        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
-        @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes slideInRight { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes iconPulse {
-          0%,100%{box-shadow:0 4px 20px rgba(138,46,136,0.4),0 0 0 1px rgba(255,255,255,0.08) inset}
-          50%{box-shadow:0 4px 30px rgba(138,46,136,0.65),0 0 0 1px rgba(255,255,255,0.13) inset}
-        }
+      {/* Main Content */}
+      <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
 
-        .orb-1 { animation: orbFloat1 8s ease-in-out infinite; }
-        .orb-2 { animation: orbFloat2 10s ease-in-out infinite; }
-        .orb-3 { animation: orbFloat3 12s ease-in-out infinite; }
-        .shimmer-bar { background:linear-gradient(90deg,#8A2E88,#C084C8,#8A2E88); background-size:200% 100%; animation:shimmer 3s linear infinite; }
-        .page-in { animation: fadeInUp 0.65s ease forwards; }
-        .icon-pulse { animation: iconPulse 3s ease-in-out infinite; }
-      `}</style>
-
-      <div className="min-h-screen bg-[#0f0a1a] font-['DM_Sans'] relative overflow-hidden">
-
-        {/* ── Main content ── */}
-        <div className="relative z-10 max-w-[1400px] mx-auto px-6 py-12">
-          {/* ── Header card with avatar ── */}
-          <div
-            className={`relative rounded-[24px] overflow-hidden border border-[#8A2E88]/22 mb-8
-            shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset,0_32px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(138,46,136,0.1)]
-            ${mounted ? "page-in" : "opacity-0"}`}
-            style={{
-              background: "rgba(20,10,35,0.72)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-            }}
-          >
-            <div className="shimmer-bar h-[3px] w-full" />
-
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-8 p-8 lg:p-10">
-              {/* Avatar section */}
-              <div className="flex flex-col items-center gap-4 md:w-1/4">
-                <div
-                  className="icon-pulse w-[120px] h-[120px] rounded-[20px] flex-shrink-0
-                  bg-gradient-to-br from-[#8A2E88] to-[#C084C8]
-                  flex items-center justify-center"
-                  style={{ boxShadow: "0 8px 32px rgba(138,46,136,0.5)" }}
-                >
-                  {studentData.photoUrl ? (
-                    <img
-                      src={studentData.photoUrl}
-                      alt={studentData.fullName}
-                      className="w-full h-full rounded-[18px] object-cover"
-                    />
-                  ) : (
-                    <User size={48} color="#fff" />
-                  )}
-                </div>
-                <button
-                  className="px-4 py-2 rounded-[10px] bg-[#8A2E88]/20 border border-[#8A2E88]/35
-                  text-[0.8rem] font-medium text-[#C084C8] hover:bg-[#8A2E88]/35 transition-all"
-                >
-                  <Edit2 size={14} className="inline mr-1.5" />
-                  Upload Photo
-                </button>
+        {/* Header / Profile Summary Card */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+          <div className="h-22 sm:h-28 bg-gradient-to-r from-[#1a365d] to-[#002045] relative overflow-hidden">
+            {/* Subtle noise texture overlay */}
+            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%)' }}></div>
+            {/* Hero Illustration - Student/Learning */}
+            {/* <img
+              src="https://cdni.iconscout.com/illustration/premium/thumb/online-learning-2769745-2302770.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute bottom-0 right-4 sm:right-10 h-[90%] sm:h-[115%] object-contain object-bottom select-none pointer-events-none drop-shadow-2xl"
+              style={{ maxWidth: '220px' }}
+            /> */}
+            {/* Decorative dots pattern */}
+            <div className="absolute top-4 left-6 opacity-20" style={{ width: 80, height: 60, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1.5px, transparent 1.5px)', backgroundSize: '12px 12px' }}></div>
+          </div>
+          <div className="px-8 pb-8 flex flex-col md:flex-row items-center md:items-end -mt-16 gap-6 relative z-10">
+            {/* Avatar */}
+            <div className="relative group">
+              <div className="w-32 h-32 rounded-3xl bg-white p-1.5 shadow-lg overflow-hidden">
+                <img
+                  src={studentData.photoUrl}
+                  alt={studentData.fullName}
+                  className="w-full h-full object-cover rounded-2xl"
+                />
               </div>
+              <button className="absolute bottom-2 right-2 p-2 bg-[#1a365d] text-white rounded-xl shadow-md hover:bg-[#002045] transition-all active:scale-90 opacity-0 group-hover:opacity-100">
+                <Edit2 size={16} />
+              </button>
+            </div>
 
-              {/* Info section */}
-              <div className="flex-1">
-                <div className="mb-4">
-                  <h1 className="font-['Comfortaa'] font-bold text-[2rem] text-white tracking-[-0.02em]">
-                    {studentData.fullName}
-                  </h1>
-                  <p className="text-[0.9rem] text-[#C8A0D7]/60 mt-1">
-                    {studentData.courseCode} • Batch {studentData.batchYear}
-                  </p>
+            {/* Name & Basic Info */}
+            <div className="flex-1 text-center md:text-left">
+              <h1 className="font-comfortaa text-3xl font-bold text-slate-900 mb-1 leading-tight">
+                {studentData.fullName}
+              </h1>
+              <div className="flex flex-wrap justify-center md:justify-start gap-3 text-sm text-slate-500 font-medium">
+                <span className="flex items-center gap-1">
+                  <GraduationCap size={16} className="text-[#1a365d]" />
+                  {studentData.department} • {studentData.batchYear} Batch
+                </span>
+                <span className="flex items-center gap-1">
+                  <Target size={16} className="text-[#1a365d]" />
+                  {studentData.rollNumber}
+                </span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowResumeModal(true)}
+                className="flex items-center gap-2 px-5 py-2.5 bg-[#1a365d] hover:bg-[#002045] text-white rounded-xl font-semibold text-sm transition-all shadow-md shadow-[#1a365d]/20 active:scale-95"
+              >
+                <FileText size={18} />
+                Generate Resume
+              </button>
+              <button className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all active:scale-95">
+                <Share2 size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Bento Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+          {/* Sidebar: Left Column (4 cols) */}
+          <div className="lg:col-span-4 flex flex-col gap-8">
+
+            {/* Quick Stats Card */}
+            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm relative overflow-hidden group">
+              {/* Stats Illustration - visible, anchored top-right */}
+              <img
+                src="/images/stats.jpeg"
+                alt=""
+                aria-hidden="true"
+                className="absolute -top-2 -right-2 w-28 sm:w-32 object-contain select-none pointer-events-none m-3 rounded-2xl opacity-90 group-hover:scale-105 transition-transform duration-500"
+                style={{ filter: 'drop-shadow(0 4px 12px rgba(26,54,93,0.12))' }}
+              />
+              <h3 className="font-comfortaa text-lg font-bold mb-6 flex items-center gap-2 text-[#1a365d]">
+                <Target size={20} />
+                Academic Stats
+              </h3>
+              <div className="space-y-6 relative z-10">
+                <div>
+                  <div className="flex justify-between items-end mb-2">
+                    <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider">CGPA</span>
+                    <span className="text-3xl font-bold text-[#1a365d]">{studentData.cgpa}</span>
+                  </div>
+                  <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#1a365d] rounded-full transition-all duration-1000 ease-out"
+                      style={{ width: `${cgpaPct}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between mt-2 text-xs font-bold text-slate-400">
+                    <span>Target: {studentData.cgpaTarget}</span>
+                    <span>{cgpaPct}%</span>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-                  {[
-                    { label: "Roll Number", value: studentData.rollNumber },
-                    { label: "Department", value: studentData.department },
-                    { label: "CGPA", value: studentData.cgpa },
-                    { label: "Status", value: studentData.graduationStatus },
-                  ].map((item, i) => (
-                    <div key={i} className="flex flex-col">
-                      <span className="text-[0.68rem] font-semibold text-[#967AA5]/50 tracking-[0.06em] uppercase mb-1">
-                        {item.label}
-                      </span>
-                      <span className="text-[0.95rem] font-semibold text-white">
-                        {item.value}
-                      </span>
-                    </div>
-                  ))}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-[#1a365d]/20 transition-colors">
+                    <p className="text-xs font-bold text-slate-400 uppercase mb-1">Projects</p>
+                    <p className="text-xl font-bold text-slate-800">{studentData.projects.length}</p>
+                  </div>
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-[#1a365d]/20 transition-colors">
+                    <p className="text-xs font-bold text-slate-400 uppercase mb-1">Certs</p>
+                    <p className="text-xl font-bold text-slate-800">{studentData.certifications.length}</p>
+                  </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Action buttons */}
-                <div className="flex flex-wrap gap-2.5">
-                  {[
-                    { icon: <Download size={16} />, label: 'Resume', action: () => setShowResumeModal(true) },
-                    { icon: <FileText size={16} />, label: 'Transcript', action: () => {} },
-                    { icon: <Share2 size={16} />, label: 'Share', action: () => {} }
-                  ].map((btn, i) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        if (btn.label === "Resume") {
-                          generateResume(studentData);
-                        }
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 rounded-[10px]
-    bg-[#8A2E88]/15 border border-[#8A2E88]/30
-    text-[0.8rem] font-medium text-[#C8A0D7]/80
-    hover:bg-[#8A2E88]/25 hover:border-[#C084C8]/45 transition-all"
-                    >
-                    {/* <button
-                      key={i}
-                      onClick={btn.action}
-                      className="flex items-center gap-2 px-4 py-2 rounded-[10px]
-                        bg-[#8A2E88]/15 border border-[#8A2E88]/30
-                        text-[0.8rem] font-medium text-[#C8A0D7]/80
-                        hover:bg-[#8A2E88]/25 hover:border-[#C084C8]/45 transition-all"> */}
-                      {btn.icon}
-                      {btn.label}
-                    </button>
-                  ))}
+            {/* Contact & Socials */}
+            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+              <h3 className="font-comfortaa text-lg font-bold mb-6 text-[#1a365d]">Connect</h3>
+              <div className="space-y-4">
+                <a href={`mailto:${studentData.email}`} className="flex items-center gap-3 p-3 rounded-2xl bg-[#1a365d]/5 text-[#1a365d] border border-[#1a365d]/10 hover:bg-[#1a365d]/10 transition-all group">
+                  <Mail size={18} className="group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-medium truncate">{studentData.email}</span>
+                </a>
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 text-slate-600 border border-slate-100">
+                  <Phone size={18} />
+                  <span className="text-sm font-medium">{studentData.phoneNumber}</span>
+                </div>
+                <div className="flex items-center gap-4 pt-4 border-t border-slate-100">
+                  <a href={`https://${studentData.profiles.Linkedin}`} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-[#1a365d] hover:bg-[#1a365d]/5 transition-all">
+                    <Phone size={20} />
+                  </a>
+                  <a href={`https://${studentData.profiles.Github}`} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+                    <Phone size={20} />
+                  </a>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ── Tabs ── */}
-          <div className="flex gap-2 mb-6 border-b border-[#8A2E88]/20">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`px-5 py-3 font-medium text-[0.9rem] transition-all border-b-2
-                  ${
-                    activeTab === tab.key
-                      ? "text-white border-[#C084C8]"
-                      : "text-[#C8A0D7]/60 border-transparent hover:text-[#C8A0D7]/80"
-                  }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          {/* Content: Right Column (8 cols) */}
+          <div className="lg:col-span-8 flex flex-col gap-8">
 
-          {/* ── Tab content ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main content area */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
-              {/* Overview tab */}
+            {/* Tab Switcher */}
+            <div className="flex p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm w-fit self-center md:self-start">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === tab.key
+                    ? "bg-[#1a365d] text-white shadow-md shadow-[#1a365d]/20"
+                    : "text-slate-500 hover:text-[#1a365d] hover:bg-[#1a365d]/5"
+                    }`}
+                >
+                  {tab.icon}
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content Panels */}
+            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex-grow relative overflow-hidden">
+
               {activeTab === "overview" && (
-                <>
-                  {/* Personal Info */}
-                  <div
-                    className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-                    shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-                    style={{
-                      background: "rgba(20,10,35,0.65)",
-                      backdropFilter: "blur(20px)",
-                      WebkitBackdropFilter: "blur(20px)",
-                    }}
-                  >
-                    <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                      <h3 className="font-['DM_Sans'] font-semibold text-white text-[1rem]">
-                        Personal Information
-                      </h3>
-                    </div>
-                    <div className="p-6 space-y-4">
-                      {[
-                        {
-                          icon: <User size={16} />,
-                          label: "Father",
-                          value: studentData.fatherName,
-                        },
-                        {
-                          icon: <User size={16} />,
-                          label: "Mother",
-                          value: studentData.motherName,
-                        },
-                        {
-                          icon: <Calendar size={16} />,
-                          label: "Date of Birth",
-                          value: new Date(
-                            studentData.dateOfBirth,
-                          ).toLocaleDateString(),
-                        },
-                        {
-                          icon: <MapPin size={16} />,
-                          label: "Region",
-                          value: studentData.region,
-                        },
-                        {
-                          icon: <Mail size={16} />,
-                          label: "Email",
-                          value: studentData.email,
-                        },
-                        {
-                          icon: <Phone size={16} />,
-                          label: "Phone",
-                          value: studentData.phoneNumber,
-                        },
-                      ].map((item, i) => (
-                        <div key={i} className="flex items-start gap-3">
-                          <span className="text-[#C084C8]/70 mt-0.5">
-                            {item.icon}
-                          </span>
-                          <div className="flex-1">
-                            <p className="text-[0.75rem] font-semibold text-[#967AA5]/60 uppercase tracking-[0.04em] mb-0.5">
-                              {item.label}
-                            </p>
-                            <p className="text-[0.9rem] text-white">
-                              {item.value}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                <div className="space-y-8 animate-in fade-in duration-500">
+                  <div className="absolute top-8 right-8 illustration-bg w-48 h-48" style={{ backgroundImage: `url('https://cdni.iconscout.com/illustration/premium/thumb/personal-data-security-4488057-3738541.png')`, opacity: 0.15 }}></div>
+
+                  <div className="flex items-center gap-4 sm:h-38 rounded-2xl bg-gradient-to-r from-[#1a365d]/5 to-blue-50 border border-[#1a365d]/10 -mt-2 mb-4">
+                    <img
+                      src="/images/overview.webp"
+                      alt="Web development illustration"
+                      className="w-full h-full sm:w-full sm:h-full object-cover rounded-2xl shrink-0 select-none"
+                    />
                   </div>
 
-                  {/* Additional Info */}
-                  <div
-                    className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-                    shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-                    style={{
-                      background: "rgba(20,10,35,0.65)",
-                      backdropFilter: "blur(20px)",
-                      WebkitBackdropFilter: "blur(20px)",
-                    }}
-                  >
-                    <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                      <h3 className="font-['DM_Sans'] font-semibold text-white text-[1rem]">
-                        Additional Details
-                      </h3>
-                    </div>
-                    <div className="p-6 space-y-4">
+                  <section>
+                    <h4 className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-6">
+                      <Briefcase size={14} className="text-[#1a365d]" />
+                      Personal Details
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
                       {[
-                        { label: "Blood Group", value: studentData.bloodGroup },
+                        { label: "Father's Name", value: studentData.fatherName },
+                        { label: "Mother's Name", value: studentData.motherName },
+                        { label: "Date of Birth", value: new Date(studentData.dateOfBirth).toLocaleDateString(undefined, { dateStyle: 'long' }) },
+                        { label: "Gender", value: studentData.gender },
                         { label: "Religion", value: studentData.religion },
-                        {
-                          label: "Nationality",
-                          value: studentData.nationality,
-                        },
-                        {
-                          label: "Aadhar Number",
-                          value: studentData.aadharNumber,
-                        },
-                        {
-                          label: "Joining Date",
-                          value: new Date(
-                            studentData.joiningDate,
-                          ).toLocaleDateString(),
-                        },
-                        {
-                          label: "Graduation Date",
-                          value: new Date(
-                            studentData.graduationDate,
-                          ).toLocaleDateString(),
-                        },
+                        { label: "Blood Group", value: studentData.bloodGroup },
+                        { label: "Nationality", value: studentData.nationality },
+                        { label: "Region", value: studentData.region },
                       ].map((item, i) => (
-                        <div
-                          key={i}
-                          className="flex justify-between items-center pb-3 border-b border-white/[0.06] last:border-0"
-                        >
-                          <span className="text-[0.85rem] text-[#C8A0D7]/60">
-                            {item.label}
-                          </span>
-                          <span className="text-[0.9rem] font-medium text-white">
-                            {item.value}
-                          </span>
+                        <div key={i}>
+                          <p className="text-xs font-bold text-slate-400 mb-1">{item.label}</p>
+                          <p className="text-sm font-semibold text-slate-800">{item.value}</p>
                         </div>
                       ))}
                     </div>
-                  </div>
-                </>
+                  </section>
+
+                  <section className="pt-8 border-t border-slate-100">
+                    <h4 className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-6">
+                      <MapPin size={14} className="text-[#1a365d]" />
+                      Registration Info
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+                      <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                        <span className="text-sm text-slate-500">Aadhar Number</span>
+                        <span className="text-sm font-bold text-slate-800 font-mono">{studentData.aadharNumber}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                        <span className="text-sm text-slate-500">Admission Type</span>
+                        <span className="text-sm font-bold text-slate-800">{studentData.entryTypeCode}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                        <span className="text-sm text-slate-500">Joining Date</span>
+                        <span className="text-sm font-bold text-slate-800">{new Date(studentData.joiningDate).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                        <span className="text-sm text-slate-500">Graduation Date</span>
+                        <span className="text-sm font-bold text-slate-800">{new Date(studentData.graduationDate).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </section>
+                </div>
               )}
 
-              {/* Academic tab */}
               {activeTab === "academic" && (
-                <div
-                  className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-                  shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-                  style={{
-                    background: "rgba(20,10,35,0.65)",
-                    backdropFilter: "blur(20px)",
-                    WebkitBackdropFilter: "blur(20px)",
-                  }}
-                >
-                  <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                    <h3 className="font-['DM_Sans'] font-semibold text-white text-[1rem]">
-                      Academic History
-                    </h3>
+                <div className="space-y-8 animate-in fade-in duration-500">
+                  <div className="absolute top-8 right-8 illustration-bg w-48 h-48" style={{ backgroundImage: `url('https://cdni.iconscout.com/illustration/premium/thumb/education-3406180-2840742.png')`, opacity: 0.15 }}></div>
+
+                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-[#1a365d]/5 to-blue-50 border border-[#1a365d]/10 -mt-2 mb-2">
+                    <img
+                      src="/images/academics.jpg"
+                      alt="Web development illustration"
+                      className="w-20 h-20 sm:w-28 sm:h-28 object-contain flex-shrink-0 select-none"
+                      style={{ filter: 'drop-shadow(0 2px 8px rgba(26,54,93,0.15))' }}
+                    />
+                    <div>
+                      <p className="font-comfortaa font-bold text-[#1a365d] text-base sm:text-lg leading-tight">Academic History</p>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">{studentData.academicHistory.length} educational achievements</p>
+                    </div>
                   </div>
-                  <div className="p-6 space-y-4">
+                  <div className="relative z-10 space-y-6">
                     {studentData.academicHistory.map((record, i) => (
-                      <div
-                        key={i}
-                        className="flex gap-4 pb-4 border-b border-white/[0.06] last:border-0"
-                      >
-                        <div
-                          className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#8A2E88] to-[#C084C8]
-                          flex items-center justify-center text-white flex-shrink-0"
-                        >
-                          <BookOpen size={18} />
+                      <div key={i} className="flex gap-4 group">
+                        <div className="flex flex-col items-center">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                            <BookOpen size={20} />
+                          </div>
+                          {i !== studentData.academicHistory.length - 1 && (
+                            <div className="w-0.5 flex-grow bg-slate-100 my-2"></div>
+                          )}
                         </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-white mb-1">
-                            {record.degree}
-                          </p>
-                          <p className="text-[0.85rem] text-[#C8A0D7]/60">
-                            {record.institution}
-                          </p>
-                          <div className="flex justify-between mt-2 text-[0.8rem]">
-                            <span className="text-[#967AA5]/60">
-                              Completed: {record.yearOfCompletion}
-                            </span>
-                            <span className="text-[#C084C8]">
-                              Grade: {record.grade}
-                            </span>
+                        <div className="pb-6 w-full">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h5 className="font-bold text-slate-900">{record.degree}</h5>
+                              <p className="text-sm text-slate-500">{record.institution}</p>
+                            </div>
+                            <div className="text-right">
+                              <span className="inline-block px-3 py-1 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                                {record.yearOfCompletion}
+                              </span>
+                              <p className="text-sm font-bold text-[#1a365d]">Grade: {record.grade}</p>
+                            </div>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
 
-              {/* Skills tab */}
-              {activeTab === "skills" && (
-                <>
-                  {/* Skills */}
-                  <div
-                    className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-                    shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-                    style={{
-                      background: "rgba(20,10,35,0.65)",
-                      backdropFilter: "blur(20px)",
-                      WebkitBackdropFilter: "blur(20px)",
-                    }}
-                  >
-                    <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                      <h3 className="font-['DM_Sans'] font-semibold text-white text-[1rem]">
-                        Skills
-                      </h3>
-                    </div>
-                    <div className="p-6">
-                      <div className="flex flex-wrap gap-2">
-                        {studentData.skills.map((skill, i) => (
-                          <span
-                            key={i}
-                            className="px-3 py-1.5 rounded-full bg-[#8A2E88]/25
-                            border border-[#8A2E88]/40 text-[0.8rem] font-medium text-[#C084C8]"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Certifications */}
-                  <div
-                    className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-                    shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-                    style={{
-                      background: "rgba(20,10,35,0.65)",
-                      backdropFilter: "blur(20px)",
-                      WebkitBackdropFilter: "blur(20px)",
-                    }}
-                  >
-                    <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                      <h3 className="font-['DM_Sans'] font-semibold text-white text-[1rem]">
-                        Certifications
-                      </h3>
-                    </div>
-                    <div className="p-6 space-y-4">
-                      {studentData.certifications.map((cert, i) => (
-                        <div
-                          key={i}
-                          className="flex gap-4 pb-4 border-b border-white/[0.06] last:border-0"
-                        >
-                          <div
-                            className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#8A2E88] to-[#C084C8]
-                            flex items-center justify-center text-white flex-shrink-0"
-                          >
-                            <Award size={18} />
+                  {/* Projects Sub-section */}
+                  <section className="pt-8 border-t border-slate-100 relative z-10">
+                    <h4 className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-6">
+                      <Cpu size={14} className="text-[#1a365d]" />
+                      Featured Projects
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {studentData.projects.map((project, i) => (
+                        <div key={i} className="p-5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-md hover:border-blue-100 transition-all cursor-pointer group">
+                          <div className="flex justify-between items-start mb-3">
+                            <h5 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{project.title}</h5>
+                            <ExternalLink size={14} className="text-slate-300" />
                           </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-white mb-1">
-                              {cert.name}
-                            </p>
-                            <p className="text-[0.85rem] text-[#C8A0D7]/60">
-                              {cert.issuer}
-                            </p>
-                            <p className="text-[0.8rem] text-[#967AA5]/60 mt-1">
-                              {new Date(cert.date).toLocaleDateString()}
-                            </p>
+                          <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
+                            {project.description}
+                          </p>
+                          <div className="flex justify-between items-center">
+                            <span className="px-2 py-0.5 rounded-md bg-blue-50 text-[10px] font-bold text-blue-600 uppercase">{project.type}</span>
+                            <span className="text-[10px] font-bold text-slate-400">{project.year}</span>
                           </div>
                         </div>
                       ))}
                     </div>
-                  </div>
-                </>
+                  </section>
+                </div>
               )}
-            </div>
 
-            {/* Sidebar */}
-            <div className="flex flex-col gap-6">
-              {/* Quick Stats */}
-              <div
-                className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-                shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-                style={{
-                  background: "rgba(20,10,35,0.65)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                }}
-              >
-                <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                  <h3 className="font-['DM_Sans'] font-semibold text-white text-[1rem]">
-                    Quick Stats
-                  </h3>
-                </div>
-                <div className="p-6 space-y-3">
-                  {[
-                    {
-                      label: "Certificates",
-                      value: studentData.certifications.length,
-                    },
-                    { label: "Projects", value: studentData.projects.length },
-                    { label: "Skills", value: studentData.skills.length },
-                  ].map((stat, i) => (
-                    <div key={i} className="flex justify-between items-center">
-                      <span className="text-[#C8A0D7]/60 text-[0.9rem]">
-                        {stat.label}
-                      </span>
-                      <span className="font-bold text-[1.2rem] text-[#C084C8]">
-                        {stat.value}
-                      </span>
+              {activeTab === "skills" && (
+                <div className="space-y-10 animate-in fade-in duration-500">
+                  {/* Skills Illustration Banner */}
+                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-[#1a365d]/5 to-blue-50 border border-[#1a365d]/10 -mt-2 mb-2">
+                    <img
+                      src="/images/skills.jpg"
+                      alt="Web development illustration"
+                      className="w-20 h-20 sm:w-28 sm:h-28 object-contain flex-shrink-0 select-none"
+                      style={{ filter: 'drop-shadow(0 2px 8px rgba(26,54,93,0.15))' }}
+                    />
+                    <div>
+                      <p className="font-comfortaa font-bold text-[#1a365d] text-base sm:text-lg leading-tight">Skills & Certifications</p>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">{studentData.skills.length} technologies · {studentData.certifications.length} certifications earned</p>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
 
-              {/* Projects */}
-              <div
-                className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-                shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-                style={{
-                  background: "rgba(20,10,35,0.65)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                }}
-              >
-                <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                  <h3 className="font-['DM_Sans'] font-semibold text-white text-[1rem]">
-                    Featured Projects
-                  </h3>
-                </div>
-                <div className="p-6 space-y-3">
-                  {studentData.projects.map((project, i) => (
-                    <div
-                      key={i}
-                      className="p-3 rounded-[12px] bg-[#8A2E88]/10 border border-[#8A2E88]/20
-                      hover:bg-[#8A2E88]/15 transition-all cursor-pointer"
-                    >
-                      <p className="font-medium text-[0.9rem] text-white mb-1">
-                        {project.title}
-                      </p>
-                      <p className="text-[0.75rem] text-[#C8A0D7]/50 line-clamp-2">
-                        {project.description}
-                      </p>
-                      <p className="text-[0.75rem] text-[#967AA5]/60 mt-2">
-                        {project.year}
-                      </p>
+                  <section className="relative z-10">
+                    <h4 className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-6">
+                      <Milestone size={14} className="text-[#1a365d]" />
+                      Skills & Technologies
+                    </h4>
+                    <div className="flex flex-wrap gap-2.5">
+                      {studentData.skills.map((skill, i) => (
+                        <span key={i} className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-all cursor-default shadow-sm active:scale-95">
+                          {skill}
+                        </span>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => setShowSkillModal(true)}
+                        className="px-4 py-2 rounded-xl bg-white border border-dashed border-slate-500 text-sm font-bold text-slate-600 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm active:scale-95"
+                      >
+                        Add +
+                      </button>
                     </div>
-                  ))}
+                  </section>
+
+                  <section className="relative z-10">
+                    <div className="flex justify-between items-center">
+                      <h4 className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-6">
+                        <Award size={14} className="text-blue-600" />
+                        Professional Certifications
+                      </h4>
+
+                      <button
+                        type="button"
+                        onClick={()=>navigate('/add',{ state: { type : "certification" } })}
+                        className="px-4 py-0.5 rounded-xl bg-white border border-dashed border-slate-500 text-sm font-bold text-slate-600 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm active:scale-95"
+                      >
+                        Add +
+                      </button>
+                    </div>
+                    <div className="space-y-4">
+                      {studentData.certifications.map((cert, i) => (
+                        <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 bg-slate-50 group hover:bg-white hover:shadow-md transition-all">
+                          <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 border border-amber-100">
+                            <Award size={24} />
+                          </div>
+                          <div className="flex-1">
+                            <h5 className="font-bold text-slate-900 text-sm">{cert.name}</h5>
+                            <p className="text-xs text-slate-500 font-medium">{cert.issuer}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs font-bold text-slate-400 uppercase">{new Date(cert.date).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
                 </div>
-              </div>
+              )}
+
             </div>
           </div>
         </div>
+      </main>
 
-        {/* Footer */}
-        <div className="relative z-10 border-t border-[#8A2E88]/15 py-5 mt-12">
-          <p className="text-center text-[0.72rem] text-[#967AA5]/35">
+      {showSkillModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
+          <div className="w-full max-w-md rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden">
+            <div className="flex items-start justify-between gap-4 p-6 border-b border-slate-200">
+              <div>
+                <h3 className="text-xl font-semibold text-slate-900">Update Skill</h3>
+                <p className="text-sm text-slate-500 mt-1">Enter a skill name to send the backend payload.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSkillModal(false)}
+                className="text-slate-400 hover:text-slate-700 transition"
+              >
+                ×
+              </button>
+            </div>
+            <form onSubmit={handleSkillSubmit} className="p-6 space-y-4">
+              <label htmlFor="skillInput" className="block text-sm font-medium text-slate-700">Skill</label>
+              <input
+                id="skillInput"
+                type="text"
+                value={newSkillValue}
+                onChange={(e) => setNewSkillValue(e.target.value)}
+                placeholder="e.g. TypeScript"
+                className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-[#1a365d] focus:ring-2 focus:ring-[#1a365d]/20 outline-none"
+              />
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setShowSkillModal(false)}
+                  className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-2xl bg-[#1a365d] px-4 py-2 text-sm font-semibold text-white hover:bg-[#002045] transition"
+                >
+                  Save Skill
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <footer className="mt-20 border-t border-slate-200 bg-white py-12">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+              <GraduationCap size={18} />
+            </div>
+            <span className="font-comfortaa font-bold text-xl text-slate-900 tracking-tight">SIS Dashboard</span>
+          </div>
+          <p className="text-slate-400 text-sm font-medium">
             © 2026 JNTU-GV Vizianagaram. All rights reserved.
           </p>
         </div>
+      </footer>
 
-        {/* Resume Generator Modal */}
-        {showResumeModal && (
-          <ResumeGenerator
-            studentData={studentData}
-            onClose={() => setShowResumeModal(false)}
-          />
-        )}
-
-      </div>
-    </>
+      {/* Resume Generator Modal */}
+      {showResumeModal && (
+        <ResumeGenerator
+          studentData={studentData}
+          onClose={() => setShowResumeModal(false)}
+        />
+      )}
+    </div>
   );
 }

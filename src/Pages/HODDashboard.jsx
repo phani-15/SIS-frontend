@@ -46,11 +46,7 @@ const HODDashboard = () => {
             { name: 'Oracle Certified', count: 25, icon: '📊' },
         ],
         recentAlerts: [
-            { type: 'warning', message: '5 students below 6.0 CGPA this semester', icon: <AlertCircle size={16} /> },
-            { type: 'success', message: '92% placement rate achieved for batch 2020', icon: <TrendingUp size={16} /> },
-            { type: 'info', message: 'New course registration opens next week', icon: <Calendar size={16} /> },
-            { type: 'success', message: '3 students selected for internship at top companies', icon: <Award size={16} /> },
-        ],
+            ],
         departmentMetrics: [
             { label: 'Published Papers', value: 12, change: '+3 this year' },
             { label: 'Active Projects', value: 28, change: '+5 ongoing' },
@@ -339,7 +335,7 @@ const HODDashboard = () => {
                     </div>
 
                     {/* ── Recent Alerts ── */}
-                    <div className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18 mt-6
+                    {/* <div className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18 mt-6
             shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
                         style={{ background: 'rgba(20,10,35,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
                         <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
@@ -370,7 +366,7 @@ const HODDashboard = () => {
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Footer */}
