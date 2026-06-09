@@ -32,7 +32,7 @@ export default function Profile() {
   const [newSkillValue, setNewSkillValue] = useState("");
 
   const [studentData, setStudentData] = useState({
-    fullName: "Srinivas",
+    fullName: "Polavarapu phani durga mani Srinivas Rao",
     rollNumber: "23VV1A0548",
     department: "CSE",
     degreeCode: "BTECH",
