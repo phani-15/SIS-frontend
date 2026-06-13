@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { fields, types } from '../assets/Data'
+import { fields, types, textFields,radioOptions, DocFields, selectOptions, dateFields } from '../assets/Data'
 import { useLocation } from 'react-router-dom'
 
 export default function AddCreds() {
@@ -14,6 +14,11 @@ export default function AddCreds() {
 
 	const isNumericField = (field) => /(amount|package|score|id|number|qty|quantity|count|year|years|percentage|percent)/i.test(field)
 	const isBooleanField = (field) => /^(is\b|has\b)/i.test(field);
+	const isSelectField = (field, type) => !!selectOptions?.[type]?.[field];
+	const isRadioField = (field, type) => !!radioOptions?.[type]?.[field];
+	const isFile = (field, type) => !!DocFields?.[type]?.includes(field) || false;
+	const isDateField = (field, type) => !!dateFields?.[type]?.includes(field) || false
+	const isTextField = (field,type) => !!textFields?.[type]?.includes(field) || false
 
 	useEffect(() => {
 		if (!type) {
@@ -85,34 +90,103 @@ export default function AddCreds() {
 											<label className="block mb-2 text-sm font-medium text-slate-700" htmlFor={key}>
 												{field.charAt(0).toUpperCase() + field.slice(1)}
 											</label>
-											{isBooleanField(field) ? (
-												<input
-													type="checkbox"
-													id={key}
-													name={key}
-													checked={!!formData[key]}
-													onChange={handleChange}
-													className="h-4 w-4"
-												/>
-											) : isNumericField(field) ? (
-												<input
-													type="number"
-													id={key}
-													name={key}
-													value={formData[key] ?? ''}
-													onChange={handleChange}
-													className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
-												/>
-											) : (
-												<input
-													type="text"
-													id={key}
-													name={key}
-													value={formData[key] ?? ''}
-													onChange={handleChange}
-													className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
-												/>
-											)}
+											{
+												// isBooleanField(field) ? (
+												// 	<input
+												// 		type="checkbox"
+												// 		id={key}
+												// 		name={key}
+												// 		checked={!!formData[key]}
+												// 		onChange={handleChange}
+												// 		className="h-4 w-4"
+												// 	/>
+												// ) :
+												isRadioField(field, type) ? (
+													<div className="flex space-x-2">
+														{radioOptions[type][field].map((opt) => (
+															<label key={opt} className="inline-flex items-center">
+																<input
+																	type="radio"
+																	name={key}
+																	value={opt}
+																	checked={formData[key] === opt}
+																	onChange={handleChange}
+																	className="h-4 w-4"
+																/>
+																<span className="ml-2 text-sm text-slate-700">{opt.charAt(0).toUpperCase() + opt.slice(1).replaceAll("_", " ")}</span>
+															</label>
+														))}
+
+													</div>
+												)
+													:
+													isSelectField(field, type) ? (
+														<select
+															type="number"
+															id={key}
+															name={key}
+															value={formData[key] ?? ''}
+															onChange={handleChange}
+															className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
+														>
+															<option value="">Select</option>
+															{selectOptions[type][field].map((opt) => (
+
+																<option key={opt} value={opt}>
+																	{opt.charAt(0).toUpperCase() + opt.slice(1).replaceAll("_", " ")}
+																</option>
+															))}
+														</select>
+													) :
+														isDateField(field, type) ? (
+															<input
+																type="date"
+																id={key}
+																name={key}
+																value={formData[key] ?? ''}
+																onChange={handleChange}
+																className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
+															/>
+														):
+														isTextField(field,type) ? (
+															<textarea
+																id={key}
+																name={key}
+																value={formData[key] ?? ''}
+																onChange={handleChange}
+																className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
+															/>
+														)
+															: isNumericField(field) ? (
+																<input
+																	type="number"
+																	id={key}
+																	name={key}
+																	value={formData[key] ?? ''}
+																	onChange={handleChange}
+																	className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
+																/>
+															)
+																:
+																isFile(field, type) ? (
+																	<input
+																		type="file"
+																		id={key}
+																		name={key}
+																		onChange={handleChange}
+																		className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
+																	/>
+																)
+																	: (
+																		<input
+																			type="text"
+																			id={key}
+																			name={key}
+																			value={formData[key] ?? ''}
+																			onChange={handleChange}
+																			className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
+																		/>
+																	)}
 										</div>
 									)
 								})}
