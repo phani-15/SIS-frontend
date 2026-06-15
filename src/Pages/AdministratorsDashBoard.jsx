@@ -4,9 +4,162 @@ import {
   Users, TrendingUp, Award, BookOpen, AlertCircle, BarChart3,
   PieChart as PieChartIcon, Calendar, Download, Filter, Building2, Code2
 } from 'lucide-react';
+import * as XLSX from "xlsx";
+import { credsData } from '../assets/Creds';
+import { personalFields, personalData, fields as credentialFieldMap, types as credentialTypes } from '../assets/Data';
 
 const AdminDashboard = () => {
   const [mounted, setMounted] = useState(false);
+
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [filters, setFilters] = useState({ degreeCode: '', entryTypeCode: '', gender: '', graduationStatus: '' });
+  const [selectedFields, setSelectedFields] = useState(personalFields || []);
+
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportFilters, setExportFilters] = useState({ degreeCode: '', entryTypeCode: '', graduationStatus: '', fromDate: '', toDate: '', department: '' });
+  const [selectedCredentialTypes, setSelectedCredentialTypes] = useState([]);
+  const [selectedCredentialFields, setSelectedCredentialFields] = useState({});
+  const [data, setData] = useState(personalData);
+
+  const toggleCredentialType = (type) => {
+    setSelectedCredentialTypes(prev => {
+      if (prev.includes(type)) {
+        setSelectedCredentialFields(fields => {
+          const next = { ...fields };
+          delete next[type];
+          return next;
+        });
+        return prev.filter((value) => value !== type);
+      }
+      setSelectedCredentialFields(fields => ({ ...fields, [type]: credentialFieldMap[type] || [] }));
+      return [...prev, type];
+    });
+  };
+
+  const toggleCredentialField = (type, field) => {
+    setSelectedCredentialFields(prev => {
+      const existing = prev[type] || [];
+      const nextFields = existing.includes(field)
+        ? existing.filter((value) => value !== field)
+        : [...existing, field];
+      return { ...prev, [type]: nextFields };
+    });
+  };
+
+  const handlePersonalsDownloadSubmit = (e) => {
+    e.preventDefault();
+
+    if (!data || !data.length) {
+      alert("No data to export");
+      return;
+    }
+
+    const selected = selectedFields.length ? selectedFields : personalFields;
+    const headers = [
+      "S.NO",
+      ...selected.map((field) =>
+        field
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/\b([a-z])/g, (m) => m.toUpperCase())
+          .replace(/([A-Z])/g, ' $1')
+          .trim()
+      ),
+    ];
+
+    const rows = data
+      .filter((student) => {
+        if (filters.degreeCode && student.degreeCode !== filters.degreeCode) return false;
+        if (filters.entryTypeCode && student.entryTypeCode !== filters.entryTypeCode) return false;
+        if (filters.gender && student.gender !== filters.gender) return false;
+        if (filters.graduationStatus && student.graduationStatus !== filters.graduationStatus) return false;
+        return true;
+      })
+      .map((student, index) => [
+        index + 1,
+        ...selected.map((field) => student[field] ?? ""),
+      ]);
+
+    if (!rows.length) {
+      alert("No matching data for selected filters");
+      return;
+    }
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length, 18) }));
+    XLSX.utils.book_append_sheet(wb, ws, "Personal Data");
+
+    const filename = `Student_Details_${new Date().toISOString().split("T")[0]}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    setShowDownloadModal(false);
+  };
+
+  const handleReportsDownload = (e) => {
+    e.preventDefault();
+
+    const filteredStudents = Object.values(credsData).filter((student) => {
+      if (exportFilters.degreeCode && student.degreeCode && student.degreeCode !== exportFilters.degreeCode) return false;
+      if (exportFilters.entryTypeCode && student.entryTypeCode && student.entryTypeCode !== exportFilters.entryTypeCode) return false;
+      if (exportFilters.graduationStatus && student.graduationStatus && student.graduationStatus !== exportFilters.graduationStatus) return false;
+      if (exportFilters.department && student.department && student.department !== exportFilters.department) return false;
+      return true;
+    });
+
+    if (!selectedCredentialTypes.length) {
+      alert('Please select at least one credential type to export.');
+      return;
+    }
+
+    const wb = XLSX.utils.book_new();
+    let sheetCount = 0;
+
+    selectedCredentialTypes.forEach((type) => {
+      const fields = (selectedCredentialFields[type] && selectedCredentialFields[type].length)
+        ? selectedCredentialFields[type]
+        : credentialFieldMap[type] || [];
+
+      const headers = [
+        'S.NO',
+        'Name',
+        'Email',
+        'Department',
+        ...fields.map((field) =>
+          field
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/\b([a-z])/g, (m) => m.toUpperCase())
+            .replace(/([A-Z])/g, ' $1')
+            .trim()
+        ),
+      ];
+
+      const rows = filteredStudents.flatMap((student, studentIndex) => {
+        const creds = student[type] || [];
+        return creds.map((credential) => [
+          studentIndex + 1,
+          student.name || '',
+          student.email || '',
+          student.department || '',
+          ...fields.map((field) => credential[field] ?? ''),
+        ]);
+      });
+
+      if (rows.length > 0) {
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+        ws['!cols'] = headers.map((h) => ({ wch: Math.max(h.length, 18) }));
+        XLSX.utils.book_append_sheet(wb, ws, type.replace(/_/g, ' ').slice(0, 31));
+        sheetCount += 1;
+      }
+    });
+
+    if (!sheetCount) {
+      alert('No credential records found for the selected filters and types.');
+      return;
+    }
+
+    const filename = `Student_Credentials_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    setShowExportModal(false);
+  };
 
   const dashboardData = {
     college: 'JNTU-GV Vizianagaram',
@@ -140,6 +293,7 @@ const AdminDashboard = () => {
                   {dashboardData.college} • College-wide Student Analytics
                 </p>
               </div>
+              <div className='flex flex-col gap-2'>
               <div className="flex gap-3">
                 <button className="flex items-center gap-2 px-4 py-2.5 rounded-[12px]
                   bg-[#8A2E88]/20 border border-[#8A2E88]/35
@@ -149,13 +303,194 @@ const AdminDashboard = () => {
                 </button>
                 <button className="flex items-center gap-2 px-4 py-2.5 rounded-[12px]
                   bg-gradient-to-br from-[#8A2E88] to-[#B060B8]
-                  text-[0.85rem] font-semibold text-white hover:shadow-[0_6px_20px_rgba(138,46,136,0.5)] transition-all">
+                  text-[0.85rem] font-semibold text-white hover:shadow-[0_6px_20px_rgba(138,46,136,0.5)] transition-all"
+                  onClick={() => setShowExportModal(true)}>
                   <Download size={16} />
                   Export Report
                 </button>
               </div>
+              
+                <button className="flex items-center gap-2 px-4 py-2.5 rounded-[12px]
+                  bg-gradient-to-br from-[#8A2E88] to-[#B060B8]
+                  text-[0.85rem] font-semibold text-white hover:shadow-[0_6px_20px_rgba(138,46,136,0.5)] transition-all"
+                  onClick={() => setShowDownloadModal(true)}>
+                  <Download size={16} />
+                  Download Student Details
+                </button>
+                </div>
             </div>
           </div>
+
+          {/* Download Student Details Modal */}
+          {showDownloadModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-black/50" onClick={() => setShowDownloadModal(false)} />
+              <div className="relative z-10 w-full max-w-2xl rounded-lg bg-[#0f0a1a] border border-[#8A2E88]/22 p-6">
+                <h2 className="text-white font-semibold text-lg mb-3">Download Student Details</h2>
+                <form onSubmit={handlePersonalsDownloadSubmit}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="text-sm text-[#C8A0D7]/80">Degree Code</label>
+                      <select value={filters.degreeCode} onChange={(e) => setFilters(f => ({ ...f, degreeCode: e.target.value }))}
+                        className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                        <option value="">--Optional--</option>
+                        <option value="B.Tech">B.Tech</option>
+                        <option value="M.Tech">M.Tech</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm text-[#C8A0D7]/80">Entry Type Code</label>
+                      <select value={filters.entryTypeCode} onChange={(e) => setFilters(f => ({ ...f, entryTypeCode: e.target.value }))}
+                        className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                        <option value="">--Optional--</option>
+                        <option value="Regular">Regular</option>
+                        <option value="Lateral">Lateral</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm text-[#C8A0D7]/80">Gender</label>
+                      <select value={filters.gender} onChange={(e) => setFilters(f => ({ ...f, gender: e.target.value }))}
+                        className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                        <option value="">--Optional--</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm text-[#C8A0D7]/80">Graduation Status</label>
+                      <select value={filters.graduationStatus} onChange={(e) => setFilters(f => ({ ...f, graduationStatus: e.target.value }))}
+                        className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                        <option value="">--Optional--</option>
+                        <option value="Graduated">Graduated</option>
+                        <option value="Pursuing">Pursuing</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <p className="text-sm text-[#C8A0D7]/80 mb-2">Select fields to include</p>
+                    <div className="max-h-48 overflow-auto border border-[#8A2E88]/12 rounded p-2 bg-[#0b0812]">
+                      {(personalFields || []).map((field) => (
+                        <label key={field} className="flex items-center gap-2 text-sm text-white/90 p-1">
+                          <input type="checkbox" checked={selectedFields.includes(field)} onChange={() => {
+                            setSelectedFields(prev => prev.includes(field) ? prev.filter(f => f !== field) : [...prev, field]);
+                          }} />
+                          <span className="capitalize">{field}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-end gap-3">
+                    <button type="button" onClick={() => setShowDownloadModal(false)} className="px-4 py-2 rounded border border-[#8A2E88]/20 text-[#C8A0D7]/80">Cancel</button>
+                    <button type="submit" className="px-4 py-2 rounded bg-gradient-to-br from-[#8A2E88] to-[#B060B8] text-white">Download</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Export Reports Modal */}
+          {showExportModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-black/50" onClick={() => setShowExportModal(false)} />
+              <div className="relative z-10 w-full max-w-3xl h-[78vh] rounded-lg bg-[#0f0a1a] border border-[#8A2E88]/22 p-6 overflow-hidden">
+                <div className="flex flex-col min-h-0 h-full overflow-y-auto pr-1">
+                  <h2 className="text-white font-semibold text-lg mb-3">Export Credential Reports</h2>
+                  <p className="text-sm text-[#C8A0D7]/70 mb-4">Choose credential types and fields, then optionally add filters before exporting.</p>
+                  <form onSubmit={handleReportsDownload}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="text-sm text-[#C8A0D7]/80">Degree Code</label>
+                        <select value={exportFilters.degreeCode} onChange={(e) => setExportFilters(f => ({ ...f, degreeCode: e.target.value }))}
+                          className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                          <option value="">--Optional--</option>
+                          <option value="B.Tech">B.Tech</option>
+                          <option value="M.Tech">M.Tech</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-[#C8A0D7]/80">Entry Type Code</label>
+                        <select value={exportFilters.entryTypeCode} onChange={(e) => setExportFilters(f => ({ ...f, entryTypeCode: e.target.value }))}
+                          className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                          <option value="">--Optional--</option>
+                          <option value="Regular">Regular</option>
+                          <option value="Lateral">Lateral</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-[#C8A0D7]/80">Graduation Status</label>
+                        <select value={exportFilters.graduationStatus} onChange={(e) => setExportFilters(f => ({ ...f, graduationStatus: e.target.value }))}
+                          className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                          <option value="">--Optional--</option>
+                          <option value="Graduated">Graduated</option>
+                          <option value="Pursuing">Pursuing</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-[#C8A0D7]/80">Department</label>
+                        <select value={exportFilters.department} onChange={(e) => setExportFilters(f => ({ ...f, department: e.target.value }))}
+                          className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                          <option value="">--All Departments--</option>
+                          <option value="Computer Science and Engineering">CSE</option>
+                          <option value="Electronics and Communication Engineering">ECE</option>
+                          <option value="Mechanical Engineering">MECH</option>
+                          <option value="Civil Engineering">CIVIL</option>
+                          <option value="Electrical and Electronics Engineering">EEE</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-[#C8A0D7]/80">Date range</label>
+                        <div className="grid grid-cols-2 gap-2 mt-1">
+                          <input type="date" value={exportFilters.fromDate} onChange={(e) => setExportFilters(f => ({ ...f, fromDate: e.target.value }))}
+                            className="w-full p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white" />
+                          <input type="date" value={exportFilters.toDate} onChange={(e) => setExportFilters(f => ({ ...f, toDate: e.target.value }))}
+                            className="w-full p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <p className="text-sm text-[#C8A0D7]/80 mb-3">Select credential types</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {credentialTypes.map((type) => (
+                          <label key={type} className="flex items-center gap-2 text-sm text-white/90 p-2 rounded border border-[#8A2E88]/20 bg-[#0b0812] cursor-pointer">
+                            <input type="checkbox" checked={selectedCredentialTypes.includes(type)} onChange={() => toggleCredentialType(type)} />
+                            <span className="capitalize">{type.replace(/_/g, ' ')}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    {selectedCredentialTypes.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-sm text-[#C8A0D7]/80 mb-3">Select fields for chosen credential types</p>
+                        <div className="space-y-4 max-h-96 overflow-auto p-2 border border-[#8A2E88]/12 rounded bg-[#0b0812]">
+                          {selectedCredentialTypes.map((type) => (
+                            <div key={type} className="rounded-lg border border-[#8A2E88]/15 p-3 bg-[#120a1f]">
+                              <div className="flex items-center justify-between mb-3">
+                                <p className="text-sm font-semibold text-white">{type.replace(/_/g, ' ')}</p>
+                                <span className="text-xs text-[#C8A0D7]/70">{selectedCredentialFields[type]?.length || 0} selected</span>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {(credentialFieldMap[type] || []).map((field) => (
+                                  <label key={field} className="flex items-center gap-2 text-sm text-white/90 p-2 rounded border border-[#8A2E88]/15 bg-[#0e0a15] cursor-pointer">
+                                    <input type="checkbox" checked={(selectedCredentialFields[type] || []).includes(field)} onChange={() => toggleCredentialField(type, field)} />
+                                    <span>{field}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-end gap-3">
+                      <button type="button" onClick={() => setShowExportModal(false)} className="px-4 py-2 rounded border border-[#8A2E88]/20 text-[#C8A0D7]/80">Cancel</button>
+                      <button type="submit" className="px-4 py-2 rounded bg-gradient-to-br from-[#8A2E88] to-[#B060B8] text-white">Export</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ── Key Metrics Grid ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">

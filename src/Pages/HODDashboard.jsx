@@ -4,7 +4,9 @@ import {
 	Users, TrendingUp, Award, BookOpen, AlertCircle, BarChart3,
 	PieChart as PieChartIcon, Calendar, Download, Filter, LogOut
 } from 'lucide-react';
-import { personalFields, fields as credentialFieldMap, types as credentialTypes } from '../assets/Data';
+import * as XLSX from "xlsx";
+import { credsData } from '../assets/Creds';
+import { personalFields, personalData, fields as credentialFieldMap, types as credentialTypes } from '../assets/Data';
 
 const HODDashboard = () => {
 	const [mounted, setMounted] = useState(false);
@@ -15,9 +17,10 @@ const HODDashboard = () => {
 	const [selectedFields, setSelectedFields] = useState(personalFields || []);
 
 	const [showExportModal, setShowExportModal] = useState(false);
-	const [exportFilters, setExportFilters] = useState({ degreeCode: '', entryTypeCode: '', graduationStatus: '', fromDate: '', toDate: '' });
+	const [exportFilters, setExportFilters] = useState({ degreeCode: '', entryTypeCode: '', graduationStatus: '', fromDate: '', toDate: '',department:"Computer Science and Engineering" });
 	const [selectedCredentialTypes, setSelectedCredentialTypes] = useState([]);
 	const [selectedCredentialFields, setSelectedCredentialFields] = useState({});
+	const [data, setData] = useState(personalData)
 
 	const toggleCredentialType = (type) => {
 		setSelectedCredentialTypes(prev => {
@@ -44,6 +47,54 @@ const HODDashboard = () => {
 		});
 	};
 
+	const handlePersonalsDownloadSubmit = (e) => {
+		e.preventDefault();
+
+		if (!data || !data.length) {
+			alert("No data to export");
+			return;
+		}
+
+		const selected = selectedFields.length ? selectedFields : personalFields;
+		const headers = [
+			"S.NO",
+			...selected.map((field) =>
+				field
+					.replace(/([A-Z])/g, ' $1')
+					.replace(/\b([a-z])/g, (m) => m.toUpperCase())
+					.replace(/([A-Z])/g, ' $1')
+					.trim()
+			),
+		];
+
+		const rows = data
+			.filter((student) => {
+				if (filters.degreeCode && student.degreeCode !== filters.degreeCode) return false;
+				if (filters.entryTypeCode && student.entryTypeCode !== filters.entryTypeCode) return false;
+				if (filters.gender && student.gender !== filters.gender) return false;
+				if (filters.graduationStatus && student.graduationStatus !== filters.graduationStatus) return false;
+				return true;
+			})
+			.map((student, index) => [
+				index + 1,
+				...selected.map((field) => student[field] ?? ""),
+			]);
+
+		if (!rows.length) {
+			alert("No matching data for selected filters");
+			return;
+		}
+
+		const wb = XLSX.utils.book_new();
+		const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+		ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length, 18) }));
+		XLSX.utils.book_append_sheet(wb, ws, "Personal Data");
+
+		const filename = `Student_Details_${new Date().toISOString().split("T")[0]}.xlsx`;
+		XLSX.writeFile(wb, filename);
+
+		setShowDownloadModal(false);
+	};
 
 	const dashboardData = {
 		department: 'Computer Science & Engineering (CSE)',
@@ -94,6 +145,73 @@ const HODDashboard = () => {
 	const [dept, setDept] = useState("CSE")
 
 	useEffect(() => { setMounted(true); }, []);
+
+	const handleReportsDownload = (e) => {
+		e.preventDefault();
+
+		const filteredStudents = Object.values(credsData).filter((student) => {
+			if (exportFilters.degreeCode && student.degreeCode && student.degreeCode !== exportFilters.degreeCode) return false;
+			if (exportFilters.entryTypeCode && student.entryTypeCode && student.entryTypeCode !== exportFilters.entryTypeCode) return false;
+			if (exportFilters.graduationStatus && student.graduationStatus && student.graduationStatus !== exportFilters.graduationStatus) return false;
+			if (exportFilters.department && student.department && student.department !== exportFilters.department) return false;
+			return true;
+		});
+
+		if (!selectedCredentialTypes.length) {
+			alert('Please select at least one credential type to export.');
+			return;
+		}
+
+		const wb = XLSX.utils.book_new();
+		let sheetCount = 0;
+
+		selectedCredentialTypes.forEach((type) => {
+			const fields = (selectedCredentialFields[type] && selectedCredentialFields[type].length)
+				? selectedCredentialFields[type]
+				: credentialFieldMap[type] || [];
+
+			const headers = [
+				'S.NO',
+				'Name',
+				'Email',
+				'Department',
+				...fields.map((field) =>
+					field
+						.replace(/([A-Z])/g, ' $1')
+						.replace(/\b([a-z])/g, (m) => m.toUpperCase())
+						.replace(/([A-Z])/g, ' $1')
+						.trim()
+				),
+			];
+
+			const rows = filteredStudents.flatMap((student, studentIndex) => {
+				const creds = student[type] || [];
+				return creds.map((credential) => [
+					studentIndex + 1,
+					student.name || '',
+					student.email || '',
+					student.department || '',
+					...fields.map((field) => credential[field] ?? ''),
+				]);
+			});
+
+			if (rows.length > 0) {
+				const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+				ws['!cols'] = headers.map((h) => ({ wch: Math.max(h.length, 18) }));
+				XLSX.utils.book_append_sheet(wb, ws, type.replace(/_/g, ' ').slice(0, 31));
+				sheetCount += 1;
+			}
+		});
+
+		if (!sheetCount) {
+			alert('No credential records found for the selected filters and types.');
+			return;
+		}
+
+		const filename = `Student_Credentials_${new Date().toISOString().split('T')[0]}.xlsx`;
+		XLSX.writeFile(wb, filename);
+		setShowExportModal(false);
+	}
 
 	// Calculate stats
 	const topSkills = dashboardData.skillMetrics.slice(0, 4);
@@ -186,13 +304,7 @@ const HODDashboard = () => {
 							<div className="absolute inset-0 bg-black/50" onClick={() => setShowDownloadModal(false)} />
 							<div className="relative z-10 w-full max-w-2xl rounded-lg bg-[#0f0a1a] border border-[#8A2E88]/22 p-6">
 								<h2 className="text-white font-semibold text-lg mb-3">Download Student Details</h2>
-								<form onSubmit={(e) => {
-									e.preventDefault();
-									const payload = { filters: { ...filters, department: dept }, fields: selectedFields };
-									console.log('Download payload ->', payload);
-									// close modal after submit
-									setShowDownloadModal(false);
-								}}>
+								<form onSubmit={handlePersonalsDownloadSubmit}>
 									<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 										<div>
 											<label className="text-sm text-[#C8A0D7]/80">Degree Code</label>
@@ -264,19 +376,7 @@ const HODDashboard = () => {
 								<div className="flex flex-col min-h-0 h-full overflow-y-auto pr-1">
 									<h2 className="text-white font-semibold text-lg mb-3">Export Credential Reports</h2>
 									<p className="text-sm text-[#C8A0D7]/70 mb-4">Choose credential types and fields, then optionally add filters before exporting.</p>
-									<form onSubmit={(e) => {
-										e.preventDefault();
-										const payload = {
-											credentialTypes: selectedCredentialTypes,
-											selectedFields: selectedCredentialFields,
-											filters: {
-												...exportFilters,
-												department: dept,
-											},
-										};
-										console.log('Export Reports payload ->', payload);
-										setShowExportModal(false);
-									}}>
+												<form onSubmit={handleReportsDownload}>
 										<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 											<div>
 												<label className="text-sm text-[#C8A0D7]/80">Degree Code</label>
@@ -365,7 +465,7 @@ const HODDashboard = () => {
 
 					</div>
 
-					
+
 					{/* ── Key Metrics Grid ── */}
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 						{[

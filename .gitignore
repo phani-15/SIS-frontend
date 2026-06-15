@@ -13,6 +13,7 @@ dist-ssr
 *.local
 
 rg.jsx
+Creds.jsx
 
 # Editor directories and files
 .vscode/*
