@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../core/auth';
 
 export default function Login() {
   const [studentId, setStudentId]   = useState('');
@@ -22,10 +23,14 @@ export default function Login() {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await loginUser(studentId, password);
       navigate('/profile');
-    }, 1200);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

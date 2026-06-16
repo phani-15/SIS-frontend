@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { fields, types, textFields,radioOptions, DocFields, selectOptions, dateFields } from '../assets/Data'
 import { useLocation } from 'react-router-dom'
+import { addCredential } from '../core/user'
 
 export default function AddCreds() {
 
@@ -44,13 +45,21 @@ export default function AddCreds() {
 		setFormData((p) => ({ ...p, [name]: val }))
 	}
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const payload = {
-			type: type,
-			formData,
+		const userId = localStorage.getItem("userId");
+		if (!userId) {
+			alert("You must be logged in");
+			return;
 		}
-		console.log(payload)
+		try {
+			await addCredential(userId, type, formData);
+			alert("Credential added successfully!");
+			setFormData({});
+			setType("");
+		} catch (err) {
+			alert(err.message);
+		}
 	}
 
 	return (

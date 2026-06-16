@@ -23,6 +23,7 @@ import {
   Target
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { fetchUserData, updateUserProfile } from "../core/user";
 
 export default function Profile() {
   const [mounted, setMounted] = useState(false);
@@ -116,16 +117,27 @@ export default function Profile() {
 
   useEffect(() => {
     setMounted(true);
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      fetchUserData().then((res) => {
+        if (res.data) {
+          setStudentData((prev) => ({ ...prev, ...res.data }));
+        }
+      }).catch(() => {});
+    }
   }, []);
 
-  const handleSkillSubmit = (e) => {
+  const handleSkillSubmit = async (e) => {
     e.preventDefault();
     if (!newSkillValue.trim()) return;
-    const payload = {
-      type : "skill",
-      skill: newSkillValue.trim(),
-    };
-    console.log(payload);
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      try {
+        await updateUserProfile(userId, { mode: 2, data: [newSkillValue.trim()] });
+      } catch (err) {
+        console.error(err);
+      }
+    }
     setStudentData((prev) => ({
       ...prev,
       skills: [...prev.skills, newSkillValue.trim()],

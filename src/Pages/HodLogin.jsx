@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { depts } from '../assets/Data';
 import {useNavigate} from 'react-router-dom'
+import { loginHod } from '../core/hod';
 
 const HodLogin = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -35,11 +36,15 @@ const HodLogin = () => {
         setIsLoading(true);
         setError('');
 
-        setTimeout(() => {
-            setIsLoading(false);
+        try {
+            await loginHod(formData.department, formData.password);
             setSuccess('Login successful! Redirecting to dashboard…');
-        }, 1800);
-        navigate('/hodboard');
+            setTimeout(() => navigate('/hodboard'), 500);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
 
     };
 

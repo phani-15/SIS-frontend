@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import {
-	Users, TrendingUp, Award, BookOpen, AlertCircle, BarChart3,
-	PieChart as PieChartIcon, Calendar, Download, Filter, LogOut
+    Users, TrendingUp, Award, BookOpen, AlertCircle, BarChart3,
+    PieChart as PieChartIcon, Calendar, Download, Filter, LogOut
 } from 'lucide-react';
+import { fetchExtractReports } from '../core/hod';
 import { personalFields, fields as credentialFieldMap, types as credentialTypes } from '../assets/Data';
 
 const HODDashboard = () => {
@@ -93,7 +94,20 @@ const HODDashboard = () => {
 
 	const [dept, setDept] = useState("CSE")
 
-	useEffect(() => { setMounted(true); }, []);
+    useEffect(() => {
+        setMounted(true);
+        const hodDept = localStorage.getItem("hodDepartment") || "CSE";
+        fetchExtractReports({
+            credentialTypes: ["certification", "co_curricular_activities"],
+            selectedFields: {
+                certification: ["Type of certification", "domain/ skill/ area"],
+                co_curricular_activities: ["activity type", "event name"],
+            },
+            filters: { department: hodDept, fromDate: "2020-01-01", toDate: "", degreeCode: "", entryTypeCode: "", graduationStatus: "" },
+        }).then((res) => {
+            if (res.data) console.log("Extracted reports:", res.data);
+        }).catch(() => {});
+    }, []);
 
 	// Calculate stats
 	const topSkills = dashboardData.skillMetrics.slice(0, 4);
