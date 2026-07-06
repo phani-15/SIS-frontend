@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { fields, types, textFields,radioOptions, DocFields, selectOptions, dateFields } from '../assets/Data'
+import { fields, types, textFields, radioOptions, DocFields, selectOptions, dateFields } from '../assets/Data'
 import { useLocation } from 'react-router-dom'
 import { addCredential } from '../core/user'
 
@@ -10,6 +10,7 @@ export default function AddCreds() {
 	const [type, setType] = useState(location.state?.type || "")
 
 	const [formData, setFormData] = useState({})
+	const [errors, setErrors] = useState({})
 
 	const fieldKey = (field) => field.replace(/[^\w]+/g, '_').replace(/^_+|_+$/g, '').toLowerCase()
 
@@ -19,11 +20,97 @@ export default function AddCreds() {
 	const isRadioField = (field, type) => !!radioOptions?.[type]?.[field];
 	const isFile = (field, type) => !!DocFields?.[type]?.includes(field) || false;
 	const isDateField = (field, type) => !!dateFields?.[type]?.includes(field) || false
-	const isTextField = (field,type) => !!textFields?.[type]?.includes(field) || false
+	const isTextField = (field, type) => !!textFields?.[type]?.includes(field) || false
+	const isAcademicYearField = (field) => /academic year/i.test(field)
+	const isYearField = (field) => /\byear\b/i.test(field) && !/academic year/i.test(field)
+	const isStartDateField = (field) => /\bstart date\b/i.test(field) || /\(from\)$/i.test(field)
+	const isEndDateField = (field) => /\bend date\b/i.test(field) || /\(to\)$/i.test(field)
+	const isRequiredField = (field) => !/if any/i.test(field)
+
+	const parseDateValue = (value) => {
+		const date = new Date(value)
+		return Number.isNaN(date.getTime()) ? null : date
+	}
+
+	const validateField = (field, value, data) => {
+		const trimmed = value === null || value === undefined ? '' : value.toString().trim()
+		const required = isRequiredField(field)
+
+		if (!required && trimmed === '') {
+			return null
+		}
+		if (trimmed === '') {
+			return 'This field is required.'
+		}
+
+		if (isAcademicYearField(field)) {
+			if (!/^\d{4}-\d{4}$/.test(trimmed)) {
+				return 'Academic year must use YYYY-YYYY format.'
+			}
+			const [startYear, endYear] = trimmed.split('-').map(Number)
+			if (endYear <= startYear) {
+				return 'End year must be greater than start year.'
+			}
+			return null
+		}
+
+		if (isYearField(field)) {
+			if (!/^\d{4}$/.test(trimmed)) {
+				return 'Year must be a 4-digit value.'
+			}
+			const year = Number(trimmed)
+			const currentYear = new Date().getFullYear()
+			if (year < 1900 || year > currentYear) {
+				return `Year must be between 1900 and ${currentYear}.`
+			}
+			return null
+		}
+
+		if (isStartDateField(field) || isEndDateField(field)) {
+			const valueDate = parseDateValue(trimmed)
+			if (!valueDate) {
+				return 'Enter a valid date.'
+			}
+
+			const relatedField = fields[type].find((f) => {
+				if (field === f) return false
+				return isStartDateField(f) || isEndDateField(f)
+			})
+			if (relatedField) {
+				const relatedKey = fieldKey(relatedField)
+				const relatedValue = data?.[relatedKey]
+				if (relatedValue) {
+					const relatedDate = parseDateValue(relatedValue)
+					if (relatedDate) {
+						if (isEndDateField(field) && valueDate <= relatedDate) {
+							return 'End date must be after start date.'
+						}
+						if (isStartDateField(field) && valueDate >= relatedDate) {
+							return 'Start date must be before end date.'
+						}
+					}
+				}
+			}
+		}
+
+		return null
+	}
+
+	const validateAllFields = () => {
+		const newErrors = {}
+		fields[type].forEach((field) => {
+			const key = fieldKey(field)
+			const error = validateField(field, formData[key], formData)
+			if (error) newErrors[key] = error
+		})
+		setErrors(newErrors)
+		return newErrors
+	}
 
 	useEffect(() => {
 		if (!type) {
 			setFormData({})
+			setErrors({})
 			return
 		}
 
@@ -31,10 +118,10 @@ export default function AddCreds() {
 		fields[type].forEach((f) => {
 			const k = fieldKey(f)
 			if (isBooleanField(f)) init[k] = false
-			else if (isNumericField(f)) init[k] = 0
 			else init[k] = ''
 		})
 		setFormData(init)
+		setErrors({})
 	}, [type])
 
 	const handleChange = (e) => {
@@ -43,6 +130,23 @@ export default function AddCreds() {
 		if (inputType === 'checkbox') val = checked
 		else if (inputType === 'number') val = value === '' ? '' : Number(value)
 		setFormData((p) => ({ ...p, [name]: val }))
+	}
+
+	const handleBlur = (field) => {
+		const key = fieldKey(field)
+		const newError = validateField(field, formData[key], formData)
+		const relatedField = fields[type].find((f) => {
+			if (field === f) return false
+			return isStartDateField(f) || isEndDateField(f)
+		})
+		setErrors((prev) => {
+			const next = { ...prev, [key]: newError }
+			if (relatedField) {
+				const relatedKey = fieldKey(relatedField)
+				next[relatedKey] = validateField(relatedField, formData[relatedKey], formData)
+			}
+			return next
+		})
 	}
 
 	const handleSubmit = async (e) => {
@@ -60,6 +164,17 @@ export default function AddCreds() {
 		} catch (err) {
 			alert(err.message);
 		}
+		const validationErrors = validateAllFields()
+		if (Object.values(validationErrors).some((error) => error)) {
+			console.log('Validation failed:', validationErrors)
+			return
+		}
+
+		const payload = {
+			type: type,
+			formData,
+		}
+		console.log(payload)
 	}
 
 	return (
@@ -111,6 +226,7 @@ export default function AddCreds() {
 												// 	/>
 												// ) :
 												isRadioField(field, type) ? (
+													<div>
 													<div className="flex space-x-2">
 														{radioOptions[type][field].map((opt) => (
 															<label key={opt} className="inline-flex items-center">
@@ -125,94 +241,118 @@ export default function AddCreds() {
 																<span className="ml-2 text-sm text-slate-700">{opt.charAt(0).toUpperCase() + opt.slice(1).replaceAll("_", " ")}</span>
 															</label>
 														))}
-
+														</div>
+														{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
 													</div>
 												)
 													:
 													isSelectField(field, type) ? (
-														<select
-															type="number"
-															id={key}
-															name={key}
-															value={formData[key] ?? ''}
-															onChange={handleChange}
-															className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
-														>
-															<option value="">Select</option>
-															{selectOptions[type][field].map((opt) => (
+														<>
+															<select
+																type="number"
+																id={key}
+																name={key}
+																value={formData[key] ?? ''}
+																onChange={handleChange}
+																onBlur={() => handleBlur(field)}
+																className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
+															>
+																<option value="">Select</option>
+																{selectOptions[type][field].map((opt) => (
 
-																<option key={opt} value={opt}>
-																	{opt.charAt(0).toUpperCase() + opt.slice(1).replaceAll("_", " ")}
-																</option>
-															))}
-														</select>
+																	<option key={opt} value={opt}>
+																		{opt.charAt(0).toUpperCase() + opt.slice(1).replaceAll("_", " ")}
+																	</option>
+																))}
+															</select>
+															{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
+														</>
 													) :
 														isDateField(field, type) ? (
-															<input
-																type="date"
-																id={key}
-																name={key}
-																value={formData[key] ?? ''}
-																onChange={handleChange}
-																className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
-															/>
-														):
-														isTextField(field,type) ? (
-															<textarea
-																id={key}
-																name={key}
-																value={formData[key] ?? ''}
-																onChange={handleChange}
-																className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
-															/>
-														)
-															: isNumericField(field) ? (
+															<>
 																<input
-																	type="number"
+																	type="date"
 																	id={key}
 																	name={key}
 																	value={formData[key] ?? ''}
 																	onChange={handleChange}
-																	className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
+																	onBlur={() => handleBlur(field)}
+																	className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
 																/>
-															)
-																:
-																isFile(field, type) ? (
-																	<input
-																		type="file"
+																{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
+															</>
+														) :
+															isTextField(field, type) ? (
+																<>
+																	<textarea
 																		id={key}
 																		name={key}
+																		value={formData[key] ?? ''}
 																		onChange={handleChange}
-																		className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
+																		onBlur={() => handleBlur(field)}
+																		className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
 																	/>
-																)
-																	: (
+																	{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
+																</>
+															)
+																: isNumericField(field) ? (
+																	<>
 																		<input
-																			type="text"
+																			type="number"
 																			id={key}
 																			name={key}
 																			value={formData[key] ?? ''}
 																			onChange={handleChange}
-																			className="w-full p-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
+																			onBlur={() => handleBlur(field)}
+																			className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
 																		/>
-																	)}
+																		{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
+																	</>
+																)
+																	:
+																	isFile(field, type) ? (
+																		<>
+																			<input
+																				type="file"
+																				id={key}
+																				name={key}
+																				onChange={handleChange}
+																				className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
+																			/>
+																			{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
+																		</>
+																	)
+																		: (
+																			<>
+																				<input
+																					type="text"
+																					id={key}
+																					name={key}
+																					value={formData[key] ?? ''}
+																					onChange={handleChange}
+																					className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
+																				/>
+																				{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
+																			</>
+																		)}
 										</div>
 									)
 								})}
+							</div>
+						)}
 
-								<div className="mt-6">
-									{type ? (
-										<button
-											type="submit"
-											className="inline-flex items-center px-4 py-2 bg-[#1a365d] text-white rounded-md hover:bg-[#002045] focus:outline-none"
-										>
-											Submit
-										</button>
-									) : (
-										<p className="text-sm text-slate-500">Please select a type to add credentials.</p>
-									)}
-								</div>
-							</div>)}
+						<div className="mt-6">
+							{type ? (
+								<button
+									type="submit"
+									className="inline-flex items-center px-4 py-2 bg-[#1a365d] text-white rounded-md hover:bg-[#002045] focus:outline-none"
+								>
+									Submit
+								</button>
+							) : (
+								<p className="text-sm text-slate-500">Please select a type to add credentials.</p>
+							)}
+						</div>
 					</form>
 				</div>
 			</div>
