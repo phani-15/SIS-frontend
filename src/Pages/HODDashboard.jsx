@@ -5,7 +5,7 @@ import {
     PieChart as PieChartIcon, Calendar, Download, Filter, LogOut
 } from 'lucide-react';
 import { fetchExtractReports } from '../core/hod';
-import { personalFields, fields as credentialFieldMap, types as credentialTypes } from '../assets/Data';
+// import { personalFields, fields as credentialFieldMap, types as credentialTypes } from '../assets/Data';
 import * as XLSX from "xlsx";
 import { credsData } from '../assets/Creds';
 import { personalFields, personalData, fields as credentialFieldMap, types as credentialTypes } from '../assets/Data';

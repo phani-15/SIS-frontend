@@ -20,7 +20,7 @@ export function register(data) {
 }
 
 export function getUserData(userId) {
-  return request(`/getData/${userId}`)
+  return request(`/getData/${userId}`,{method:"GET"})
 }
 
 export function updateUser(userId, data) {

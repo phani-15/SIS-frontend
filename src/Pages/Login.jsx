@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../core/auth';
 
 export default function Login() {
-  const [studentId, setStudentId]   = useState('');
-  const [password,  setPassword]    = useState('');
+  const [studentId, setStudentId]   = useState('1234567990');
+  const [password,  setPassword]    = useState('misteran');
   const [isLoading, setIsLoading]   = useState(false);
   const [error,     setError]       = useState('');
   const navigate = useNavigate();
