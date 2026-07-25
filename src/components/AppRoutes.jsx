@@ -29,6 +29,7 @@ function AppRoutes() {
                     <Route path='/profile' element={<Profile />} />
                     <Route path='/hod' element={<HodLogin />} />
                     <Route path='/hodboard' element={<HODDashboard />} />
+                    <Route path='/administratorlogin' element={<AdministratorsLogin />} />
                     <Route path='/administrator' element={<AdminDashboard />} />
                     <Route path='/admin' element={<Admin />} />
                     <Route path='/add' element={<AddCreds />} />

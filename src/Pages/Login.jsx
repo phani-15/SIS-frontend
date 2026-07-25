@@ -287,12 +287,21 @@ export default function Login() {
             className="relative w-full"
             style={{ maxWidth: '420px' }}
           >
-            <video 
-              src="/vids/Login.mp4"
-              autoPlay loop muted
-              className="rounded-xl shadow-lg"
-              style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
-            ></video>
+            <video
+  src="/vids/Login.mp4"
+  autoPlay
+  loop
+  muted
+  playsInline
+  disablePictureInPicture
+  controlsList="nodownload noplaybackrate nofullscreen"
+  className="rounded-xl shadow-lg"
+  style={{
+    width: "100%",
+    height: "auto",
+    objectFit: "cover",
+  }}
+></video>
           </div>
         </div>
       </div>

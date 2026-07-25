@@ -177,7 +177,7 @@ export default function Profile() {
 
         {/* Header / Profile Summary Card */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-          <div className="h-22 sm:h-28 bg-gradient-to-r from-[#1a365d] to-[#002045] relative overflow-hidden">
+          <div className="h-22 sm:h-28 bg-linear-to-r from-[#1a365d] to-[#002045] relative overflow-hidden">
             {/* Subtle noise texture overlay */}
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%)' }}></div>
             {/* Hero Illustration - Student/Learning */}
@@ -335,13 +335,13 @@ export default function Profile() {
             </div>
 
             {/* Tab Content Panels */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex-grow relative overflow-hidden">
+            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm grow relative overflow-hidden">
 
               {activeTab === "overview" && (
                 <div className="space-y-8 animate-in fade-in duration-500">
                   <div className="absolute top-8 right-8 illustration-bg w-48 h-48" style={{ backgroundImage: `url('https://cdni.iconscout.com/illustration/premium/thumb/personal-data-security-4488057-3738541.png')`, opacity: 0.15 }}></div>
 
-                  <div className="flex items-center gap-4 sm:h-38 rounded-2xl bg-gradient-to-r from-[#1a365d]/5 to-blue-50 border border-[#1a365d]/10 -mt-2 mb-4">
+                  <div className="flex items-center gap-4 sm:h-38 rounded-2xl bg-linear-to-r from-[#1a365d]/5 to-blue-50 border border-[#1a365d]/10 -mt-2 mb-4">
                     <img
                       src="/images/overview.webp"
                       alt="Web development illustration"
@@ -404,11 +404,11 @@ export default function Profile() {
                 <div className="space-y-8 animate-in fade-in duration-500">
                   <div className="absolute top-8 right-8 illustration-bg w-48 h-48" style={{ backgroundImage: `url('https://cdni.iconscout.com/illustration/premium/thumb/education-3406180-2840742.png')`, opacity: 0.15 }}></div>
 
-                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-[#1a365d]/5 to-blue-50 border border-[#1a365d]/10 -mt-2 mb-2">
+                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-linear-to-r from-[#1a365d]/5 to-blue-50 border border-[#1a365d]/10 -mt-2 mb-2">
                     <img
                       src="/images/academics.jpg"
                       alt="Web development illustration"
-                      className="w-20 h-20 sm:w-28 sm:h-28 object-contain flex-shrink-0 select-none"
+                      className="w-20 h-20 sm:w-28 sm:h-28 object-contain shrink-0 select-none"
                       style={{ filter: 'drop-shadow(0 2px 8px rgba(26,54,93,0.15))' }}
                     />
                     <div>
@@ -424,7 +424,7 @@ export default function Profile() {
                             <BookOpen size={20} />
                           </div>
                           {i !== studentData.academicHistory.length - 1 && (
-                            <div className="w-0.5 flex-grow bg-slate-100 my-2"></div>
+                            <div className="w-0.5 grow bg-slate-100 my-2"></div>
                           )}
                         </div>
                         <div className="pb-6 w-full">
@@ -475,11 +475,11 @@ export default function Profile() {
               {activeTab === "skills" && (
                 <div className="space-y-10 animate-in fade-in duration-500">
                   {/* Skills Illustration Banner */}
-                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-[#1a365d]/5 to-blue-50 border border-[#1a365d]/10 -mt-2 mb-2">
+                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-linear-to-r from-[#1a365d]/5 to-blue-50 border border-[#1a365d]/10 -mt-2 mb-2">
                     <img
                       src="/images/skills.jpg"
                       alt="Web development illustration"
-                      className="w-20 h-20 sm:w-28 sm:h-28 object-contain flex-shrink-0 select-none"
+                      className="w-20 h-20 sm:w-28 sm:h-28 object-contain shrink-0 select-none"
                       style={{ filter: 'drop-shadow(0 2px 8px rgba(26,54,93,0.15))' }}
                     />
                     <div>

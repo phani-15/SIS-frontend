@@ -2,11 +2,20 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import {
   Users, TrendingUp, Award, BookOpen, AlertCircle, BarChart3,
-  PieChart as PieChartIcon, Calendar, Download, Filter, Building2, Code2
+  PieChart as PieChartIcon, Calendar, Download, Filter, Building2, Code2,
+  Cloud, Globe, Cpu, Database
 } from 'lucide-react';
 import * as XLSX from "xlsx";
 import { credsData } from '../assets/Creds';
 import { personalFields, personalData, fields as credentialFieldMap, types as credentialTypes } from '../assets/Data';
+
+const getCertIcon = (name) => {
+  if (name.includes('AWS')) return <Cloud size={20} className="text-[#13696a]" />;
+  if (name.includes('Google') || name.includes('Cloud')) return <Globe size={20} className="text-[#13696a]" />;
+  if (name.includes('Azure')) return <Cpu size={20} className="text-[#13696a]" />;
+  if (name.includes('Oracle') || name.includes('Database')) return <Database size={20} className="text-[#13696a]" />;
+  return <Award size={20} className="text-[#13696a]" />;
+};
 
 const AdminDashboard = () => {
   const [mounted, setMounted] = useState(false);
@@ -232,125 +241,143 @@ const AdminDashboard = () => {
 
   const totalGradeCount = Object.values(dashboardData.performanceGrades).reduce((a, b) => a + b, 0);
 
+  const METRICS = [
+    { label: 'Total Students', value: dashboardData.totalStudents, icon: <Users size={20} />, bg: 'var(--primary-container)', color: 'var(--on-primary)' },
+    { label: 'Active Students', value: dashboardData.activeStudents, icon: <TrendingUp size={20} />, bg: 'var(--secondary-container)', color: 'var(--on-secondary-container)' },
+    { label: 'Departments', value: dashboardData.totalDepartments, icon: <Building2 size={20} />, bg: 'var(--tertiary-container)', color: 'var(--on-tertiary-container)' },
+    { label: 'Avg CGPA', value: dashboardData.avgCGPA.toFixed(2), icon: <Award size={20} />, bg: 'var(--primary-fixed)', color: 'var(--primary)' },
+    { label: 'Placements (2020)', value: '287/312', icon: <TrendingUp size={20} />, bg: 'var(--secondary-fixed)', color: 'var(--on-secondary-container)' },
+  ];
+
+  const getAlertStyles = (type) => {
+    if (type === 'warning') return 'bg-amber-50/70 border-amber-200/50 text-amber-900';
+    if (type === 'success') return 'bg-emerald-50/70 border-emerald-200/50 text-emerald-950';
+    return 'bg-sky-50/70 border-sky-200/50 text-sky-950';
+  };
+
+  const getAlertIconStyles = (type) => {
+    if (type === 'warning') return 'text-amber-600';
+    if (type === 'success') return 'text-emerald-600';
+    return 'text-sky-600';
+  };
+
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-        @keyframes orbFloat1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,40px)} }
-        @keyframes orbFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,-30px)} }
-        @keyframes orbFloat3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,-20px)} }
-        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
         @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes badgePulse {
-          0%,100%{box-shadow:0 4px 20px rgba(138,46,136,0.4),0 0 0 1px rgba(255,255,255,0.08) inset}
-          50%{box-shadow:0 4px 30px rgba(138,46,136,0.65),0 0 0 1px rgba(255,255,255,0.13) inset}
-        }
         @keyframes barGrow { from { width: 0; } to { width: 100%; } }
 
-        .orb-1 { animation: orbFloat1 8s ease-in-out infinite; }
-        .orb-2 { animation: orbFloat2 10s ease-in-out infinite; }
-        .orb-3 { animation: orbFloat3 12s ease-in-out infinite; }
-        .shimmer-bar { background:linear-gradient(90deg,#8A2E88,#C084C8,#8A2E88); background-size:200% 100%; animation:shimmer 3s linear infinite; }
         .page-in { animation: fadeInUp 0.65s ease forwards; }
-        .badge-pulse { animation: badgePulse 3s ease-in-out infinite; }
         .bar-animate { animation: barGrow 0.8s ease-out; }
       `}</style>
 
-      <div className="min-h-screen bg-[#0f0a1a] font-['DM_Sans'] relative overflow-hidden">
+      <div className="min-h-screen bg-slate-50 text-slate-800 font-['DM_Sans'] relative overflow-hidden">
 
-        {/* Orbs */}
-        <div className="orb-1 absolute w-150 h-150 rounded-full pointer-events-none -top-40 -left-35"
-          style={{ background:'radial-gradient(circle,rgba(138,46,136,0.3) 0%,transparent 70%)', filter:'blur(100px)' }} />
-        <div className="orb-2 absolute w-125 h-125 rounded-full pointer-events-none bottom-0 -right-25"
-          style={{ background:'radial-gradient(circle,rgba(99,40,180,0.22) 0%,transparent 70%)', filter:'blur(100px)' }} />
-
-        {/* Grid */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          backgroundImage: 'linear-gradient(rgba(138,46,136,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(138,46,136,0.05) 1px,transparent 1px)',
-          backgroundSize: '48px 48px'
-        }} />
+        {/* Decorative soft background blobs */}
+        <div className="absolute pointer-events-none -z-10 rounded-full"
+          style={{
+            top: '-10%', left: '-10%',
+            width: '45%', height: '45%',
+            backgroundColor: 'rgba(214, 227, 255, 0.4)',
+            filter: 'blur(80px)',
+          }}
+        />
+        <div className="absolute pointer-events-none -z-10 rounded-full"
+          style={{
+            bottom: '-10%', right: '-10%',
+            width: '45%', height: '45%',
+            backgroundColor: 'rgba(165, 239, 240, 0.35)',
+            filter: 'blur(80px)',
+          }}
+        />
 
         <Header />
 
         {/* ── Main content ── */}
-        <div className="relative z-10 max-w-400 mx-auto px-6 py-12">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
 
-          {/* ── Welcome Header ── */}
-          <div className={`relative rounded-3xl overflow-hidden border border-[#8A2E88]/22 mb-8
-            shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset,0_32px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(138,46,136,0.1)]
-            ${mounted ? 'page-in' : 'opacity-0'}`}
-            style={{ background:'rgba(20,10,35,0.72)', backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)' }}>
+          {/* ── Welcome Header Card ── */}
+          <div className={`relative rounded-3xl overflow-hidden mb-8 text-white shadow-md ${mounted ? 'page-in' : 'opacity-0'}`}
+            style={{ background: 'linear-gradient(135deg, var(--primary-container) 0%, var(--primary) 100%)' }}>
+            
+            {/* Dot grid decoration */}
+            <div className="absolute top-4 left-6 opacity-20" style={{ width: 80, height: 60, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1.5px, transparent 1.5px)', backgroundSize: '12px 12px' }}></div>
+            
+            {/* Campus photo overlay
+            <img
+              src="/images/college.png"
+              alt="College Campus Overlay"
+              className="absolute bottom-0 right-4 sm:right-10 h-[90%] sm:h-[110%] object-contain object-bottom select-none pointer-events-none opacity-85 hidden md:block"
+              style={{ maxWidth: '280px', mixBlendMode: 'luminosity' }}
+            /> */}
 
-            <div className="shimmer-bar h-0.75 w-full" />
-
-            <div className="p-8 lg:p-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div className="p-8 lg:p-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10 pr-6 md:pr-80">
               <div>
-                <h1 className="font-['Comfortaa'] font-bold text-[2rem] text-white tracking-[-0.02em] mb-2">
+                <h1 className="font-['Comfortaa'] font-bold text-3xl text-white tracking-tight mb-2">
                   Administrator Dashboard
                 </h1>
-                <p className="text-[0.95rem] text-[#C8A0D7]/60 max-w-150">
+                <p className="text-base text-slate-300 max-w-xl">
                   {dashboardData.college} • College-wide Student Analytics
                 </p>
               </div>
-              <div className='flex flex-col gap-2'>
-              <div className="flex gap-3">
-                <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl
-                  bg-[#8A2E88]/20 border border-[#8A2E88]/35
-                  text-[0.85rem] font-medium text-[#C084C8] hover:bg-[#8A2E88]/30 transition-all">
-                  <Filter size={16} />
-                  Filter
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl
-                  bg-linear-to-br from-[#8A2E88] to-[#B060B8]
-                  text-[0.85rem] font-semibold text-white hover:shadow-[0_6px_20px_rgba(138,46,136,0.5)] transition-all"
-                  onClick={() => setShowExportModal(true)}>
-                  <Download size={16} />
-                  Export Report
-                </button>
-              </div>
-              
-                <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl
-                  bg-linear-to-br from-[#8A2E88] to-[#B060B8]
-                  text-[0.85rem] font-semibold text-white hover:shadow-[0_6px_20px_rgba(138,46,136,0.5)] transition-all"
+
+              <div className='flex flex-col gap-2.5 sm:flex-row lg:flex-col w-full sm:w-auto shrink-0'>
+                <div className="flex gap-3 w-full sm:w-auto">
+                  <button className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-xl
+                    bg-white/10 border border-white/25 text-sm font-medium text-white hover:bg-white/20 transition-all cursor-pointer">
+                    <Filter size={16} />
+                    Filter
+                  </button>
+                  <button className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-xl
+                    bg-white text-[var(--primary)] text-sm font-semibold hover:bg-slate-100 transition-all shadow-xs cursor-pointer"
+                    onClick={() => setShowExportModal(true)}>
+                    <Download size={16} />
+                    Export Report
+                  </button>
+                </div>
+                
+                <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl
+                  bg-[var(--secondary)] text-sm font-semibold text-white hover:bg-[var(--secondary)]/90 hover:shadow-[0_6px_20px_rgba(19,105,106,0.3)] transition-all cursor-pointer"
                   onClick={() => setShowDownloadModal(true)}>
                   <Download size={16} />
                   Download Student Details
                 </button>
-                </div>
+              </div>
             </div>
           </div>
 
           {/* Download Student Details Modal */}
           {showDownloadModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="absolute inset-0 bg-black/50" onClick={() => setShowDownloadModal(false)} />
-              <div className="relative z-10 w-full max-w-2xl rounded-lg bg-[#0f0a1a] border border-[#8A2E88]/22 p-6">
-                <h2 className="text-white font-semibold text-lg mb-3">Download Student Details</h2>
+              <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" onClick={() => setShowDownloadModal(false)} />
+              <div className="relative z-10 w-full max-w-2xl rounded-2xl bg-white border border-slate-200 p-6 shadow-xl">
+                <h2 className="text-slate-900 font-bold text-xl mb-4">Download Student Details</h2>
                 <form onSubmit={handlePersonalsDownloadSubmit}>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                     <div>
-                      <label className="text-sm text-[#C8A0D7]/80">Degree Code</label>
+                      <label className="text-sm font-semibold text-slate-600 block mb-1">Degree Code</label>
                       <select value={filters.degreeCode} onChange={(e) => setFilters(f => ({ ...f, degreeCode: e.target.value }))}
-                        className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                        className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] outline-none text-sm">
                         <option value="">--Optional--</option>
                         <option value="B.Tech">B.Tech</option>
                         <option value="M.Tech">M.Tech</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm text-[#C8A0D7]/80">Entry Type Code</label>
+                      <label className="text-sm font-semibold text-slate-600 block mb-1">Entry Type Code</label>
                       <select value={filters.entryTypeCode} onChange={(e) => setFilters(f => ({ ...f, entryTypeCode: e.target.value }))}
-                        className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                        className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] outline-none text-sm">
                         <option value="">--Optional--</option>
                         <option value="Regular">Regular</option>
                         <option value="Lateral">Lateral</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm text-[#C8A0D7]/80">Gender</label>
+                      <label className="text-sm font-semibold text-slate-600 block mb-1">Gender</label>
                       <select value={filters.gender} onChange={(e) => setFilters(f => ({ ...f, gender: e.target.value }))}
-                        className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                        className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] outline-none text-sm">
                         <option value="">--Optional--</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
@@ -358,31 +385,31 @@ const AdminDashboard = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm text-[#C8A0D7]/80">Graduation Status</label>
+                      <label className="text-sm font-semibold text-slate-600 block mb-1">Graduation Status</label>
                       <select value={filters.graduationStatus} onChange={(e) => setFilters(f => ({ ...f, graduationStatus: e.target.value }))}
-                        className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                        className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] outline-none text-sm">
                         <option value="">--Optional--</option>
                         <option value="Graduated">Graduated</option>
                         <option value="Pursuing">Pursuing</option>
                       </select>
                     </div>
                   </div>
-                  <div className="mb-4">
-                    <p className="text-sm text-[#C8A0D7]/80 mb-2">Select fields to include</p>
-                    <div className="max-h-48 overflow-auto border border-[#8A2E88]/12 rounded p-2 bg-[#0b0812]">
+                  <div className="mb-5">
+                    <p className="text-sm font-semibold text-slate-600 mb-2">Select fields to include</p>
+                    <div className="max-h-48 overflow-auto border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-1">
                       {(personalFields || []).map((field) => (
-                        <label key={field} className="flex items-center gap-2 text-sm text-white/90 p-1">
+                        <label key={field} className="flex items-center gap-2.5 text-sm text-slate-700 p-1 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors">
                           <input type="checkbox" checked={selectedFields.includes(field)} onChange={() => {
                             setSelectedFields(prev => prev.includes(field) ? prev.filter(f => f !== field) : [...prev, field]);
-                          }} />
-                          <span className="capitalize">{field}</span>
+                          }} className="rounded border-slate-300 text-[var(--primary)] focus:ring-[var(--primary)]/20" />
+                          <span className="capitalize">{field.replace(/([A-Z])/g, ' $1').trim()}</span>
                         </label>
                       ))}
                     </div>
                   </div>
-                  <div className="flex items-center justify-end gap-3">
-                    <button type="button" onClick={() => setShowDownloadModal(false)} className="px-4 py-2 rounded border border-[#8A2E88]/20 text-[#C8A0D7]/80">Cancel</button>
-                    <button type="submit" className="px-4 py-2 rounded bg-linear-to-br from-[#8A2E88] to-[#B060B8] text-white">Download</button>
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onClick={() => setShowDownloadModal(false)} className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium transition-colors cursor-pointer">Cancel</button>
+                    <button type="submit" className="px-5 py-2.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white text-sm font-semibold transition-colors shadow-sm cursor-pointer">Download</button>
                   </div>
                 </form>
               </div>
@@ -392,44 +419,44 @@ const AdminDashboard = () => {
           {/* Export Reports Modal */}
           {showExportModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="absolute inset-0 bg-black/50" onClick={() => setShowExportModal(false)} />
-              <div className="relative z-10 w-full max-w-3xl h-[78vh] rounded-lg bg-[#0f0a1a] border border-[#8A2E88]/22 p-6 overflow-hidden">
+              <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" onClick={() => setShowExportModal(false)} />
+              <div className="relative z-10 w-full max-w-3xl h-[82vh] rounded-2xl bg-white border border-slate-200 p-6 shadow-xl overflow-hidden flex flex-col">
                 <div className="flex flex-col min-h-0 h-full overflow-y-auto pr-1">
-                  <h2 className="text-white font-semibold text-lg mb-3">Export Credential Reports</h2>
-                  <p className="text-sm text-[#C8A0D7]/70 mb-4">Choose credential types and fields, then optionally add filters before exporting.</p>
+                  <h2 className="text-slate-900 font-bold text-xl mb-1">Export Credential Reports</h2>
+                  <p className="text-sm text-slate-500 mb-5">Choose credential types and fields, then optionally add filters before exporting.</p>
                   <form onSubmit={handleReportsDownload}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                       <div>
-                        <label className="text-sm text-[#C8A0D7]/80">Degree Code</label>
+                        <label className="text-sm font-semibold text-slate-600 block mb-1">Degree Code</label>
                         <select value={exportFilters.degreeCode} onChange={(e) => setExportFilters(f => ({ ...f, degreeCode: e.target.value }))}
-                          className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                          className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] outline-none text-sm">
                           <option value="">--Optional--</option>
                           <option value="B.Tech">B.Tech</option>
                           <option value="M.Tech">M.Tech</option>
                         </select>
                       </div>
                       <div>
-                        <label className="text-sm text-[#C8A0D7]/80">Entry Type Code</label>
+                        <label className="text-sm font-semibold text-slate-600 block mb-1">Entry Type Code</label>
                         <select value={exportFilters.entryTypeCode} onChange={(e) => setExportFilters(f => ({ ...f, entryTypeCode: e.target.value }))}
-                          className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                          className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] outline-none text-sm">
                           <option value="">--Optional--</option>
                           <option value="Regular">Regular</option>
                           <option value="Lateral">Lateral</option>
                         </select>
                       </div>
                       <div>
-                        <label className="text-sm text-[#C8A0D7]/80">Graduation Status</label>
+                        <label className="text-sm font-semibold text-slate-600 block mb-1">Graduation Status</label>
                         <select value={exportFilters.graduationStatus} onChange={(e) => setExportFilters(f => ({ ...f, graduationStatus: e.target.value }))}
-                          className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                          className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] outline-none text-sm">
                           <option value="">--Optional--</option>
                           <option value="Graduated">Graduated</option>
                           <option value="Pursuing">Pursuing</option>
                         </select>
                       </div>
                       <div>
-                        <label className="text-sm text-[#C8A0D7]/80">Department</label>
+                        <label className="text-sm font-semibold text-slate-600 block mb-1">Department</label>
                         <select value={exportFilters.department} onChange={(e) => setExportFilters(f => ({ ...f, department: e.target.value }))}
-                          className="w-full mt-1 p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white">
+                          className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] outline-none text-sm">
                           <option value="">--All Departments--</option>
                           <option value="Computer Science and Engineering">CSE</option>
                           <option value="Electronics and Communication Engineering">ECE</option>
@@ -439,41 +466,41 @@ const AdminDashboard = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="text-sm text-[#C8A0D7]/80">Date range</label>
+                        <label className="text-sm font-semibold text-slate-600 block mb-1">Date range</label>
                         <div className="grid grid-cols-2 gap-2 mt-1">
                           <input type="date" value={exportFilters.fromDate} onChange={(e) => setExportFilters(f => ({ ...f, fromDate: e.target.value }))}
-                            className="w-full p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white" />
+                            className="w-full p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] outline-none text-sm" />
                           <input type="date" value={exportFilters.toDate} onChange={(e) => setExportFilters(f => ({ ...f, toDate: e.target.value }))}
-                            className="w-full p-2 rounded bg-[#0b0a12] border border-[#8A2E88]/20 text-white" />
+                            className="w-full p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] outline-none text-sm" />
                         </div>
                       </div>
                     </div>
-                    <div className="mb-4">
-                      <p className="text-sm text-[#C8A0D7]/80 mb-3">Select credential types</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="mb-5">
+                      <p className="text-sm font-semibold text-slate-600 mb-3">Select Credential Types</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         {credentialTypes.map((type) => (
-                          <label key={type} className="flex items-center gap-2 text-sm text-white/90 p-2 rounded border border-[#8A2E88]/20 bg-[#0b0812] cursor-pointer">
-                            <input type="checkbox" checked={selectedCredentialTypes.includes(type)} onChange={() => toggleCredentialType(type)} />
+                          <label key={type} className="flex items-center gap-2.5 text-sm text-slate-700 p-2.5 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
+                            <input type="checkbox" checked={selectedCredentialTypes.includes(type)} onChange={() => toggleCredentialType(type)} className="rounded border-slate-300 text-[var(--primary)] focus:ring-[var(--primary)]/20" />
                             <span className="capitalize">{type.replace(/_/g, ' ')}</span>
                           </label>
                         ))}
                       </div>
                     </div>
                     {selectedCredentialTypes.length > 0 && (
-                      <div className="mb-4">
-                        <p className="text-sm text-[#C8A0D7]/80 mb-3">Select fields for chosen credential types</p>
-                        <div className="space-y-4 max-h-96 overflow-auto p-2 border border-[#8A2E88]/12 rounded bg-[#0b0812]">
+                      <div className="mb-5">
+                        <p className="text-sm font-semibold text-slate-600 mb-3">Select fields for chosen credential types</p>
+                        <div className="space-y-4 max-h-96 overflow-auto p-3 border border-slate-200 rounded-xl bg-slate-50">
                           {selectedCredentialTypes.map((type) => (
-                            <div key={type} className="rounded-lg border border-[#8A2E88]/15 p-3 bg-[#120a1f]">
-                              <div className="flex items-center justify-between mb-3">
-                                <p className="text-sm font-semibold text-white">{type.replace(/_/g, ' ')}</p>
-                                <span className="text-xs text-[#C8A0D7]/70">{selectedCredentialFields[type]?.length || 0} selected</span>
+                            <div key={type} className="rounded-xl border border-slate-200/80 p-4 bg-white shadow-xs">
+                              <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                                <p className="text-sm font-bold text-slate-800 capitalize">{type.replace(/_/g, ' ')}</p>
+                                <span className="text-xs font-semibold text-[var(--primary)] bg-[var(--primary-fixed)] px-2 py-0.5 rounded-full">{selectedCredentialFields[type]?.length || 0} selected</span>
                               </div>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 {(credentialFieldMap[type] || []).map((field) => (
-                                  <label key={field} className="flex items-center gap-2 text-sm text-white/90 p-2 rounded border border-[#8A2E88]/15 bg-[#0e0a15] cursor-pointer">
-                                    <input type="checkbox" checked={(selectedCredentialFields[type] || []).includes(field)} onChange={() => toggleCredentialField(type, field)} />
-                                    <span>{field}</span>
+                                  <label key={field} className="flex items-center gap-2.5 text-sm text-slate-600 p-2 rounded-lg border border-slate-100 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
+                                    <input type="checkbox" checked={(selectedCredentialFields[type] || []).includes(field)} onChange={() => toggleCredentialField(type, field)} className="rounded border-slate-300 text-[var(--primary)] focus:ring-[var(--primary)]/20" />
+                                    <span className="truncate">{field}</span>
                                   </label>
                                 ))}
                               </div>
@@ -482,9 +509,9 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                     )}
-                    <div className="flex items-center justify-end gap-3">
-                      <button type="button" onClick={() => setShowExportModal(false)} className="px-4 py-2 rounded border border-[#8A2E88]/20 text-[#C8A0D7]/80">Cancel</button>
-                      <button type="submit" className="px-4 py-2 rounded bg-linear-to-br from-[#8A2E88] to-[#B060B8] text-white">Export</button>
+                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                      <button type="button" onClick={() => setShowExportModal(false)} className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium transition-colors cursor-pointer">Cancel</button>
+                      <button type="submit" className="px-5 py-2.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white text-sm font-semibold transition-colors shadow-sm cursor-pointer">Export</button>
                     </div>
                   </form>
                 </div>
@@ -493,67 +520,53 @@ const AdminDashboard = () => {
           )}
 
           {/* ── Key Metrics Grid ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-            {[
-              { label: 'Total Students', value: dashboardData.totalStudents, icon: <Users size={20} />, color: '#C084C8' },
-              { label: 'Active Students', value: dashboardData.activeStudents, icon: <TrendingUp size={20} />, color: '#8A2E88' },
-              { label: 'Departments', value: dashboardData.totalDepartments, icon: <Building2 size={20} />, color: '#D8A8E0' },
-              { label: 'Avg CGPA', value: dashboardData.avgCGPA.toFixed(2), icon: <Award size={20} />, color: '#B060B8' },
-              { label: 'Placements (2020)', value: '287/312', icon: <TrendingUp size={20} />, color: '#C084C8' },
-            ].map((metric, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4.5 mb-8">
+            {METRICS.map((metric, i) => (
               <div
                 key={i}
-                className={`relative rounded-[18px] overflow-hidden p-5 border border-[#8A2E88]/18
-                  transition-all duration-300 hover:-translate-y-1 hover:border-[#C084C8]/35
-                  hover:shadow-[0_12px_40px_rgba(138,46,136,0.2)]
+                className={`rounded-2xl p-5 border border-slate-200/80 bg-white
+                  shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5
                   ${mounted ? 'page-in' : 'opacity-0'}`}
                 style={{
-                  background:'rgba(20,10,35,0.65)',
-                  backdropFilter:'blur(20px)',
-                  WebkitBackdropFilter:'blur(20px)',
                   animationDelay: `${i * 0.1}s`,
-                  opacity: 0
                 }}>
-                <div className="flex items-start justify-between mb-3">
-                  <div className="badge-pulse w-10 h-10 flex items-center justify-center
-                    rounded-[11px] bg-linear-to-br from-[#8A2E88] to-[#C084C8] text-white"
-                    style={{ boxShadow:'0 4px 14px rgba(138,46,136,0.35)' }}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl"
+                    style={{ backgroundColor: metric.bg, color: metric.color }}>
                     {metric.icon}
                   </div>
                 </div>
-                <p className="text-[0.75rem] font-semibold text-[#967AA5]/60 uppercase tracking-[0.06em] mb-1">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
                   {metric.label}
                 </p>
-                <p className="text-[1.6rem] font-bold text-white">{metric.value}</p>
+                <p className="text-xl font-bold text-slate-800">{metric.value}</p>
               </div>
             ))}
           </div>
 
-          {/* ── Department-wise Distribution ── */}
-          <div className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18 mb-8
-            shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-            style={{ background:'rgba(20,10,35,0.65)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)' }}>
-            <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-              <h3 className="font-['DM_Sans'] font-semibold text-white text-[1.05rem] flex items-center gap-2">
-                <Building2 size={18} className="text-[#C084C8]" />
+          {/* ── Department-wise Student Distribution ── */}
+          <div className="rounded-2xl overflow-hidden border border-slate-200/80 bg-white shadow-xs mb-8">
+            <div className="px-6 py-4.5 border-b border-slate-100 bg-slate-50/50">
+              <h3 className="font-semibold text-slate-800 text-base flex items-center gap-2">
+                <Building2 size={18} className="text-[var(--primary)]" />
                 Department-wise Student Distribution
               </h3>
             </div>
-            <div className="p-6 space-y-5">
+            <div className="p-6 space-y-6">
               {dashboardData.departmentData.map((dept, i) => (
                 <div key={i}>
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <span className="text-[0.9rem] font-semibold text-white">{dept.dept}</span>
-                      <p className="text-[0.75rem] text-[#C8A0D7]/50">{dept.shortName}</p>
+                      <span className="text-sm font-semibold text-slate-800">{dept.dept}</span>
+                      <p className="text-xs text-slate-400 font-medium">{dept.shortName}</p>
                     </div>
-                    <span className="text-[0.8rem] text-[#C8A0D7]/60">{dept.students} students • {dept.placement}% placed</span>
+                    <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">{dept.students} students • {dept.placement}% placed</span>
                   </div>
-                  <div className="h-8 rounded-[10px] overflow-hidden bg-white/4 border border-white/6 flex">
+                  <div className="h-8 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/50 p-0.5 flex">
                     <div
-                      className="bar-animate bg-linear-to-r from-[#8A2E88] to-[#C084C8] h-full flex items-center justify-center relative"
+                      className="bar-animate bg-linear-to-r from-[var(--primary)] to-[var(--secondary)] h-full flex items-center justify-center relative rounded-lg text-white text-[10px] font-bold"
                       style={{ width: `${(dept.students / 300) * 100}%` }}>
-                      <span className="text-[0.65rem] font-bold text-white/80">CGPA: {dept.avgCGPA}</span>
+                      Avg CGPA: {dept.avgCGPA}
                     </div>
                   </div>
                 </div>
@@ -565,41 +578,37 @@ const AdminDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
             {/* Batch-wise distribution */}
-            <div className="lg:col-span-2 rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-              shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-              style={{ background:'rgba(20,10,35,0.65)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)' }}>
-              <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                <h3 className="font-['DM_Sans'] font-semibold text-white text-[1.05rem] flex items-center gap-2">
-                  <BarChart3 size={18} className="text-[#C084C8]" />
+            <div className="lg:col-span-2 rounded-2xl overflow-hidden border border-slate-200/80 bg-white shadow-xs">
+              <div className="px-6 py-4.5 border-b border-slate-100 bg-slate-50/50">
+                <h3 className="font-semibold text-slate-800 text-base flex items-center gap-2">
+                  <BarChart3 size={18} className="text-[var(--primary)]" />
                   College Batch-wise Distribution
                 </h3>
               </div>
-              <div className="p-6 space-y-5">
+              <div className="p-6 space-y-6">
                 {dashboardData.batchData.map((batch, i) => (
                   <div key={i}>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[0.9rem] font-semibold text-white">Batch {batch.batch}</span>
-                      <span className="text-[0.8rem] text-[#C8A0D7]/60">{batch.total} students</span>
+                      <span className="text-sm font-semibold text-slate-800">Batch {batch.batch}</span>
+                      <span className="text-xs font-medium text-slate-500">{batch.total} students</span>
                     </div>
-                    <div className="h-8 rounded-[10px] overflow-hidden bg-white/4 border border-white/6 flex">
+                    <div className="h-8 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/50 p-0.5 flex">
                       <div
-                        className="bar-animate bg-linear-to-r from-[#8A2E88] to-[#C084C8] h-full flex items-center justify-center relative"
+                        className="bar-animate bg-[var(--primary)] h-full flex items-center justify-center relative rounded-lg text-white text-[10px] font-bold"
                         style={{ width: `${(batch.pursuing / batch.total) * 100}%` }}>
-                        {batch.pursuing > 0 && (
-                          <span className="text-[0.65rem] font-bold text-white/80">Pursuing</span>
-                        )}
+                        {batch.pursuing > 0 && "Pursuing"}
                       </div>
                       {batch.graduated > 0 && (
                         <div
-                          className="h-full flex items-center justify-center bg-[#4ade80]/40"
+                          className="h-full flex items-center justify-center bg-[var(--secondary-container)] text-[var(--on-secondary-container)] text-[10px] font-bold rounded-lg ml-0.5"
                           style={{ width: `${(batch.graduated / batch.total) * 100}%` }}>
-                          <span className="text-[0.65rem] font-bold text-white/70">Graduated</span>
+                          Graduated
                         </div>
                       )}
                     </div>
-                    <div className="flex justify-between mt-2 text-[0.75rem] text-[#967AA5]/60">
+                    <div className="flex justify-between mt-2 text-xs font-medium text-slate-500">
                       <span>Pursuing: {batch.pursuing} | Graduated: {batch.graduated}</span>
-                      <span>Placed: {batch.onPlacement}</span>
+                      <span className="text-slate-600 font-semibold">Placed: {batch.onPlacement}</span>
                     </div>
                   </div>
                 ))}
@@ -607,30 +616,27 @@ const AdminDashboard = () => {
             </div>
 
             {/* Performance Distribution */}
-            <div className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-              shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-              style={{ background:'rgba(20,10,35,0.65)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)' }}>
-              <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                <h3 className="font-['DM_Sans'] font-semibold text-white text-[1.05rem] flex items-center gap-2">
-                  <PieChartIcon size={18} className="text-[#C084C8]" />
+            <div className="rounded-2xl overflow-hidden border border-slate-200/80 bg-white shadow-xs">
+              <div className="px-6 py-4.5 border-b border-slate-100 bg-slate-50/50">
+                <h3 className="font-semibold text-slate-800 text-base flex items-center gap-2">
+                  <PieChartIcon size={18} className="text-[var(--primary)]" />
                   Performance Distribution
                 </h3>
               </div>
-              <div className="p-6 space-y-3">
+              <div className="p-6 space-y-4">
                 {Object.entries(dashboardData.performanceGrades).map(([grade, count], i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-[10px] flex items-center justify-center
-                      bg-linear-to-br from-[#8A2E88] to-[#C084C8] text-white font-bold text-[0.9rem]">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--primary-container)] text-white font-bold text-sm flex items-center justify-center">
                       {grade}
                     </div>
                     <div className="flex-1">
-                      <div className="h-6 rounded-lg bg-white/4 overflow-hidden">
+                      <div className="h-5 bg-slate-100 rounded-lg overflow-hidden p-0.5">
                         <div
-                          className="bar-animate h-full bg-linear-to-r from-[#8A2E88]/60 to-[#C084C8]/60"
+                          className="bar-animate h-full bg-[var(--primary)] rounded-md"
                           style={{ width: `${(count / totalGradeCount) * 100}%` }} />
                       </div>
                     </div>
-                    <span className="text-[0.85rem] font-semibold text-[#C8A0D7]/70 min-w-10 text-right">
+                    <span className="text-xs font-semibold text-slate-500 min-w-10 text-right">
                       {count}
                     </span>
                   </div>
@@ -640,28 +646,26 @@ const AdminDashboard = () => {
           </div>
 
           {/* ── Skills Proficiency ── */}
-          <div className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18 mb-8
-            shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-            style={{ background:'rgba(20,10,35,0.65)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)' }}>
-            <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-              <h3 className="font-['DM_Sans'] font-semibold text-white text-[1.05rem] flex items-center gap-2">
-                <Code2 size={18} className="text-[#C084C8]" />
+          <div className="rounded-2xl overflow-hidden border border-slate-200/80 bg-white shadow-xs mb-8">
+            <div className="px-6 py-4.5 border-b border-slate-100 bg-slate-50/50">
+              <h3 className="font-semibold text-slate-800 text-base flex items-center gap-2">
+                <Code2 size={18} className="text-[var(--primary)]" />
                 College-wide Skill-wise Proficiency
               </h3>
             </div>
             <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {dashboardData.skillMetrics.map((skill, i) => (
                   <div key={i}>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[0.9rem] font-medium text-white">{skill.skill}</span>
-                      <span className="text-[0.8rem] font-semibold text-[#C084C8]">
+                      <span className="text-sm font-semibold text-slate-700">{skill.skill}</span>
+                      <span className="text-xs font-bold text-[var(--secondary)] bg-[var(--secondary-container)] px-2.5 py-0.5 rounded-full">
                         {skill.count} ({skill.percentage}%)
                       </span>
                     </div>
-                    <div className="h-6 rounded-[10px] bg-white/4 border border-white/6 overflow-hidden">
+                    <div className="h-5 rounded-lg bg-slate-100 overflow-hidden p-0.5 border border-slate-200/30">
                       <div
-                        className="bar-animate h-full bg-linear-to-r from-[#8A2E88] via-[#B060B8] to-[#C084C8]"
+                        className="bar-animate h-full bg-linear-to-r from-[var(--primary)] to-[var(--secondary)] rounded-md"
                         style={{ width: `${skill.percentage}%` }} />
                     </div>
                   </div>
@@ -670,33 +674,33 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* ── Bottom Grid: Certifications & Metrics ── */}
+          {/* ── Bottom Grid: Certifications & Infrastructure Metrics ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             {/* Certifications */}
-            <div className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-              shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-              style={{ background:'rgba(20,10,35,0.65)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)' }}>
-              <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                <h3 className="font-['DM_Sans'] font-semibold text-white text-[1.05rem] flex items-center gap-2">
-                  <Award size={18} className="text-[#C084C8]" />
+            <div className="rounded-2xl overflow-hidden border border-slate-200/80 bg-white shadow-xs">
+              <div className="px-6 py-4.5 border-b border-slate-100 bg-slate-50/50">
+                <h3 className="font-semibold text-slate-800 text-base flex items-center gap-2">
+                  <Award size={18} className="text-[var(--primary)]" />
                   Industry Certifications (College-wide)
                 </h3>
               </div>
-              <div className="p-6 space-y-3">
+              <div className="p-6 space-y-4">
                 {dashboardData.certifications.map((cert, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-xl
-                    bg-[#8A2E88]/10 border border-[#8A2E88]/20 hover:bg-[#8A2E88]/15 transition-all">
-                    <div className="flex items-center gap-3">
-                      <span className="text-[1.4rem]">{cert.icon}</span>
+                  <div key={i} className="flex items-center justify-between p-4 rounded-2xl
+                    bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors">
+                    <div className="flex items-center gap-4.5">
+                      <div className="w-10 h-10 rounded-xl bg-[var(--secondary-container)] flex items-center justify-center">
+                        {getCertIcon(cert.name)}
+                      </div>
                       <div>
-                        <p className="font-semibold text-white text-[0.9rem]">{cert.name}</p>
-                        <p className="text-[0.75rem] text-[#C8A0D7]/50">{cert.depts}</p>
+                        <p className="font-bold text-slate-800 text-sm">{cert.name}</p>
+                        <p className="text-xs text-slate-400 font-medium">{cert.depts}</p>
                       </div>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className="text-[1.1rem] font-bold text-[#C084C8]">{cert.count}</span>
-                      <span className="text-[0.7rem] text-[#967AA5]/60">
+                      <span className="text-sm font-bold text-[var(--secondary)]">{cert.count}</span>
+                      <span className="text-[10px] text-slate-400 font-semibold">
                         {((cert.count / dashboardData.totalStudents) * 100).toFixed(1)}%
                       </span>
                     </div>
@@ -706,23 +710,21 @@ const AdminDashboard = () => {
             </div>
 
             {/* College Metrics */}
-            <div className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18
-              shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-              style={{ background:'rgba(20,10,35,0.65)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)' }}>
-              <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-                <h3 className="font-['DM_Sans'] font-semibold text-white text-[1.05rem] flex items-center gap-2">
-                  <Building2 size={18} className="text-[#C084C8]" />
+            <div className="rounded-2xl overflow-hidden border border-slate-200/80 bg-white shadow-xs">
+              <div className="px-6 py-4.5 border-b border-slate-100 bg-slate-50/50">
+                <h3 className="font-semibold text-slate-800 text-base flex items-center gap-2">
+                  <Building2 size={18} className="text-[var(--primary)]" />
                   College Infrastructure Metrics
                 </h3>
               </div>
-              <div className="p-6 grid grid-cols-2 gap-3">
+              <div className="p-6 grid grid-cols-2 gap-4">
                 {dashboardData.collegeMetrics.map((metric, i) => (
-                  <div key={i} className="p-3 rounded-xl bg-[#8A2E88]/10 border border-[#8A2E88]/20">
-                    <p className="text-[0.75rem] text-[#C8A0D7]/60 uppercase tracking-[0.04em] mb-1">
+                  <div key={i} className="p-4.5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
                       {metric.label}
                     </p>
-                    <p className="text-[1.4rem] font-bold text-white">{metric.value}</p>
-                    <p className="text-[0.7rem] text-[#967AA5]/60 mt-1">{metric.change}</p>
+                    <p className="text-xl font-bold text-slate-800">{metric.value}</p>
+                    <p className="text-xs text-[var(--secondary)] font-semibold mt-1">{metric.change}</p>
                   </div>
                 ))}
               </div>
@@ -730,43 +732,30 @@ const AdminDashboard = () => {
           </div>
 
           {/* ── Alerts & Updates ── */}
-          {/* <div className="rounded-[20px] overflow-hidden border border-[#8A2E88]/18 mt-6
-            shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-            style={{ background:'rgba(20,10,35,0.65)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)' }}>
-            <div className="px-6 py-4 border-b border-[#8A2E88]/15 bg-[#8A2E88]/08">
-              <h3 className="font-['DM_Sans'] font-semibold text-white text-[1.05rem] flex items-center gap-2">
-                <AlertCircle size={18} className="text-[#C084C8]" />
+          <div className="rounded-2xl overflow-hidden border border-slate-200/80 bg-white shadow-xs mt-8">
+            <div className="px-6 py-4.5 border-b border-slate-100 bg-slate-50/50">
+              <h3 className="font-semibold text-slate-800 text-base flex items-center gap-2">
+                <AlertCircle size={18} className="text-[var(--primary)]" />
                 College Alerts & Updates
               </h3>
             </div>
-            <div className="p-6 space-y-3">
+            <div className="p-6 space-y-4">
               {dashboardData.recentAlerts.map((alert, i) => (
-                <div key={i} className={`flex items-start gap-3 p-3 rounded-xl border
-                  ${alert.type === 'warning'
-                    ? 'bg-red-500/10 border-red-500/25'
-                    : alert.type === 'success'
-                    ? 'bg-emerald-500/10 border-emerald-500/25'
-                    : 'bg-blue-500/10 border-blue-500/25'
-                  }`}>
-                  <span className={`mt-0.5 flex-shrink-0
-                    ${alert.type === 'warning'
-                      ? 'text-red-400'
-                      : alert.type === 'success'
-                      ? 'text-emerald-400'
-                      : 'text-blue-400'
-                    }`}>
+                <div key={i} className={`flex items-start gap-4 p-4.5 rounded-2xl border text-sm font-medium transition-shadow hover:shadow-xs
+                  ${getAlertStyles(alert.type)}`}>
+                  <span className={`mt-0.5 shrink-0 ${getAlertIconStyles(alert.type)}`}>
                     {alert.icon}
                   </span>
-                  <p className="text-[0.9rem] text-[#C8A0D7]/70">{alert.message}</p>
+                  <p className="m-0 leading-relaxed">{alert.message}</p>
                 </div>
               ))}
             </div>
-          </div> */}
+          </div>
         </div>
 
         {/* Footer */}
-        <div className="relative z-10 border-t border-[#8A2E88]/15 py-5 mt-12">
-          <p className="text-center text-[0.72rem] text-[#967AA5]/35">
+        <div className="relative z-10 border-t border-slate-200 py-6 mt-12">
+          <p className="text-center text-xs text-slate-400 font-medium">
             © 2026 JNTU-GV Vizianagaram. All rights reserved.
           </p>
         </div>
@@ -776,4 +765,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default AdminDashboard;  

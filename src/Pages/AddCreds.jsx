@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { fields, types, textFields, radioOptions, DocFields, selectOptions, dateFields } from '../assets/Data'
-import { useLocation } from 'react-router-dom'
-import { addCredential } from '../core/user'
+import React, { useState, useEffect } from 'react';
+import { fields, types, textFields, radioOptions, DocFields, selectOptions, dateFields } from '../assets/Data';
+import { useLocation } from 'react-router-dom';
+import { addCredential } from '../core/user';
+import { NotebookPen, ShieldCheck, Sparkles, UploadCloud } from 'lucide-react';
 
 export default function AddCreds() {
 
@@ -178,113 +179,111 @@ export default function AddCreds() {
 	}
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: '#f8f9ff' }}>
-			<div className="w-full max-w-2xl">
-				<header className="rounded-t-md p-6" style={{ background: '#002045', color: '#ffffff' }}>
-					<h1 className="text-2xl font-semibold">Add Credentials</h1>
-					<p className="text-sm mt-1 text-slate-200">Add details for the selected credential type</p>
-				</header>
-
-				<div className="bg-white border border-slate-300 rounded-b-md p-6 shadow-sm">
-					<div className="mb-4">
-						<label className="block mb-2 text-sm font-medium text-slate-700" htmlFor="type">Type</label>
-						<select
-							id="type"
-							name="type"
-							value={type}
-							onChange={(e) => setType(e.target.value)}
-							className="w-full p-2 border rounded-md bg-white text-slate-700 border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d]"
-						>
-							<option value="">Select Type</option>
-							{types.map((t) => (
-								<option key={t} value={t}>
-									{t.charAt(0).toUpperCase() + t.slice(1).replaceAll("_", " ")}
-								</option>
-							))}
-						</select>
+		<div className="sis-page-shell flex items-center justify-center px-4 py-10">
+			<div className="w-full max-w-6xl overflow-hidden rounded-[32px] sis-panel grid lg:grid-cols-[1.1fr_0.9fr]">
+				<div className="p-8 lg:p-10">
+					<div className="mb-5 flex items-center gap-3">
+						<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--primary)] text-white shadow-sm">
+							<NotebookPen size={20} />
+						</div>
+						<div>
+							<h1 className="text-2xl font-semibold text-[var(--primary)]">Add credentials</h1>
+							<p className="text-sm text-[var(--on-surface-variant)]">Capture new academic, skill, or achievement details with confidence.</p>
+						</div>
 					</div>
 
-					<form onSubmit={handleSubmit}>
-						{type && (
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								{fields[type].map((field) => {
-									const key = fieldKey(field)
-									return (
-										<div key={key}>
-											<label className="block mb-2 text-sm font-medium text-slate-700" htmlFor={key}>
-												{field.charAt(0).toUpperCase() + field.slice(1)}
-											</label>
-											{
-												// isBooleanField(field) ? (
-												// 	<input
-												// 		type="checkbox"
-												// 		id={key}
-												// 		name={key}
-												// 		checked={!!formData[key]}
-												// 		onChange={handleChange}
-												// 		className="h-4 w-4"
-												// 	/>
-												// ) :
-												isRadioField(field, type) ? (
-													<div>
-													<div className="flex space-x-2">
-														{radioOptions[type][field].map((opt) => (
-															<label key={opt} className="inline-flex items-center">
-																<input
-																	type="radio"
-																	name={key}
-																	value={opt}
-																	checked={formData[key] === opt}
-																	onChange={handleChange}
-																	className="h-4 w-4"
-																/>
-																<span className="ml-2 text-sm text-slate-700">{opt.charAt(0).toUpperCase() + opt.slice(1).replaceAll("_", " ")}</span>
-															</label>
-														))}
-														</div>
-														{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
-													</div>
-												)
-													:
-													isSelectField(field, type) ? (
-														<>
-															<select
-																type="number"
-																id={key}
-																name={key}
-																value={formData[key] ?? ''}
-																onChange={handleChange}
-																onBlur={() => handleBlur(field)}
-																className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
-															>
-																<option value="">Select</option>
-																{selectOptions[type][field].map((opt) => (
+					<div className="mb-5 flex flex-wrap items-center gap-2">
+						<span className="sis-accent-pill"><Sparkles size={15} /> Guided entry</span>
+						<span className="sis-accent-pill"><ShieldCheck size={15} /> Secure submission</span>
+					</div>
 
-																	<option key={opt} value={opt}>
-																		{opt.charAt(0).toUpperCase() + opt.slice(1).replaceAll("_", " ")}
-																	</option>
+					<div className="rounded-2xl border border-[var(--outline-variant)]/60 bg-[var(--surface-container-low)] p-5 shadow-sm">
+						<div className="mb-4">
+							<label className="mb-2 block text-sm font-semibold text-[var(--on-surface)]" htmlFor="type">Credential type</label>
+							<select
+								id="type"
+								name="type"
+								value={type}
+								onChange={(e) => setType(e.target.value)}
+								className="w-full rounded-xl border border-[var(--outline-variant)] bg-[var(--surface-container-lowest)] px-3 py-2.5 text-sm outline-none transition focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10"
+							>
+								<option value="">Select type</option>
+								{types.map((t) => (
+									<option key={t} value={t}>
+										{t.charAt(0).toUpperCase() + t.slice(1).replaceAll("_", " ")}
+									</option>
+								))}
+							</select>
+						</div>
+
+						<form onSubmit={handleSubmit} className="mt-6 space-y-4">
+							{type && (
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+									{fields[type].map((field) => {
+										const key = fieldKey(field)
+										return (
+											<div key={key}>
+												<label className="mb-2 block text-sm font-semibold text-[var(--on-surface)]" htmlFor={key}>
+													{field.charAt(0).toUpperCase() + field.slice(1)}
+												</label>
+												{
+													// isBooleanField(field) ? (
+													// 	<input
+													// 		type="checkbox"
+													// 		id={key}
+													// 		name={key}
+													// 		checked={!!formData[key]}
+													// 		onChange={handleChange}
+													// 		className="h-4 w-4"
+													// 	/>
+													// ) :
+													isRadioField(field, type) ? (
+														<div>
+															<div className="flex flex-wrap gap-3">
+																{radioOptions[type][field].map((opt) => (
+																	<label key={opt} className="inline-flex items-center gap-2 text-sm text-[var(--on-surface-variant)]">
+																		<input
+																			type="radio"
+																			name={key}
+																			value={opt}
+																			checked={formData[key] === opt}
+																			onChange={handleChange}
+																			className="h-4 w-4 accent-[var(--primary)]"
+																		/>
+																		<span>{opt.charAt(0).toUpperCase() + opt.slice(1).replaceAll("_", " ")}</span>
+																	</label>
 																))}
-															</select>
+															</div>
 															{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
-														</>
-													) :
-														isDateField(field, type) ? (
+														</div>
+													)
+														:
+														isSelectField(field, type) ? (
 															<>
-																<input
-																	type="date"
+																<select
+																	type="number"
 																	id={key}
 																	name={key}
 																	value={formData[key] ?? ''}
 																	onChange={handleChange}
 																	onBlur={() => handleBlur(field)}
 																	className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
-																/>
+																>
+																	<option value="">Select</option>
+																	{selectOptions[type][field].map((opt) => (
+
+																		<option key={opt} value={opt}>
+																			{opt.charAt(0).toUpperCase() + opt.slice(1).replaceAll("_", " ")}
+																		</option>
+																	))}
+																</select>
 																{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
 															</>
 														) :
-															isTextField(field, type) ? (
+															isDateField(field, type) ? (
 																<>
-																	<textarea
+																	<input
+																		type="date"
 																		id={key}
 																		name={key}
 																		value={formData[key] ?? ''}
@@ -294,11 +293,10 @@ export default function AddCreds() {
 																	/>
 																	{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
 																</>
-															)
-																: isNumericField(field) ? (
+															) :
+																isTextField(field, type) ? (
 																	<>
-																		<input
-																			type="number"
+																		<textarea
 																			id={key}
 																			name={key}
 																			value={formData[key] ?? ''}
@@ -309,51 +307,76 @@ export default function AddCreds() {
 																		{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
 																	</>
 																)
-																	:
-																	isFile(field, type) ? (
+																	: isNumericField(field) ? (
 																		<>
 																			<input
-																				type="file"
+																				type="number"
 																				id={key}
 																				name={key}
+																				value={formData[key] ?? ''}
 																				onChange={handleChange}
+																				onBlur={() => handleBlur(field)}
 																				className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
 																			/>
 																			{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
 																		</>
 																	)
-																		: (
+																		:
+																		isFile(field, type) ? (
 																			<>
 																				<input
-																					type="text"
+																					type="file"
 																					id={key}
 																					name={key}
-																					value={formData[key] ?? ''}
 																					onChange={handleChange}
 																					className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
 																				/>
 																				{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
 																			</>
-																		)}
-										</div>
-									)
-								})}
-							</div>
-						)}
-
-						<div className="mt-6">
-							{type ? (
-								<button
-									type="submit"
-									className="inline-flex items-center px-4 py-2 bg-[#1a365d] text-white rounded-md hover:bg-[#002045] focus:outline-none"
-								>
-									Submit
-								</button>
-							) : (
-								<p className="text-sm text-slate-500">Please select a type to add credentials.</p>
+																		)
+																			: (
+																				<>
+																					<input
+																						type="text"
+																						id={key}
+																						name={key}
+																						value={formData[key] ?? ''}
+																						onChange={handleChange}
+																						className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1a365d] focus:border-[#1a365d] ${errors[key] ? 'border-red-500' : 'border-slate-300'}`}
+																					/>
+																					{errors[key] && <p className="mt-1 text-xs text-red-600">{errors[key]}</p>}
+																				</>
+																			)}
+											</div>
+										)
+									})}
+								</div>
 							)}
+
+							<div className="mt-6">
+								{type ? (
+									<button
+										type="submit"
+										className="inline-flex items-center px-4 py-2 bg-[#1a365d] text-white rounded-md hover:bg-[#002045] focus:outline-none"
+									>
+										Submit
+									</button>
+								) : (
+									<p className="text-sm text-slate-500">Please select a type to add credentials.</p>
+								)}
+							</div>
+						</form>
+					</div>
+
+					<div className="relative hidden lg:block">
+						<img src="/images/academics.jpg" alt="" className="h-full w-full object-cover" />
+						<div className="absolute inset-0 bg-gradient-to-t from-[var(--primary)]/80 via-[var(--primary)]/30 to-transparent" />
+						<div className="absolute bottom-8 left-8 right-8 rounded-2xl border border-white/20 bg-white/15 p-5 text-white backdrop-blur-md">
+							<p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--primary-fixed)]">Student portal</p>
+							<h2 className="mt-2 text-2xl font-semibold">Keep every achievement in one polished profile.</h2>
+							<p className="mt-2 text-sm text-[var(--primary-fixed)]">Use the same structure for internships, projects, certifications, and extracurriculars.</p>
 						</div>
-					</form>
+					</div>
 				</div>
 			</div>
 		</div>
