@@ -26,7 +26,7 @@ function AppRoutes() {
                 <Routes>
                     <Route path='/' element={<Home />} />
                     <Route path='/login' element={<Login />} />
-                    <Route path='/profile' element={<Profile />} />
+                    <Route path='/student/profile/*' element={<Profile />} />
                     <Route path='/hod' element={<HodLogin />} />
                     <Route path='/hodboard' element={<HODDashboard />} />
                     <Route path='/administratorlogin' element={<AdministratorsLogin />} />

@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+particulars.md
+Modals
+
 rg.jsx
 
 # Editor directories and files

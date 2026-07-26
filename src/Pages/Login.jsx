@@ -25,7 +25,7 @@ export default function Login() {
     setIsLoading(true);
     try {
       await loginUser(studentId, password);
-      navigate('/profile');
+      navigate('/student/profile');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -35,7 +35,7 @@ export default function Login() {
 
   return (
     <div
-      className="flex-grow flex items-center justify-center relative overflow-hidden"
+      className="grow flex items-center justify-center relative overflow-hidden"
       style={{
         padding: '32px 16px',
         backgroundColor: 'var(--background)',

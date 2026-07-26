@@ -1,0 +1,179 @@
+[
+  {
+    "type": "internship",
+    "title": "Internships",
+    "items": [
+      {
+        "title": "Software Engineering Intern",
+        "organization": "TechNova Labs",
+        "startDate": "2024-05-01",
+        "endDate": "2024-07-31",
+        "stipend": "Yes",
+        "amount": "25000"
+      }
+    ]
+  },
+  {
+    "type": "placement",
+    "title": "Placements",
+    "items": [
+      {
+        "jobRole": "Junior Software Engineer",
+        "company": "CloudBridge Solutions",
+        "package": "8.2 LPA",
+        "dateOfSelection": "2025-02-18"
+      }
+    ]
+  },
+  {
+    "type": "certification",
+    "title": "Professional Certifications",
+    "items": [
+      {
+        "name": "AWS Certified Cloud Practitioner",
+        "issuer": "Amazon Web Services",
+        "date": "2024-03-15"
+      },
+      {
+        "name": "Google Associate Cloud Engineer",
+        "issuer": "Google Cloud",
+        "date": "2024-01-20"
+      },
+      {
+        "name": "Microsoft Azure Fundamentals",
+        "issuer": "Microsoft",
+        "date": "2023-10-12"
+      }
+    ]
+  },
+  {
+    "type": "professional_bodies",
+    "title": "Professional Bodies",
+    "items": [
+      {
+        "name": "IEEE Student Member",
+        "membershipId": "IEEEM-1024",
+        "validTill": "2026-12-31"
+      }
+    ]
+  },
+  {
+    "type": "skills",
+    "title": "Skills",
+    "items": [
+      { "name": "Python" },
+      { "name": "Java" },
+      { "name": "React.js" },
+      { "name": "Tailwind CSS" },
+      { "name": "Node.js" }
+    ]
+  },
+  {
+    "type": "extra_curricular_activities",
+    "title": "Extra Curricular Activities",
+    "items": [
+      {
+        "eventName": "Coding Sprint",
+        "organization": "Student Innovation Club",
+        "date": "2024-09-10"
+      }
+    ]
+  },
+  {
+    "type": "scholarships",
+    "title": "Scholarships",
+    "items": [
+      {
+        "name": "Merit Scholarship",
+        "amount": "50000",
+        "year": "2024"
+      }
+    ]
+  },
+  {
+    "type": "co_curricular_activities",
+    "title": "Co-Curricular Activities",
+    "items": [
+      {
+        "eventName": "Tech Symposium Volunteer",
+        "organization": "Department of CSE",
+        "date": "2024-11-02"
+      }
+    ]
+  },
+  {
+    "type": "journal_publication",
+    "title": "Journal Publications",
+    "items": [
+      {
+        "title": "AI-Assisted Learning Analytics",
+        "journal": "International Journal of Computer Applications"
+      }
+    ]
+  },
+  {
+    "type": "conference_paper",
+    "title": "Conference Papers",
+    "items": [
+      {
+        "title": "Secure Data Sharing in IoT",
+        "conference": "NCRDCS 2024"
+      }
+    ]
+  },
+  {
+    "type": "patent",
+    "title": "Patents",
+    "items": [
+      {
+        "title": "Smart Attendance Tracking System",
+        "status": "Published"
+      }
+    ]
+  },
+  {
+    "type": "competitions",
+    "title": "Competitions",
+    "items": [
+      {
+        "name": "Hackathon 2024",
+        "rank": "2nd Place"
+      }
+    ]
+  },
+  {
+    "type": "projects",
+    "title": "Projects",
+    "items": [
+      {
+        "title": "Student Information System",
+        "description": "Centralized platform for managing student data with modern UI and secure access.",
+        "year": 2024,
+        "type": "Full Stack"
+      },
+      {
+        "title": "E-Commerce Platform",
+        "description": "Full-stack web application with payment integration and optimized performance.",
+        "year": 2023,
+        "type": "Web Application"
+      },
+      {
+        "title": "Smart Campus Assistant",
+        "description": "AI-powered assistant for campus notifications and event tracking.",
+        "year": 2025,
+        "type": "AI Product"
+      }
+    ]
+  },
+  {
+    "type": "entrance_examinations",
+    "title": "Entrance Examinations",
+    "items": [
+      {
+        "examName": "GATE",
+        "score": "88",
+        "rank": "1245"
+      }
+    ]
+  }
+]
