@@ -1,161 +1,8 @@
 import React from 'react';
-import { Briefcase, Calendar, MapPin, DollarSign, FileText } from 'lucide-react';
+import { Briefcase, Calendar, DollarSign, FileText } from 'lucide-react';
+import { fileUrl } from '../../utils/helpers';
 
 export default function Internship({ items = [] }) {
-  if (!items || items.length === 0) {
-    return (
-      <div className="bg-white p-8 rounded-3xl border border-slate-200 text-center text-slate-500 font-medium shadow-sm">
-        No internship details found.
-      </div>
-    );
-  }
-
-  const internships = [
-  {
-    title: "Java Developer Intern",
-    organizationCompanyName: "Infosys Ltd.",
-    industryMentor: "Rakesh Sharma",
-    facultyMentor: "Dr. P. Kumar",
-    status: "Completed",
-    startDate: "2025-01-10",
-    endDate: "2025-03-10",
-    isStipendBased: "yes",
-    amount: "15000",
-    certificate: null,
-  },
-  {
-    title: "Web Development Intern",
-    organizationCompanyName: "Tata Consultancy Services",
-    industryMentor: "Sneha Rao",
-    facultyMentor: "Dr. S. Lakshmi",
-    status: "Completed",
-    startDate: "2025-02-01",
-    endDate: "2025-04-30",
-    isStipendBased: "yes",
-    amount: "18000",
-    certificate: null,
-  },
-  {
-    title: "Frontend Developer Intern",
-    organizationCompanyName: "Wipro Technologies",
-    industryMentor: "Amit Verma",
-    facultyMentor: "Dr. R. Prasad",
-    status: "Completed",
-    startDate: "2024-06-01",
-    endDate: "2024-08-31",
-    isStipendBased: "no",
-    amount: "",
-    certificate: null,
-  },
-  {
-    title: "Backend Developer Intern",
-    organizationCompanyName: "Tech Mahindra",
-    industryMentor: "Neha Singh",
-    facultyMentor: "Dr. K. Reddy",
-    status: "Completed",
-    startDate: "2024-05-15",
-    endDate: "2024-07-15",
-    isStipendBased: "yes",
-    amount: "20000",
-    certificate: null,
-  },
-  {
-    title: "Data Science Intern",
-    organizationCompanyName: "Accenture",
-    industryMentor: "Vivek Nair",
-    facultyMentor: "Dr. M. Rao",
-    status: "Completed",
-    startDate: "2024-01-08",
-    endDate: "2024-03-31",
-    isStipendBased: "yes",
-    amount: "22000",
-    certificate: null,
-  },
-  {
-    title: "Machine Learning Intern",
-    organizationCompanyName: "Cognizant",
-    industryMentor: "Rahul Mehta",
-    facultyMentor: "Dr. A. Devi",
-    status: "Completed",
-    startDate: "2024-09-01",
-    endDate: "2024-11-30",
-    isStipendBased: "yes",
-    amount: "25000",
-    certificate: null,
-  },
-  {
-    title: "Android Developer Intern",
-    organizationCompanyName: "Zoho Corporation",
-    industryMentor: "Arun Raj",
-    facultyMentor: "Dr. V. Suresh",
-    status: "Completed",
-    startDate: "2023-12-01",
-    endDate: "2024-02-29",
-    isStipendBased: "no",
-    amount: "",
-    certificate: null,
-  },
-  {
-    title: "Cloud Computing Intern",
-    organizationCompanyName: "IBM India",
-    industryMentor: "Priya Kapoor",
-    facultyMentor: "Dr. N. Anitha",
-    status: "Completed",
-    startDate: "2023-07-03",
-    endDate: "2023-09-30",
-    isStipendBased: "yes",
-    amount: "24000",
-    certificate: null,
-  },
-  {
-    title: "Cyber Security Intern",
-    organizationCompanyName: "HCL Technologies",
-    industryMentor: "Sandeep Joshi",
-    facultyMentor: "Dr. G. Srinivas",
-    status: "Completed",
-    startDate: "2023-10-02",
-    endDate: "2023-12-29",
-    isStipendBased: "yes",
-    amount: "17000",
-    certificate: null,
-  },
-  {
-    title: "DevOps Intern",
-    organizationCompanyName: "Capgemini",
-    industryMentor: "Deepak Gupta",
-    facultyMentor: "Dr. B. Ramesh",
-    status: "Completed",
-    startDate: "2025-05-01",
-    endDate: "2025-07-31",
-    isStipendBased: "yes",
-    amount: "23000",
-    certificate: null,
-  },
-  {
-    title: "UI/UX Design Intern",
-    organizationCompanyName: "LTIMindtree",
-    industryMentor: "Anjali Iyer",
-    facultyMentor: "Dr. Hema Priya",
-    status: "Completed",
-    startDate: "2023-03-15",
-    endDate: "2023-06-15",
-    isStipendBased: "no",
-    amount: "",
-    certificate: null,
-  },
-  {
-    title: "Software Engineer Intern",
-    organizationCompanyName: "Oracle India",
-    industryMentor: "Kiran Desai",
-    facultyMentor: "Dr. T. Narayana",
-    status: "Ongoing",
-    startDate: "2026-06-01",
-    endDate: "",
-    isStipendBased: "yes",
-    amount: "30000",
-    certificate: null,
-  },
-];
 
   return (
     <div className="space-y-6">
@@ -224,17 +71,21 @@ export default function Internship({ items = [] }) {
                   {item.status || "Completed"}
                 </span>
 
-                {(item.certificate || item.certificateFile) && (
-                  <a
-                    href={typeof item.certificate === 'string' ? item.certificate : '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 mt-2 text-xs font-bold text-[#1a365d] hover:text-[#002045] bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 transition-all active:scale-95"
-                  >
-                    <FileText size={14} />
-                    View Certificate
-                  </a>
-                )}
+                {(() => {
+                  const certVal = item.certificate || item.certificateFile || item.document;
+                  const href = certVal ? fileUrl(certVal) : null;
+                  return href ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 mt-2 text-xs font-bold text-[#1a365d] hover:text-[#002045] bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 transition-all active:scale-95"
+                    >
+                      <FileText size={14} />
+                      View Certificate
+                    </a>
+                  ) : null
+                })()}
               </div>
             </div>
           </div>

@@ -21,10 +21,16 @@ import {
   Cpu,
   Briefcase,
   Milestone,
-  Target
+  Target,
+  Users,
+  Scroll,
+  Clipboard,
+  Star,
+  Trophy
 } from "lucide-react";
-import { fetchUserData, updateUserProfile } from "../core/user";
+import { fetchMyProfile, fetchPortfolioCounts, getEntries } from "../core/user";
 import { credentialTypes } from "./AddCreds";
+import { PATH_TO_COUNTS_KEY } from "../utils/helpers";
 import CredDataJson from "../assets/CredData.json";
 
 // Import Credentials Display Components
@@ -48,6 +54,28 @@ export default function Profile() {
   const [showResumeModal, setShowResumeModal] = useState(false);
   const [showSkillModal, setShowSkillModal] = useState(false);
   const [newSkillValue, setNewSkillValue] = useState("");
+  const [counts, setCounts] = useState({});
+  const [sectionData, setSectionData] = useState({});
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const sectionIcon = {
+    Overview: User,
+    Internship: Briefcase,
+    Competitions: Trophy,
+    Placement: Target,
+    Projects: Code,
+    Certification: FileText,
+    'Extra Curricular Activities': Star,
+    'Co-Curricular Activities': BookOpen,
+    'Professional Bodies': Users,
+    Skills: Cpu,
+    'Journal Publication': Scroll,
+    'Conference Paper': Clipboard,
+    Patent: Award,
+    Scholarships: Award,
+    'Entrance Examinations': BookOpen,
+  };
 
   const CredData = CredDataJson;
   const credentialMap = Object.fromEntries(
@@ -124,15 +152,25 @@ export default function Profile() {
 
   useEffect(() => {
     setMounted(true);
-    const userId = localStorage.getItem("userId");
-    if (userId) {
-      fetchUserData().then((res) => {
+    
+    fetchPortfolioCounts().then((res) => {
+      if (res.data) {
+        setCounts(res.data);
+      }
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const segment = location.pathname.split('/').filter(Boolean).pop() || "";
+    const view = segment === 'profile' ? '' : segment;
+    if (view && !sectionData[view]) {
+      getEntries(view).then((res) => {
         if (res.data) {
-          setStudentData((prev) => ({ ...prev, ...res.data }));
+          setSectionData((prev) => ({ ...prev, [view]: res.data }));
         }
       }).catch(() => {});
     }
-  }, []);
+  }, [location.pathname]);
 
   const getItemsForType = (typeKey) => {
     const snakeCaseKey = typeKey.replace(/([A-Z])/g, "_$1").toLowerCase();
@@ -143,7 +181,7 @@ export default function Profile() {
     if (typeKey === 'journalPublication') altKeys.push('journal_publication');
     if (typeKey === 'conferencePaper') altKeys.push('conference_paper');
     if (typeKey === 'entranceExaminations') altKeys.push('entrance_examinations');
-    
+
     for (const key of altKeys) {
       if (studentData[key] && Array.isArray(studentData[key])) {
         return studentData[key];
@@ -152,8 +190,38 @@ export default function Profile() {
     return [];
   };
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  const fetchdata = async () => {
+    try {
+      const [profileRes, skillsRes] = await Promise.all([
+        fetchMyProfile(),
+        getEntries('skills').catch(() => ({ data: [] })),
+      ]);
+      if (profileRes.data) {
+        const portfolio = profileRes.data.portfolio || {};
+        const skills = Array.isArray(skillsRes.data) ? skillsRes.data : [];
+        setStudentData((prev) => ({
+          ...prev,
+          rollNumber: profileRes.data.rollNumber || prev.rollNumber,
+          ...portfolio,
+          projects: (portfolio.projects || []).map((p) => ({
+            title: p.projectTitle || p.title || '',
+            year: p.academicYear || p.year || '',
+            description: p.projectDomain || p.technologiesUsed || '',
+          })),
+          certifications: (portfolio.certification || []).map((c) => ({
+            name: c.typeOfCertification || c.name || '',
+            issuer: c.domainSkillArea || c.issuer || '',
+          })),
+          achievements: (portfolio.competitions || []).map((c) =>
+            c.awardReceived
+              ? `${c.competitionName} — ${c.awardReceived}`
+              : c.competitionName || '',
+          ),
+          skills,
+        }));
+      }
+    } catch (e) {}
+  }
 
   const activeSegment = location.pathname.split('/').filter(Boolean).pop() || "";
   const activeView = activeSegment === 'profile' ? 'Overview' : activeSegment;
@@ -161,11 +229,31 @@ export default function Profile() {
   const cgpaPct = Math.round((studentData.cgpa / (studentData.cgpaTarget || 10.0)) * 100);
 
   function Overview() {
+    const infoCards = [
+      { icon: Mail, label: "Email", value: studentData.email },
+      { icon: Phone, label: "Phone", value: studentData.phoneNumber },
+      { icon: GraduationCap, label: "Department", value: `${studentData.department} • ${studentData.degreeCode}` },
+      { icon: Calendar, label: "Batch", value: studentData.batchYear },
+      { icon: Target, label: "Roll No", value: studentData.rollNumber },
+      { icon: Award, label: "CGPA", value: `${studentData.cgpa} / ${studentData.cgpaTarget}` },
+    ]
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Personal Info Card */}
-          
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {infoCards.map((card, i) => {
+            const Icon = card.icon
+            return (
+              <div key={i} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 rounded-xl bg-blue-50 text-[#1a365d]">
+                    <Icon size={18} />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{card.label}</span>
+                </div>
+                <p className="text-sm font-bold text-slate-800 ml-[50px]">{card.value || "—"}</p>
+              </div>
+            )
+          })}
         </div>
 
         {/* Academic History Timeline */}
@@ -244,7 +332,7 @@ export default function Profile() {
             {/* Actions */}
             <div className="flex gap-2">
               <button
-                onClick={() => setShowResumeModal(true)}
+                onClick={() => {setShowResumeModal(true),fetchdata()}}
                 className="flex items-center gap-2 px-5 py-2.5 bg-[#1a365d] hover:bg-[#002045] text-white rounded-xl font-semibold text-sm transition-all shadow-md shadow-[#1a365d]/20 active:scale-95"
               >
                 <FileText size={18} />
@@ -257,75 +345,83 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Main Bento Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Section Cards Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6">
+          <button
+            onClick={() => navigate('/student/profile')}
+            className={`flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all ${activeView === 'Overview'
+                ? 'bg-[#1a365d] text-white border-[#1a365d] shadow-md'
+                : 'bg-white text-slate-700 border-slate-200 hover:border-[#1a365d]/30 hover:shadow-sm'
+              }`}
+          >
+            <div className={`p-2.5 rounded-xl ${activeView === 'Overview' ? 'bg-white/15' : 'bg-slate-50'
+              }`}>
+              <User size={22} />
+            </div>
+            <span className="font-bold text-xs">Overview</span>
+          </button>
 
-          {/* Sidebar: Left Column (4 cols) */}
-          <div className="lg:col-span-4 flex flex-col gap-6">
-            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-2">
-              <h3 className="font-comfortaa text-lg font-bold mb-4 text-[#1a365d]">Profile Navigation</h3>
-              
+          {Object.entries(credentialTypes).map(([label, pathValue]) => {
+            const IconComp = sectionIcon[label] || User;
+                  const countKey = PATH_TO_COUNTS_KEY[pathValue] || pathValue;
+                  const count = counts[countKey] ?? 0;
+            return (
               <button
-                onClick={() => navigate('/student/profile')}
-                className={`w-full text-left rounded-2xl px-4 py-3 text-sm font-semibold transition ${activeView === 'Overview' ? 'bg-[#1a365d] text-white shadow-xs' : 'bg-slate-50 text-slate-700 hover:bg-[#1a365d]/5 hover:text-[#1a365d]'}`}
+                key={label}
+                onClick={() => navigate(`/student/profile/${pathValue}`)}
+                className={`flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all relative ${activeView === pathValue
+                    ? 'bg-[#1a365d] text-white border-[#1a365d] shadow-md'
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-[#1a365d]/30 hover:shadow-sm'
+                  }`}
               >
-                Overview
+                <span className={`absolute top-1.5 right-1.5 text-[9px] px-1.5 py-0.5 rounded-full font-bold ${activeView === pathValue ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                  {count}
+                </span>
+                <div className={`p-2.5 rounded-xl ${activeView === pathValue ? 'bg-white/15' : 'bg-slate-50'
+                  }`}>
+                  <IconComp size={22} />
+                </div>
+                <span className="font-bold text-xs text-center leading-tight">{label}</span>
               </button>
-
-              {Object.entries(credentialTypes).map(([label, pathValue]) => (
-                <button
-                  key={label}
-                  onClick={() => navigate(`/student/profile/${pathValue}`)}
-                  className={`w-full text-left rounded-2xl px-4 py-3 text-sm font-semibold transition flex items-center justify-between ${activeView === pathValue ? 'bg-[#1a365d] text-white shadow-xs' : 'bg-slate-50 text-slate-700 hover:bg-[#1a365d]/5 hover:text-[#1a365d]'}`}
-                >
-                  <span>{label}</span>
-                  <span className={`text-[10.5px] px-2 py-0.5 rounded-full font-bold ${activeView === pathValue ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'}`}>
-                    {getItemsForType(pathValue).length}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Right Column: Dynamic Content Area (8 cols) */}
-          <div className="lg:col-span-8 flex flex-col">
-            {/* Explorer-style Breadcrumbs */}
-            <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-3xs mb-6 select-none">
-              <span className="material-symbols-outlined text-[20px] text-slate-400">folder_open</span>
-              <span className="hover:text-[#1a365d] cursor-pointer" onClick={() => navigate('/student/profile')}>student</span>
-              <span className="text-slate-300">/</span>
-              <span className="hover:text-[#1a365d] cursor-pointer" onClick={() => navigate('/student/profile')}>profile</span>
-              {activeView !== 'Overview' && (
-                <>
-                  <span className="text-slate-300">/</span>
-                  <span className="text-[#1a365d] bg-blue-50/50 border border-blue-100/50 px-2 py-0.5 rounded-md font-bold">
-                    {Object.keys(credentialTypes).find(key => credentialTypes[key] === activeView) || activeView}
-                  </span>
-                </>
-              )}
-            </div>
-
-            {/* Routes for sub-components */}
-            <Routes>
-              <Route path="/" element={<Overview />} />
-              <Route path="/internship" element={<Internship items={getItemsForType('internship')} />} />
-              <Route path="/competitions" element={<Competitions items={getItemsForType('competitions')} />} />
-              <Route path="/placement" element={<Placement items={getItemsForType('placement')} />} />
-              <Route path="/projects" element={<ProjectsDisplay items={getItemsForType('projects')} />} />
-              <Route path="/certification" element={<Certification items={getItemsForType('certification')} />} />
-              <Route path="/extraCurricular" element={<ExtraCurricularActivities items={getItemsForType('extraCurricular')} />} />
-              <Route path="/coCurricular" element={<CoCurricularActivities items={getItemsForType('coCurricular')} />} />
-              <Route path="/professionalBodies" element={<ProfessionalBodies items={getItemsForType('professionalBodies')} />} />
-              <Route path="/skills" element={<SkillsDisplay items={getItemsForType('skills')} />} />
-              <Route path="/journalPublication" element={<JournalPublication items={getItemsForType('journalPublication')} />} />
-              <Route path="/conferencePaper" element={<ConferencePaper items={getItemsForType('conferencePaper')} />} />
-              <Route path="/patent" element={<Patent items={getItemsForType('patent')} />} />
-              <Route path="/scholarships" element={<Scholarships items={getItemsForType('scholarships')} />} />
-              <Route path="/entranceExaminations" element={<EntranceExaminations items={getItemsForType('entranceExaminations')} />} />
-            </Routes>
-          </div>
-
+            );
+          })}
         </div>
+
+        {/* Explorer-style Breadcrumbs */}
+        <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-3xs mb-6 select-none">
+          <span className="material-symbols-outlined text-[20px] text-slate-400">folder_open</span>
+          <span className="hover:text-[#1a365d] cursor-pointer" onClick={() => navigate('/student/profile')}>student</span>
+          <span className="text-slate-300">/</span>
+          <span className="hover:text-[#1a365d] cursor-pointer" onClick={() => navigate('/student/profile')}>profile</span>
+          {activeView !== 'Overview' && (
+            <>
+              <span className="text-slate-300">/</span>
+              <span className="text-[#1a365d] bg-blue-50/50 border border-blue-100/50 px-2 py-0.5 rounded-md font-bold">
+                {Object.keys(credentialTypes).find(key => credentialTypes[key] === activeView) || activeView}
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Routes for sub-components */}
+        <Routes>
+          <Route path="/" element={<Overview />} />
+          <Route path="/internship" element={<Internship items={sectionData.internship || []} />} />
+          <Route path="/competition" element={<Competitions items={sectionData.competition || []} />} />
+          <Route path="/placement" element={<Placement items={sectionData.placement || []} />} />
+          <Route path="/project" element={<ProjectsDisplay items={sectionData.project || []} />} />
+          <Route path="/certification" element={<Certification items={sectionData.certification || []} />} />
+          <Route path="/extraCurricular" element={<ExtraCurricularActivities items={sectionData.extraCurricular || []} />} />
+          <Route path="/coCurricular" element={<CoCurricularActivities items={sectionData.coCurricular || []} />} />
+          <Route path="/professionalBody" element={<ProfessionalBodies items={sectionData.professionalBody || []} />} />
+          <Route path="/skills" element={<SkillsDisplay items={sectionData.skills || []} />} />
+          <Route path="/journalPublication" element={<JournalPublication items={sectionData.journalPublication || []} />} />
+          <Route path="/conferencePaper" element={<ConferencePaper items={sectionData.conferencePaper || []} />} />
+          <Route path="/patent" element={<Patent items={sectionData.patent || []} />} />
+          <Route path="/scholarship" element={<Scholarships items={sectionData.scholarship || []} />} />
+          <Route path="/entranceExam" element={<EntranceExaminations items={sectionData.entranceExam || []} />} />
+        </Routes>
       </main>
 
       {/* Resume Generator Modal */}

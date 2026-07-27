@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../core/auth';
 
 export default function Login() {
-  const [studentId, setStudentId]   = useState('1234567990');
-  const [password,  setPassword]    = useState('misteran');
+  const [studentId, setStudentId]   = useState('');
+  const [password,  setPassword]    = useState('');
   const [isLoading, setIsLoading]   = useState(false);
   const [error,     setError]       = useState('');
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export default function Login() {
 
     setIsLoading(true);
     try {
-      await loginUser(studentId, password);
+      await loginUser({ data: studentId, password });
       navigate('/student/profile');
     } catch (err) {
       setError(err.message);

@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function coCurricular() {
+export default function coCurricular({ onAdd }) {
   const [coCurricular, setcoCurricular] = useState({
     activityType: "",
     otherType: "",
@@ -17,29 +17,6 @@ export default function coCurricular() {
   });
 
   const [errors, setErrors] = useState({});
-
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "coCurricular";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "coCurricularActivities details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add coCurricularActivities information." });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
@@ -114,18 +91,16 @@ export default function coCurricular() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("activityType", coCurricular.activityType === 'others' ? coCurricular.otherType : coCurricular.activityType);
-    payload.append("eventName", coCurricular.eventName.trim());
-    payload.append("eventLevel", coCurricular.eventLevel);
-    payload.append("eventDate", coCurricular.eventDate);
-    payload.append("organizationName", coCurricular.organizationName.trim());
-    payload.append("awardRecieved", coCurricular.awardRecieved);
-    payload.append("awardName", coCurricular.awardRecieved === "Yes" ? coCurricular.awardName.trim() : "");
-    payload.append("certificate", coCurricular.certificate);
-    return payload;
-  };
+  const buildPayload = () => ({
+    activityType: coCurricular.activityType === 'others' ? coCurricular.otherType : coCurricular.activityType,
+    eventName: coCurricular.eventName.trim(),
+    eventLevel: coCurricular.eventLevel,
+    eventDate: coCurricular.eventDate,
+    organizationName: coCurricular.organizationName.trim(),
+    awardReceived: coCurricular.awardRecieved,
+    awardName: coCurricular.awardRecieved === "Yes" ? coCurricular.awardName.trim() : "",
+    certificate: coCurricular.certificate,
+  });
 
   const resetForm = () => {
     setcoCurricular({
@@ -148,10 +123,10 @@ export default function coCurricular() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      handleAdd(payload);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("coCurricular payload:", Object.fromEntries(payload.entries()));
+      console.log("coCurricular payload:", payload);
     }
 
     resetForm();

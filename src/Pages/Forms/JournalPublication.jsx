@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function JournalPublication() {
+export default function JournalPublication({ onAdd }) {
   const [journalPublication, setJournalPublication] = useState({
     titleOfThePaper: "",
     nameOfTheJournal: "",
@@ -30,28 +30,6 @@ export default function JournalPublication() {
 
   const [errors, setErrors] = useState({});
 
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "journalPublication";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "journalPublication details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add journalPublication information." });
-    } finally {
-      setLoading(false);
-    }
-  };
 
 
   const handleChange = (e) => {
@@ -178,31 +156,29 @@ export default function JournalPublication() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("Title Of The Paper", journalPublication.titleOfThePaper.trim());
-    payload.append("Name Of The Journal", journalPublication.nameOfTheJournal.trim());
-    payload.append("Page Numbers(from-to)", journalPublication.pageNumbersFromTo.trim());
-    payload.append("Year Of Publication", journalPublication.yearOfPublication.trim());
-    payload.append("Volume Number", journalPublication.volumeNumber.trim());
-    payload.append("Issue Number", journalPublication.issueNumber.trim());
-    payload.append("Impact Factor", journalPublication.impactFactor.trim());
-    payload.append("Is Thomson Reuters", journalPublication.isThomsonReuters);
-    payload.append("scope", journalPublication.scope);
-    payload.append("Do you have Issn Number", journalPublication.doYouHaveIssnNumber);
-    payload.append("Issn Number (if yes)", journalPublication.doYouHaveIssnNumber === "Yes" ? journalPublication.issnNumberIfYes.trim() : "");
-    payload.append("Do you have e-Issn Number", journalPublication.doYouHaveEIssnNumber);
-    payload.append("e-Issn Number (if)", journalPublication.doYouHaveEIssnNumber === "Yes" ? journalPublication.eIssnNumberIf.trim() : "");
-    payload.append("No. Of Authors", journalPublication.noOfAuthors.trim());
-    payload.append("Author", journalPublication.author.trim());
-    payload.append("Indexing Platform", journalPublication.indexingPlatform.trim());
-    payload.append("H Index Of Journal", journalPublication.hIndexOfJournal.trim());
-    payload.append("Do you have Doi", journalPublication.doYouHaveDoi);
-    payload.append("Doi (if)", journalPublication.doYouHaveDoi === "Yes" ? journalPublication.doiIf.trim() : "");
-    payload.append("First Page Of Journal", journalPublication.firstPageOfJournal);
-    payload.append("Remarks", journalPublication.remarks.trim());
-    return payload;
-  };
+  const buildPayload = () => ({
+    titleOfThePaper: journalPublication.titleOfThePaper.trim(),
+    nameOfTheJournal: journalPublication.nameOfTheJournal.trim(),
+    pageNumbersFromTo: journalPublication.pageNumbersFromTo.trim(),
+    yearOfPublication: journalPublication.yearOfPublication.trim(),
+    volumeNumber: journalPublication.volumeNumber.trim(),
+    issueNumber: journalPublication.issueNumber.trim(),
+    impactFactor: journalPublication.impactFactor.trim(),
+    isThomsonReuters: journalPublication.isThomsonReuters,
+    nationalInternational: journalPublication.scope,
+    doYouHaveIssnNumber: journalPublication.doYouHaveIssnNumber,
+    issnNumberIfYes: journalPublication.doYouHaveIssnNumber === "Yes" ? journalPublication.issnNumberIfYes.trim() : "",
+    doYouHaveEIssnNumber: journalPublication.doYouHaveEIssnNumber,
+    eIssnNumberIf: journalPublication.doYouHaveEIssnNumber === "Yes" ? journalPublication.eIssnNumberIf.trim() : "",
+    noOfAuthors: journalPublication.noOfAuthors.trim(),
+    author: journalPublication.author.trim(),
+    indexingPlatform: journalPublication.indexingPlatform.trim(),
+    hIndexOfJournal: journalPublication.hIndexOfJournal.trim(),
+    doYouHaveDoi: journalPublication.doYouHaveDoi,
+    doiIf: journalPublication.doYouHaveDoi === "Yes" ? journalPublication.doiIf.trim() : "",
+    firstPageOfJournal: journalPublication.firstPageOfJournal,
+    remarks: journalPublication.remarks.trim(),
+  });
 
   const resetForm = () => {
     setJournalPublication({
@@ -238,10 +214,10 @@ export default function JournalPublication() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      handleAdd(payload, journalPublication);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("JournalPublication payload:", Object.fromEntries(payload.entries()));
+      console.log("JournalPublication payload:", payload);
     }
 
     resetForm();

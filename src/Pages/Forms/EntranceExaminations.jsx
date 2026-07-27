@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import InputField from "../FormComponents/InputField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function EntranceExaminations() {
+export default function EntranceExaminations({ onAdd }) {
   const [entranceExaminations, setEntranceExaminations] = useState({
     examName: "",
     otherName:"",
@@ -28,28 +28,6 @@ export default function EntranceExaminations() {
     }
   };
 
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "entranceExaminations";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "entranceExaminations details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add entranceExaminations information." });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const validate = () => {
     const newErrors = {};
@@ -101,16 +79,14 @@ export default function EntranceExaminations() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("exam name", entranceExaminations.examName === 'others' ? entranceExaminations.otherName : entranceExaminations.examName);
-    payload.append("registaration/ hall ticket number", entranceExaminations.registarationHallTicketNumber.trim());
-    payload.append("score", entranceExaminations.score.trim());
-    payload.append("rank", entranceExaminations.rank.trim());
-    payload.append("percentile", entranceExaminations.percentile.trim());
-    payload.append("year of examination", entranceExaminations.yearOfExamination.trim());
-    return payload;
-  };
+  const buildPayload = () => ({
+    examName: entranceExaminations.examName === 'others' ? entranceExaminations.otherName : entranceExaminations.examName,
+    registrationHallTicketNumber: entranceExaminations.registarationHallTicketNumber.trim(),
+    score: entranceExaminations.score.trim(),
+    rank: entranceExaminations.rank.trim(),
+    percentile: entranceExaminations.percentile.trim(),
+    yearOfExamination: entranceExaminations.yearOfExamination.trim(),
+  });
 
   const resetForm = () => {
     setEntranceExaminations({
@@ -131,10 +107,10 @@ export default function EntranceExaminations() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      handleAdd(payload);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("EntranceExaminations payload:", Object.fromEntries(payload.entries()));
+      console.log("EntranceExaminations payload:", payload);
     }
 
     resetForm();

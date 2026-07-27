@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { addCredential } from '../core/user';
+import { addEntry, addSkills } from '../core/user';
 import { NotebookPen, ShieldCheck, Sparkles } from 'lucide-react';
 
 import Internship from './Forms/Internship';
@@ -20,19 +20,19 @@ import Projects from './Forms/Projects';
 
 export const credentialTypes = {
   "Internship" : "internship",
-  "Competitions":"competitions",
+  "Competitions":"competition",
   "Placement":"placement",
-  "Projects":"projects",
+  "Projects":"project",
   "Certification":"certification",
   "Extra Curricular Activities" :"extraCurricular",
   "Co-Curricular Activities":"coCurricular",
-  "Professional Bodies" :"professionalBodies",
+  "Professional Bodies" :"professionalBody",
   "Skills" :"skills",
   "Journal Publication":"journalPublication",
   "Conference Paper":"conferencePaper",
   "Patent":"patent",
-  "Scholarships":"scholarships",
-  "Entrance Examinations":"entranceExaminations"
+  "Scholarships":"scholarship",
+  "Entrance Examinations":"entranceExam"
 };
 
 export default function AddCreds() {
@@ -53,18 +53,13 @@ export default function AddCreds() {
     setLoading(true);
     setMessage(null);
     try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
+      const typeKey = credentialTypes[type];
+      if (typeKey === "skills") {
+        await addSkills([payload.skill]);
+      } else {
+        await addEntry(typeKey, [payload]);
       }
-
-      // Convert display type to backend snake_case key
-      const typeKey = type.toLowerCase().replace(/[\s-]+/g, '_');
-
-      await addCredential(userId, typeKey, payload);
       setMessage({ type: "success", text: `${type} details added successfully!` });
-      
-      // Auto scroll to message or top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error(err);

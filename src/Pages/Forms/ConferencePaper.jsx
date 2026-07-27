@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function ConferencePaper() {
+export default function ConferencePaper({ onAdd }) {
   const [conferencePaper, setConferencePaper] = useState({
     titleOfThePaper: "",
     nameOfTheConference: "",
@@ -42,28 +42,6 @@ export default function ConferencePaper() {
     }
   };
 
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "conferencePaper";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "conferencePaper details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add conferencePaper information." });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const validate = () => {
     const newErrors = {};
@@ -215,29 +193,27 @@ export default function ConferencePaper() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("titleOfThePaper", conferencePaper.titleOfThePaper.trim());
-    payload.append("nameOfTheConference", conferencePaper.nameOfTheConference.trim());
-    payload.append("organizedBy", conferencePaper.organizedBy.trim());
-    payload.append("scope", conferencePaper.scope);
-    payload.append("fromDate", conferencePaper.fromDate);
-    payload.append("toDate", conferencePaper.toDate);
-    payload.append("modeOfConference", conferencePaper.modeOfConference);
-    payload.append("venue", conferencePaper.venue.trim());
-    payload.append("isbnNumber", conferencePaper.isbnNumber.trim())
-    payload.append("Conference Proceedings Title", conferencePaper.conferenceProceedingsTitle.trim());
-    payload.append("Publisher Name", conferencePaper.publisherName.trim());
-    payload.append("Indexing Type", conferencePaper.indexingType.trim());
-    payload.append("doi", conferencePaper.doYouHaveDoi);
-    payload.append("Page Numbers(from-to)", conferencePaper.pageNumbersFromTo.trim());
-    payload.append("Authors List", conferencePaper.authorsList.trim());
-    payload.append("Affiliation Of Authors", conferencePaper.affiliationOfAuthors.trim());
-    payload.append("Best Paper Award Certificate (if got)", conferencePaper.bestPaperAwardCertificateIfGot || "");
-    payload.append("Conference Certificate", conferencePaper.conferenceCertificate);
-    payload.append("Conference Paper First Page", conferencePaper.conferencePaperFirstPage);
-    return payload;
-  };
+  const buildPayload = () => ({
+    titleOfThePaper: conferencePaper.titleOfThePaper.trim(),
+    nameOfTheConference: conferencePaper.nameOfTheConference.trim(),
+    organizedBy: conferencePaper.organizedBy.trim(),
+    nationalInternational: conferencePaper.scope,
+    dateOfConferenceFrom: conferencePaper.fromDate,
+    dateOfConferenceTo: conferencePaper.toDate,
+    modeOfConference: conferencePaper.modeOfConference,
+    venue: conferencePaper.venue.trim(),
+    isbnNumberForProceedings: conferencePaper.isbnNumber.trim(),
+    conferenceProceedingsTitle: conferencePaper.conferenceProceedingsTitle.trim(),
+    publisherName: conferencePaper.publisherName.trim(),
+    indexingType: conferencePaper.indexingType.trim(),
+    doYouHaveDoi: conferencePaper.doi,
+    pageNumbersFromTo: conferencePaper.pageNumbersFromTo.trim(),
+    authorsList: conferencePaper.authorsList.trim(),
+    affiliationOfAuthors: conferencePaper.affiliationOfAuthors.trim(),
+    bestPaperAwardCertificateIfGot: conferencePaper.bestPaperAwardCertificateIfGot || "",
+    conferenceCertificate: conferencePaper.conferenceCertificate,
+    conferencePaperFirstPage: conferencePaper.conferencePaperFirstPage,
+  });
 
   const resetForm = () => {
     setConferencePaper({
@@ -272,10 +248,10 @@ export default function ConferencePaper() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      handleAdd(payload);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("ConferencePaper payload:", Object.fromEntries(payload.entries()));
+      console.log("ConferencePaper payload:", payload);
     }
 
     resetForm();

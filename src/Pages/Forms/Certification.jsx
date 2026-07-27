@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function Certification() {
+export default function Certification({ onAdd }) {
   const [certification, setCertification] = useState({
     typeOfCertification: "",
     domain: "",
@@ -87,41 +87,16 @@ export default function Certification() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "certification";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "Certification details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add Certification information." });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("typeOfCertification", certification.typeOfCertification === 'others' ? certification.otherType : certification.typeOfCertification);
-    payload.append("domain", certification.domain.trim());
-    payload.append("certificationId", certification.certificationId.trim());
-    payload.append("scoreObtained", certification.scoreObtained);
-    payload.append("gradeObtained", certification.gradeObtained.trim());
-    payload.append("duration", certification.duration);
-    payload.append("dateOfCompletion", certification.dateOfCompletion);
-    payload.append("certificate", certification.certificate);
-    return payload;
-  };
+  const buildPayload = () => ({
+    typeOfCertification: certification.typeOfCertification === 'others' ? certification.otherType : certification.typeOfCertification,
+    domainSkillArea: certification.domain.trim(),
+    certificationIdNumber: certification.certificationId.trim(),
+    scoreObtained: certification.scoreObtained,
+    gradeObtained: certification.gradeObtained.trim(),
+    duration: certification.duration,
+    dateOfCompletion: certification.dateOfCompletion,
+    certificate: certification.certificate,
+  });
 
   const resetForm = () => {
     setCertification({
@@ -144,10 +119,10 @@ export default function Certification() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      handleAdd(payload);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("Certification payload:", Object.fromEntries(payload.entries()));
+      console.log("Certification payload:", payload);
     }
 
     resetForm();

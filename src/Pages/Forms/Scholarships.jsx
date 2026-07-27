@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import InputField from "../FormComponents/InputField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function Scholarships() {
+export default function Scholarships({ onAdd }) {
   const [scholarships, setScholarships] = useState({
     nameOfScholarship: "",
     otherName: "",
@@ -10,28 +10,6 @@ export default function Scholarships() {
     academicYear: "",
   });
 
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "scholarships";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "scholarships details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add scholarships information." });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const [errors, setErrors] = useState({});
 
@@ -104,13 +82,11 @@ export default function Scholarships() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("nameOfScholarship", scholarships.nameOfScholarship === 'others' ? scholarships.otherName : scholarships.nameOfScholarship);
-    payload.append("amountSanctioned", scholarships.amountSanctioned.trim());
-    payload.append("academicYear", scholarships.academicYear.trim());
-    return payload;
-  };
+  const buildPayload = () => ({
+    nameOfScholarship: scholarships.nameOfScholarship === 'others' ? scholarships.otherName : scholarships.nameOfScholarship,
+    amountSanctioned: scholarships.amountSanctioned.trim(),
+    academicYear: scholarships.academicYear.trim(),
+  });
 
   const resetForm = () => {
     setScholarships({
@@ -129,10 +105,10 @@ export default function Scholarships() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      handleAdd(payload, scholarships);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("Scholarships payload:", Object.fromEntries(payload.entries()));
+      console.log("Scholarships payload:", payload);
     }
 
     resetForm();

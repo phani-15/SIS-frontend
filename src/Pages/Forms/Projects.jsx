@@ -4,7 +4,7 @@ import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 import { credentialTypes } from "../AddCreds";
 
-export default function Projects() {
+export default function Projects({ onAdd }) {
   const [projects, setProjects] = useState({
     projectType: "",
     otherType: "",
@@ -55,29 +55,6 @@ export default function Projects() {
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "projects";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "projects details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add projects information." });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -243,40 +220,40 @@ export default function Projects() {
   };
 
   const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("project type", projects.projectType === 'others' ? projects.otherType : projects.projectType);
-    payload.append("project title", projects.projectTitle.trim());
-    payload.append("project domain", projects.projectDomain.trim());
-    payload.append("academic year", projects.academicYear.trim());
-    payload.append("project status", projects.projectStatus);
-    payload.append("team size", projects.teamSize);
-    payload.append("faculty guide", projects.facultyGuide.trim());
-    payload.append("external mentor", projects.externalMentor.trim());
-    payload.append("industry sponsored", projects.industrySponsored);
-
-    if (projects.industrySponsored === "yes") {
-      payload.append("industry name", projects.industryName.trim());
-      payload.append("funding agency", projects.fundingAgency.trim());
-      payload.append("amount sanctioned", projects.amountSanctioned.trim());
-    } else {
-      payload.append("industry name", "");
-      payload.append("funding agency", "");
-      payload.append("amount sanctioned", "");
+    const obj = {
+      projectType: projects.projectType === 'others' ? projects.otherType : projects.projectType,
+      projectTitle: projects.projectTitle.trim(),
+      projectDomain: projects.projectDomain.trim(),
+      academicYear: projects.academicYear.trim(),
+      projectStatus: projects.projectStatus,
+      teamSize: projects.teamSize,
+      facultyGuide: projects.facultyGuide.trim(),
+      externalMentor: projects.externalMentor.trim(),
+      industrySponsored: projects.industrySponsored,
+      industryName: projects.industrySponsored === "yes" ? projects.industryName.trim() : "",
+      fundingAgency: projects.industrySponsored === "yes" ? projects.fundingAgency.trim() : "",
+      amountSanctioned: projects.industrySponsored === "yes" ? projects.amountSanctioned.trim() : "",
+      startDate: projects.startDate,
+      endDate: projects.endDate,
+      technologiesUsed: projects.technologiesUsed.trim(),
+      prototypeDeveloped: projects.prototypeDeveloped,
+      patentFiled: projects.patentFiled,
+      publicationGenerated: projects.publicationGenerated,
+      awardReceived: projects.awardRecieved,
+      awardName: projects.awardRecieved === "Yes" ? projects.awardName.trim() : "",
+      certificate: projects.certificate,
+    };
+    if (projects.patentFiled === 'Yes') {
+      obj.patent = {
+        patentNumber: patent.patentNumber.trim(),
+        titleOfThePatent: patent.titleOfThePatent.trim(),
+        publishedGranted: patent.publishedGranted,
+        yearOfPublishedGranted: patent.yearOfPublishedGranted.trim(),
+        scope: patent.scope,
+        document: patent.document,
+      };
     }
-
-    payload.append("start date", projects.startDate);
-    payload.append("end date", projects.endDate);
-    payload.append("technologies used", projects.technologiesUsed.trim());
-    payload.append("prototype developed ?", projects.prototypeDeveloped);
-    payload.append("patent filed ?", projects.patentFiled);
-    payload.append("publication generated ?", projects.publicationGenerated);
-    payload.append("award recieved ?", projects.awardRecieved);
-    payload.append("award name", projects.awardRecieved === "Yes" ? projects.awardName.trim() : "");
-    payload.append("certificate", projects.certificate);
-
-    if(projects.patentFiled === 'Yes')
-        payload.append("patent",patent)
-    return payload;
+    return obj;
   };
 
   const [patent, setPatent] = useState({
@@ -323,10 +300,10 @@ export default function Projects() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      handleAdd(payload, projects);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("Projects payload:", Object.fromEntries(payload.entries()));
+      console.log("Projects payload:", payload);
     }
 
     resetForm();

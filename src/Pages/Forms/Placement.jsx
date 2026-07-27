@@ -67,39 +67,16 @@ export default function Placement({ onAdd }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("jobRole", placement.jobRole.trim());
-    payload.append("companyEmployerName", placement.companyEmployerName.trim());
-    payload.append("package", placement.package.trim());
-    payload.append("dateOfSelectionAppointmentOffer", placement.dateOfSelectionAppointmentOffer);
-    payload.append("appointmentLetterReferenceNumber", placement.appointmentLetterReferenceNumber.trim());
-    payload.append("offer letter", placement.offerLetter);
-    return payload;
-  };
+  const buildPayload = () => ({
+    jobRole: placement.jobRole.trim(),
+    companyEmployerName: placement.companyEmployerName.trim(),
+    package: placement.package.trim(),
+    dateOfSelectionAppointmentOffer: placement.dateOfSelectionAppointmentOffer,
+    appointmentLetterReferenceNumber: placement.appointmentLetterReferenceNumber.trim(),
+    offerLetter: placement.offerLetter,
+  });
 
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "placement";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "Placement details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add Placement information." });
-    } finally {
-      setLoading(false);
-    }
-  };  
+  
 
   const resetForm = () => {
     setPlacement({
@@ -120,10 +97,10 @@ export default function Placement({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (handleadd) {
-      handleadd(payload);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("Placement payload:", Object.fromEntries(payload.entries()));
+      console.log("Placement payload:", payload);
     }
 
     resetForm();

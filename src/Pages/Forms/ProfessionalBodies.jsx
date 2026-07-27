@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function ProfessionalBodies() {
+export default function ProfessionalBodies({ onAdd }) {
   const [professionalBodies, setProfessionalBodies] = useState({
     nameOfProfessionalBody: "",
     otherName:"",
@@ -13,29 +13,6 @@ export default function ProfessionalBodies() {
   });
 
   const [errors, setErrors] = useState({});
-
-    const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "professionalBodies";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "professionalBodies details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add professionalBodies information." });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
@@ -85,14 +62,12 @@ export default function ProfessionalBodies() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("Name of professional body", professionalBodies.nameOfProfessionalBody === 'others' ? professionalBodies.otherName : professionalBodies.nameOfProfessionalBody);
-    payload.append("membership id", professionalBodies.membershipId.trim());
-    payload.append("valid till", professionalBodies.validTill);
-    payload.append("membership certificate", professionalBodies.membershipCertificate);
-    return payload;
-  };
+  const buildPayload = () => ({
+    nameOfProfessionalBody: professionalBodies.nameOfProfessionalBody === 'others' ? professionalBodies.otherName : professionalBodies.nameOfProfessionalBody,
+    membershipId: professionalBodies.membershipId.trim(),
+    validTill: professionalBodies.validTill,
+    membershipCertificate: professionalBodies.membershipCertificate,
+  });
 
   const resetForm = () => {
     setProfessionalBodies({
@@ -111,10 +86,10 @@ export default function ProfessionalBodies() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      handleAdd(payload, professionalBodies);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("ProfessionalBodies payload:", Object.fromEntries(payload.entries()));
+      console.log("ProfessionalBodies payload:", payload);
     }
 
     resetForm();

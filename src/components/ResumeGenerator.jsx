@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import { X } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { fetchMyProfile } from "../core/user";
+
 
 export default function ResumeGenerator({ studentData = {}, onClose = () => {} }) {
 	const resumeRef = useRef();
@@ -131,8 +133,8 @@ export default function ResumeGenerator({ studentData = {}, onClose = () => {} }
 					<button onClick={onClose} style={iconBtnStyle}><X size={16} /></button>
 				</div>
 
-				<div style={{ display: 'flex', gap: 18 }}>
-					<div ref={resumeRef} style={resumeStyle}>
+			<div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
+				<div ref={resumeRef} style={resumeStyle}>
 						<div style={resumeHeader}>
 							<div style={{ maxWidth: '70%' }}>
 								<h1 style={{ margin: 0, fontSize: 24, letterSpacing: 0.2 }}>{studentData.fullName}</h1>
@@ -197,7 +199,7 @@ export default function ResumeGenerator({ studentData = {}, onClose = () => {} }
 								<h4 style={sectionTitle}>Skills</h4>
 								<div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
 									{studentData.skills.map((s, i) => (
-										<span key={i} style={skillChip}>{s}</span>
+										<span key={i} style={skillChip}>{typeof s === 'string' ? s : s.name || s.skill || ''}</span>
 									))}
 								</div>
 							</section>
@@ -227,14 +229,14 @@ export default function ResumeGenerator({ studentData = {}, onClose = () => {} }
 									<div key={`c-${i}`} style={{ marginBottom: 6 }}><strong>{c.name}</strong> <span style={{ color:'#666' }}>{c.issuer ? `• ${c.issuer}` : ''}</span></div>
 								))}
 								{studentData.achievements && studentData.achievements.map((a, i) => (
-									<div key={`a-${i}`} style={{ marginBottom: 6 }}>{a}</div>
+									<div key={`a-${i}`} style={{ marginBottom: 6 }}>{typeof a === 'string' ? a : a.name || a.title || ''}</div>
 								))}
 							</section>
 						) : null}
 
 					</div>
 
-					<div style={{ width: 200, display: 'flex', flexDirection: 'column', gap: 10 }}>
+					<div style={{ width: 200, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 10, position: 'sticky', top: 0 }}>
 						<button onClick={handlePrint} style={secondaryBtn}>Print to PDF</button>
 						<button onClick={handleDownload} style={primaryBtn}>Download PDF</button>
 						<button onClick={onClose} style={ghostBtn}>Close</button>
@@ -250,12 +252,12 @@ export default function ResumeGenerator({ studentData = {}, onClose = () => {} }
 
 /* Styles */
 const overlayStyle = {
-	position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60,
+	position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 60, overflowY: 'auto', padding: '20px 0',
 };
-const modalStyle = { background: '#fff', padding: 18, borderRadius: 12, width: '95%', maxWidth: 1200, boxShadow: '0 10px 40px rgba(0,0,0,0.4)' };
+const modalStyle = { background: '#fff', padding: 18, borderRadius: 12, width: '95%', maxWidth: 1200, margin: '0 auto', boxShadow: '0 10px 40px rgba(0,0,0,0.4)' };
 const headerStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 };
 const iconBtnStyle = { background: 'transparent', border: 'none', cursor: 'pointer', color: '#333' };
-const resumeStyle = { background: '#fff', padding: 26, width: 612, boxShadow: '0 8px 20px rgba(0,0,0,0.08)', borderRadius: 8, color: '#111', fontFamily: 'Arial, Helvetica, sans-serif' };
+const resumeStyle = { background: '#fff', padding: 26, width: 612, maxWidth: '100%', boxShadow: '0 8px 20px rgba(0,0,0,0.08)', borderRadius: 8, color: '#111', fontFamily: 'Arial, Helvetica, sans-serif' };
 const resumeHeader = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 };
 const photoWrapper = { width: 96, height: 96, borderRadius: 10, overflow: 'hidden', flexShrink: 0, border: '2px solid #f3e8ff' };
 const photoStyle = { width: '100%', height: '100%', objectFit: 'cover', display: 'block' };

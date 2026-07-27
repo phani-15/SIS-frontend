@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, KeyRound, ArrowRight, ShieldCheck, Sparkles, GraduationCap, BookOpen } from 'lucide-react';
+import { Eye, EyeOff, KeyRound, ArrowRight, ShieldCheck, Sparkles, GraduationCap } from 'lucide-react';
 import { depts } from '../assets/Data';
 import { useNavigate } from 'react-router-dom';
-import { loginHod } from '../core/hod';
+import { hodLogin } from '../core/hod';
 
 const HodLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +31,7 @@ const HodLogin = () => {
     setError('');
 
     try {
-      await loginHod(formData.department, formData.password);
+      await hodLogin({ department: formData.department, password: formData.password });
       setSuccess('Login successful! Redirecting to dashboard…');
       setTimeout(() => navigate('/hodboard'), 500);
     } catch (err) {

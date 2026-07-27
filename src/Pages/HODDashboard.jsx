@@ -5,7 +5,8 @@ import {
     PieChart as PieChartIcon, Calendar, Download, Filter, LogOut,
     Cloud, Globe, Cpu, Database
 } from 'lucide-react';
-import { fetchExtractReports } from '../core/hod';
+import { extractReports, extractPersonalReports } from '../core/hod';
+import { mapFilters } from '../utils/helpers';
 // import { personalFields, fields as credentialFieldMap, types as credentialTypes } from '../assets/Data';
 import * as XLSX from "xlsx";
 import { credsData } from '../assets/Creds';
@@ -58,13 +59,8 @@ const HODDashboard = () => {
 		});
 	};
 
-	const handlePersonalsDownloadSubmit = (e) => {
+	const handlePersonalsDownloadSubmit = async (e) => {
 		e.preventDefault();
-
-		if (!data || !data.length) {
-			alert("No data to export");
-			return;
-		}
 
 		const selected = selectedFields.length ? selectedFields : personalFields;
 		const headers = [
@@ -78,33 +74,29 @@ const HODDashboard = () => {
 			),
 		];
 
-		const rows = data
-			.filter((student) => {
-				if (filters.degreeCode && student.degreeCode !== filters.degreeCode) return false;
-				if (filters.entryTypeCode && student.entryTypeCode !== filters.entryTypeCode) return false;
-				if (filters.gender && student.gender !== filters.gender) return false;
-				if (filters.graduationStatus && student.graduationStatus !== filters.graduationStatus) return false;
-				return true;
-			})
-			.map((student, index) => [
+		try {
+			const res = await extractPersonalReports({
+				fields: selected,
+				filters: mapFilters(filters),
+			});
+			const students = res.data || [];
+			if (!students.length) {
+				alert("No matching data for selected filters");
+				return;
+			}
+			const rows = students.map((student, index) => [
 				index + 1,
 				...selected.map((field) => student[field] ?? ""),
 			]);
-
-		if (!rows.length) {
-			alert("No matching data for selected filters");
-			return;
+			const wb = XLSX.utils.book_new();
+			const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+			ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length, 18) }));
+			XLSX.utils.book_append_sheet(wb, ws, "Personal Data");
+			XLSX.writeFile(wb, `Student_Details_${new Date().toISOString().split("T")[0]}.xlsx`);
+			setShowDownloadModal(false);
+		} catch (err) {
+			alert(err.message || "Failed to fetch data");
 		}
-
-		const wb = XLSX.utils.book_new();
-		const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-		ws["!cols"] = headers.map((h) => ({ wch: Math.max(h.length, 18) }));
-		XLSX.utils.book_append_sheet(wb, ws, "Personal Data");
-
-		const filename = `Student_Details_${new Date().toISOString().split("T")[0]}.xlsx`;
-		XLSX.writeFile(wb, filename);
-
-		setShowDownloadModal(false);
 	};
 
 	const dashboardData = {
@@ -157,84 +149,90 @@ const HODDashboard = () => {
 
     useEffect(() => {
         setMounted(true);
-        const hodDept = localStorage.getItem("hodDepartment") || "CSE";
-        fetchExtractReports({
-            credentialTypes: ["certification", "co_curricular_activities"],
+        const hodDept = "Computer Science and Engineering";
+        extractReports({
+            credentialTypes: ["certification", "coCurricular"],
             selectedFields: {
-                certification: ["Type of certification", "domain/ skill/ area"],
-                co_curricular_activities: ["activity type", "event name"],
+                certification: ["typeOfCertification", "domainSkillArea"],
+                coCurricular: ["activityType", "eventName"],
             },
-            filters: { department: hodDept, fromDate: "2020-01-01", toDate: "", degreeCode: "", entryTypeCode: "", graduationStatus: "" },
+            filters: mapFilters({ department: hodDept, fromDate: "2020-01-01", toDate: "", degreeCode: "", entryTypeCode: "", graduationStatus: "", gender: "" }),
         }).then((res) => {
             if (res.data) console.log("Extracted reports:", res.data);
         }).catch(() => {});
     }, []);
 
-	const handleReportsDownload = (e) => {
+	const handleReportsDownload = async (e) => {
 		e.preventDefault();
-
-		const filteredStudents = Object.values(credsData).filter((student) => {
-			if (exportFilters.degreeCode && student.degreeCode && student.degreeCode !== exportFilters.degreeCode) return false;
-			if (exportFilters.entryTypeCode && student.entryTypeCode && student.entryTypeCode !== exportFilters.entryTypeCode) return false;
-			if (exportFilters.graduationStatus && student.graduationStatus && student.graduationStatus !== exportFilters.graduationStatus) return false;
-			if (exportFilters.department && student.department && student.department !== exportFilters.department) return false;
-			return true;
-		});
 
 		if (!selectedCredentialTypes.length) {
 			alert('Please select at least one credential type to export.');
 			return;
 		}
 
-		const wb = XLSX.utils.book_new();
-		let sheetCount = 0;
+		try {
+			const res = await extractReports({
+				credentialTypes: selectedCredentialTypes,
+				selectedFields: selectedCredentialFields,
+				filters: mapFilters(exportFilters),
+			});
+			const students = res.data || [];
+			if (!students.length) {
+				alert('No matching data for selected filters');
+				return;
+			}
 
-		selectedCredentialTypes.forEach((type) => {
-			const fields = (selectedCredentialFields[type] && selectedCredentialFields[type].length)
-				? selectedCredentialFields[type]
-				: credentialFieldMap[type] || [];
+			const wb = XLSX.utils.book_new();
+			let sheetCount = 0;
 
-			const headers = [
-				'S.NO',
-				'Name',
-				'Email',
-				'Department',
-				...fields.map((field) =>
-					field
-						.replace(/([A-Z])/g, ' $1')
-						.replace(/\b([a-z])/g, (m) => m.toUpperCase())
-						.replace(/([A-Z])/g, ' $1')
-						.trim()
-				),
-			];
+			selectedCredentialTypes.forEach((type) => {
+				const fields = (selectedCredentialFields[type] && selectedCredentialFields[type].length)
+					? selectedCredentialFields[type]
+					: credentialFieldMap[type] || [];
 
-			const rows = filteredStudents.flatMap((student, studentIndex) => {
-				const creds = student[type] || [];
-				return creds.map((credential) => [
-					studentIndex + 1,
-					student.name || '',
-					student.email || '',
-					student.department || '',
-					...fields.map((field) => credential[field] ?? ''),
-				]);
+				const headers = [
+					'S.NO',
+					'Name',
+					'Email',
+					'Department',
+					...fields.map((field) =>
+						field
+							.replace(/([A-Z])/g, ' $1')
+							.replace(/\b([a-z])/g, (m) => m.toUpperCase())
+							.replace(/([A-Z])/g, ' $1')
+							.trim()
+					),
+				];
+
+				const rows = students.flatMap((student, studentIndex) => {
+					const creds = student[type] || [];
+					return creds.map((credential) => [
+						studentIndex + 1,
+						student.name || '',
+						student.email || '',
+						student.department || '',
+						...fields.map((field) => credential[field] ?? ''),
+					]);
+				});
+
+				if (rows.length > 0) {
+					const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+					ws['!cols'] = headers.map((h) => ({ wch: Math.max(h.length, 18) }));
+					XLSX.utils.book_append_sheet(wb, ws, type.replace(/_/g, ' ').slice(0, 31));
+					sheetCount += 1;
+				}
 			});
 
-			if (rows.length > 0) {
-				const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-				ws['!cols'] = headers.map((h) => ({ wch: Math.max(h.length, 18) }));
-				XLSX.utils.book_append_sheet(wb, ws, type.replace(/_/g, ' ').slice(0, 31));
-				sheetCount += 1;
+			if (!sheetCount) {
+				alert('No credential records found for the selected filters and types.');
+				return;
 			}
-		});
 
-		if (!sheetCount) {
-			alert('No credential records found for the selected filters and types.');
-			return;
+			XLSX.writeFile(wb, `Student_Credentials_${new Date().toISOString().split('T')[0]}.xlsx`);
+			setShowExportModal(false);
+		} catch (err) {
+			alert(err.message || "Failed to fetch data");
 		}
-
-		const filename = `Student_Credentials_${new Date().toISOString().split('T')[0]}.xlsx`;
-		XLSX.writeFile(wb, filename);
-		setShowExportModal(false);
 	}
 
 	// Calculate stats

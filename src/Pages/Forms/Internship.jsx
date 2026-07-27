@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
-import { addCredential } from "../../core/user";
 
-export default function Internship() {
+export default function Internship({ onAdd }) {
   const [internship, setInternship] = useState({
     title: "",
     organizationCompanyName: "",
@@ -20,29 +19,6 @@ export default function Internship() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
-
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "internship";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "Internship details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add credential information." });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
@@ -115,19 +91,17 @@ export default function Internship() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("title", internship.title.trim());
-    payload.append("organizationCompanyName", internship.organizationCompanyName.trim());
-    payload.append("industryMentor", internship.industryMentor.trim());
-    payload.append("facultyMentor", internship.facultyMentor.trim());
-    payload.append("status", internship.status);
-    payload.append("startDate", internship.startDate);
-    payload.append("endDate", internship.endDate);
-    payload.append("amount", internship.isStipendBased === "yes" ? internship.amount.trim() : "");
-    payload.append("certificate", internship.certificate);
-    return payload;
-  };
+  const buildPayload = () => ({
+    title: internship.title.trim(),
+    organizationCompanyName: internship.organizationCompanyName.trim(),
+    industryMentor: internship.industryMentor.trim(),
+    facultyMentor: internship.facultyMentor.trim(),
+    startDate: internship.startDate,
+    endDate: internship.endDate,
+    isStipendBased: internship.isStipendBased === "yes",
+    amountIfYes: internship.isStipendBased === "yes" ? internship.amount.trim() : "",
+    certificate: internship.certificate,
+  });
 
   const resetForm = () => {
     setInternship({
@@ -152,9 +126,9 @@ export default function Internship() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      console.log(Object.fromEntries(payload.entries()));
-      handleAdd(payload);
+    if (onAdd) {
+      console.log(payload);
+      onAdd(payload);
     } else {
       console.log("Internship payload:", Object.fromEntries(payload.entries()));
     }

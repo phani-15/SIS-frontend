@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function Competitions() {
+export default function Competitions({ onAdd }) {
   const [competitions, setCompetitions] = useState({
     competitionCategory: "",
     competitionName: "",
@@ -30,29 +30,6 @@ export default function Competitions() {
     outcomeAchieved: "",
     certificate: null,
   });
-
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "competitions";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "competition details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add competition information." });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const [errors, setErrors] = useState({});
 
@@ -137,46 +114,32 @@ export default function Competitions() {
   };
 
   const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("competitionCategory", competitions.competitionCategory === 'others' ? competitions.otherCategory : competitions.competitionCategory);
-    payload.append("competitionName", competitions.competitionName.trim());
-    payload.append("themeDomain", competitions.themeDomain.trim());
-    payload.append("eventLevel", competitions.eventLevel);
-    payload.append("organizingInstitutionCompany", competitions.organizingInstitutionCompany.trim());
-    payload.append("organizerType", competitions.organizerType);
-    payload.append("startDate", competitions.startDate);
-    payload.append("endDate", competitions.endDate);
-    payload.append("mode", competitions.mode);
-    payload.append("venue", competitions.venue.trim());
-    payload.append("typeOfParticipation", competitions.typeOfParticipation);
-
-    if (competitions.typeOfParticipation === "Team") {
-      payload.append("team name", competitions.teamName.trim());
-      payload.append("team size", competitions.teamSize);
-    } else {
-      payload.append("team name", "");
-      payload.append("team size", "");
-    }
-
-    payload.append("faculty mentor", competitions.facultyMentor.trim());
-    payload.append("presented project/ idea title", competitions.presentedProjectIdeaTitle.trim());
-    payload.append("abstract summary", competitions.abstractSummary.trim());
-    payload.append("participation status", competitions.participationStatus);
-    payload.append("award recieved", competitions.awardRecieved);
-
-    if (competitions.awardRecieved === "Yes") {
-      payload.append("award name", competitions.awardName.trim());
-      payload.append("prize money", competitions.prizeMoney.trim());
-      payload.append("rank secured", competitions.rankSecured.trim());
-    } else {
-      payload.append("award name", "");
-      payload.append("prize money", "");
-      payload.append("rank secured", "");
-    }
-
-    payload.append("outcome achieved", competitions.outcomeAchieved.trim());
-    payload.append("certificate", competitions.certificate);
-    return payload;
+    const base = {
+      competitionCategory: competitions.competitionCategory === 'others' ? competitions.otherCategory : competitions.competitionCategory,
+      competitionName: competitions.competitionName.trim(),
+      themeDomain: competitions.themeDomain.trim(),
+      eventLevel: competitions.eventLevel,
+      organizingInstitutionCompany: competitions.organizingInstitutionCompany.trim(),
+      organizerType: competitions.organizerType,
+      startDate: competitions.startDate,
+      endDate: competitions.endDate,
+      mode: competitions.mode,
+      venue: competitions.venue.trim(),
+      typeOfParticipation: competitions.typeOfParticipation,
+      teamName: competitions.typeOfParticipation === "Team" ? competitions.teamName.trim() : "",
+      teamSize: competitions.typeOfParticipation === "Team" ? competitions.teamSize : "",
+      facultyMentor: competitions.facultyMentor.trim(),
+      presentedProjectIdeaTitle: competitions.presentedProjectIdeaTitle.trim(),
+      abstractSummary: competitions.abstractSummary.trim(),
+      participationStatus: competitions.participationStatus,
+      awardReceived: competitions.awardRecieved,
+      awardName: competitions.awardRecieved === "Yes" ? competitions.awardName.trim() : "",
+      prizeMoney: competitions.awardRecieved === "Yes" ? competitions.prizeMoney.trim() : "",
+      rankSecured: competitions.awardRecieved === "Yes" ? competitions.rankSecured.trim() : "",
+      outcomeAchieved: competitions.outcomeAchieved.trim(),
+      certificate: competitions.certificate,
+    };
+    return base;
   };
 
   const resetForm = () => {
@@ -216,10 +179,10 @@ export default function Competitions() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      handleAdd(payload);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("Competitions payload:", Object.fromEntries(payload.entries()));
+      console.log("Competitions payload:", payload);
     }
 
     resetForm();

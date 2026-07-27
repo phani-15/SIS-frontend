@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function Patent() {
+export default function Patent({ onAdd }) {
   const [patent, setPatent] = useState({
     patentNumber: "",
     titleOfThePatent: "",
@@ -73,16 +73,14 @@ export default function Patent() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("Patent Number", patent.patentNumber.trim());
-    payload.append("Title Of The Patent", patent.titleOfThePatent.trim());
-    payload.append("Published/granted", patent.publishedGranted);
-    payload.append("Year Of Published/granted", patent.yearOfPublishedGranted.trim());
-    payload.append("Scope", patent.scope);
-    payload.append("Document", patent.document);
-    return payload;
-  };
+  const buildPayload = () => ({
+    patentNumber: patent.patentNumber.trim(),
+    titleOfThePatent: patent.titleOfThePatent.trim(),
+    publishedGranted: patent.publishedGranted,
+    yearOfPublishedGranted: patent.yearOfPublishedGranted.trim(),
+    scope: patent.scope,
+    document: patent.document,
+  });
 
   const resetForm = () => {
     setPatent({
@@ -104,9 +102,9 @@ export default function Patent() {
     const payload = buildPayload();
 
     if (onAdd) {
-      onAdd(payload, patent);
+      onAdd(payload);
     } else {
-      console.log("Patent payload:", Object.fromEntries(payload.entries()));
+      console.log("Patent payload:", payload);
     }
 
     resetForm();

@@ -32,11 +32,7 @@ export default function Skills({ onAdd }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("skill", skills.skill.trim());
-    return payload;
-  };
+  const buildPayload = () => ({ skill: skills.skill.trim() });
 
   const resetForm = () => {
     setSkills({
@@ -53,7 +49,7 @@ export default function Skills({ onAdd }) {
     const payload = buildPayload();
 
     if (onAdd) {
-      onAdd(payload, skills);
+      onAdd(payload);
     } else {
       console.log("Skills payload:", Object.fromEntries(payload.entries()));
     }

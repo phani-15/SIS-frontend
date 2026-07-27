@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function extraCurricular() {
+export default function extraCurricular({ onAdd }) {
   const [extraCurricular, setextraCurricular] = useState({
     eventType: "",
     otherType: "",
@@ -28,29 +28,6 @@ export default function extraCurricular() {
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
-      const typeKey = "extraCurricular";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "extraCurricularActivities details added successfully!" });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add extraCurricularActivities information." });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -114,18 +91,16 @@ export default function extraCurricular() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildPayload = () => {
-    const payload = new FormData();
-    payload.append("event type", extraCurricular.eventType === 'others' ? extraCurricular.otherType : extraCurricular.eventType);
-    payload.append("event name", extraCurricular.eventName.trim());
-    payload.append("event level", extraCurricular.eventLevel);
-    payload.append("date of event", extraCurricular.dateOfEvent);
-    payload.append("organization name", extraCurricular.organizationName.trim());
-    payload.append("prize recieved", extraCurricular.prizeRecieved);
-    payload.append("prize name(if yes)", extraCurricular.prizeRecieved === "Yes" ? extraCurricular.prizeNameIfYes.trim() : "");
-    payload.append("certificate", extraCurricular.certificate);
-    return payload;
-  };
+  const buildPayload = () => ({
+    eventType: extraCurricular.eventType === 'others' ? extraCurricular.otherType : extraCurricular.eventType,
+    eventName: extraCurricular.eventName.trim(),
+    eventLevel: extraCurricular.eventLevel,
+    dateOfEvent: extraCurricular.dateOfEvent,
+    organizationName: extraCurricular.organizationName.trim(),
+    prizeReceived: extraCurricular.prizeRecieved,
+    prizeNameIfYes: extraCurricular.prizeRecieved === "Yes" ? extraCurricular.prizeNameIfYes.trim() : "",
+    certificate: extraCurricular.certificate,
+  });
 
   const resetForm = () => {
     setextraCurricular({
@@ -149,10 +124,10 @@ export default function extraCurricular() {
 
     const payload = buildPayload();
 
-    if (handleAdd) {
-      handleAdd(payload, extraCurricular);
+    if (onAdd) {
+      onAdd(payload);
     } else {
-      console.log("extraCurricular payload:", Object.fromEntries(payload.entries()));
+      console.log("extraCurricular payload:", payload);
     }
 
     resetForm();

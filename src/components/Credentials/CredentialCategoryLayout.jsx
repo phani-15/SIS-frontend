@@ -1,5 +1,6 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
+import { fileUrl } from '../../utils/helpers';
 
 export default function CredentialCategoryLayout({
   title,
@@ -43,17 +44,20 @@ export default function CredentialCategoryLayout({
                       {badgeText(item)}
                     </span>
                   )}
-                  {certVal && (
-                    <a
-                      href={typeof certVal === 'string' ? certVal : '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 mt-2 text-xs font-bold text-[#1a365d] hover:text-[#002045] bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 transition-all active:scale-95"
-                    >
-                      <FileText size={14} />
-                      View Document
-                    </a>
-                  )}
+                  {(() => {
+                    const href = certVal ? fileUrl(certVal) : null;
+                    return href ? (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 mt-2 text-xs font-bold text-[#1a365d] hover:text-[#002045] bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 transition-all active:scale-95"
+                      >
+                        <FileText size={14} />
+                        View Document
+                      </a>
+                    ) : null
+                  })()}
                 </div>
               </div>
             </div>
