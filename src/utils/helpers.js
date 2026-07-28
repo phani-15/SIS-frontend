@@ -27,15 +27,6 @@ export const TYPE_TO_ENDPOINT = {
   entranceExaminations: "entranceExam",
 }
 
-// Reverse: backend endpoint name -> counts API key
-export const PATH_TO_COUNTS_KEY = {
-  competition: "competitions",
-  project: "projects",
-  professionalBody: "professionalBodies",
-  scholarship: "scholarships",
-  entranceExam: "entranceExaminations",
-}
-
 export const PORTFOLIO_TYPES_WITH_FILES = Object.keys(FILE_FIELDS)
 
 export const BACKEND_URL = "http://localhost:5000"
