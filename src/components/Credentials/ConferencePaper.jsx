@@ -7,6 +7,7 @@ export default function ConferencePaper({ items = [] }) {
     <CredentialCategoryLayout
       title="Conference Papers"
       items={items}
+      addPath="/student/profile/addconferencePaper"
       certificateKey="conferenceCertificate"
       badgeText={(item) => item.scope || 'National'}
       renderCardContent={(item) => (

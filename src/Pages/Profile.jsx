@@ -49,13 +49,113 @@ import Patent from "../components/Credentials/Patent";
 import Scholarships from "../components/Credentials/Scholarships";
 import EntranceExaminations from "../components/Credentials/EntranceExaminations";
 
+import AddInternship from "./Forms/Internship";
+import AddCompetitions from "./Forms/Competitions";
+import AddPlacement from "./Forms/Placement";
+import AddProjects from "./Forms/Projects";
+import AddCertification from "./Forms/Certification";
+import AddExtraCurricularActivities from "./Forms/ExtraCurricularActivities";
+import AddCoCurricularActivities from "./Forms/CoCurricularActivities";
+import AddProfessionalBodies from "./Forms/ProfessionalBodies";
+import AddSkills from "./Forms/Skills";
+import AddJournalPublication from "./Forms/JournalPublication";
+import AddConferencePaper from "./Forms/ConferencePaper";
+import AddPatent from "./Forms/Patent";
+import AddScholarships from "./Forms/Scholarships";
+import AddEntranceExaminations from "./Forms/EntranceExaminations";
+
+const FALLBACK_SECTION_DATA = {
+  internship: [
+    {
+      title: "Software Development Intern",
+      organizationCompanyName: "TCS Digital",
+      industryMentor: "Ravi Kumar",
+      facultyMentor: "Dr. Priya Rao",
+      startDate: "2024-05-01",
+      endDate: "2024-07-31",
+      amount: "15000",
+      isStipendBased: "yes",
+      status: "Completed",
+      certificate: "demo-certificate-1"
+    },
+    {
+      title: "Frontend Developer Intern",
+      organizationCompanyName: "Infosys Springboard",
+      industryMentor: "Nikhil Reddy",
+      facultyMentor: "Dr. Suresh Babu",
+      startDate: "2023-12-01",
+      endDate: "2024-02-15",
+      amount: "12000",
+      isStipendBased: "yes",
+      status: "Completed",
+      certificate: "demo-certificate-2"
+    }
+  ],
+  competition: [
+    {
+      competitionName: "Smart India Hackathon",
+      organizingInstitutionCompany: "AICTE",
+      competitionCategory: "Innovation",
+      eventLevel: "National",
+      mode: "Hybrid",
+      presentedProjectIdeaTitle: "AI based attendance analytics",
+      themeDomain: "Machine Learning",
+      startDate: "2024-01-10",
+      endDate: "2024-01-12",
+      typeOfParticipation: "Team",
+      teamName: "ByteForce",
+      teamSize: 4,
+      rankSecured: "2nd Runner Up",
+      prizeMoney: "25000",
+      awardRecieved: "Yes",
+      awardName: "Runner Up"
+    },
+    {
+      competitionName: "CodeSprint Challenge",
+      organizingInstitutionCompany: "JNTU-GV",
+      competitionCategory: "Coding",
+      eventLevel: "College",
+      mode: "Online",
+      presentedProjectIdeaTitle: "Campus resource planner",
+      themeDomain: "Web Development",
+      startDate: "2023-10-05",
+      endDate: "2023-10-06",
+      typeOfParticipation: "Individual",
+      teamName: "",
+      teamSize: 1,
+      rankSecured: "1st",
+      prizeMoney: "5000",
+      awardRecieved: "Yes",
+      awardName: "Winner"
+    }
+  ]
+};
+
 export default function Profile() {
   const [mounted, setMounted] = useState(false);
   const [showResumeModal, setShowResumeModal] = useState(false);
   const [showSkillModal, setShowSkillModal] = useState(false);
   const [newSkillValue, setNewSkillValue] = useState("");
-  const [counts, setCounts] = useState({});
-  const [sectionData, setSectionData] = useState({});
+  const [counts, setCounts] = useState({
+    "internship": 4,
+    "placement": 5,
+    "certification": 3,
+    "extraCurricular": 4,
+    "coCurricular": 4,
+    "scholarships": 3,
+    "competitions": 2,
+    "projects": 4,
+    "entranceExaminations": 2,
+    "professionalBodies": 5,
+    "journalPublication": 1,
+    "conferencePaper": 5,
+    "patent": 4
+  });
+
+  const [sectionData, setSectionData] = useState({
+    internship: FALLBACK_SECTION_DATA.internship,
+    competition: FALLBACK_SECTION_DATA.competition,
+  });
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -152,24 +252,31 @@ export default function Profile() {
 
   useEffect(() => {
     setMounted(true);
-    
+
     fetchPortfolioCounts().then((res) => {
       if (res.data) {
         setCounts(res.data);
       }
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   useEffect(() => {
     const segment = location.pathname.split('/').filter(Boolean).pop() || "";
     const view = segment === 'profile' ? '' : segment;
-    if (view && !sectionData[view]) {
-      getEntries(view).then((res) => {
-        if (res.data) {
-          setSectionData((prev) => ({ ...prev, [view]: res.data }));
-        }
-      }).catch(() => {});
-    }
+
+    if (!view) return;
+
+    getEntries(view)
+      .then((res) => {
+        const nextItems = Array.isArray(res?.data) && res.data.length > 0
+          ? res.data
+          : (FALLBACK_SECTION_DATA[view] || []);
+
+        setSectionData((prev) => ({ ...prev, [view]: nextItems }));
+      })
+      .catch(() => {
+        setSectionData((prev) => ({ ...prev, [view]: FALLBACK_SECTION_DATA[view] || [] }));
+      });
   }, [location.pathname]);
 
   const getItemsForType = (typeKey) => {
@@ -220,66 +327,45 @@ export default function Profile() {
           skills,
         }));
       }
-    } catch (e) {}
+    } catch (e) { }
   }
+
+  const handleAddEntry = async (typeKey, payload) => {
+    try {
+      if (typeKey === "skills") {
+        await addSkills([payload.skill]);
+      } else {
+        await addEntry(typeKey, [payload]);
+      }
+      
+      // Fetch updated profile counts
+      fetchPortfolioCounts().then((res) => {
+        if (res.data) setCounts(res.data);
+      }).catch(() => {});
+      
+      // Fetch updated section data
+      getEntries(typeKey)
+        .then((res) => {
+          const nextItems = Array.isArray(res?.data) && res.data.length > 0
+            ? res.data
+            : (FALLBACK_SECTION_DATA[typeKey] || []);
+          setSectionData((prev) => ({ ...prev, [typeKey]: nextItems }));
+        })
+        .catch(() => {});
+
+      // Navigate back to the specific category display page
+      navigate(`/student/profile/${typeKey}`);
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Failed to add entry. Please try again.");
+    }
+  };
 
   const activeSegment = location.pathname.split('/').filter(Boolean).pop() || "";
   const activeView = activeSegment === 'profile' ? 'Overview' : activeSegment;
 
   const cgpaPct = Math.round((studentData.cgpa / (studentData.cgpaTarget || 10.0)) * 100);
 
-  function Overview() {
-    const infoCards = [
-      { icon: Mail, label: "Email", value: studentData.email },
-      { icon: Phone, label: "Phone", value: studentData.phoneNumber },
-      { icon: GraduationCap, label: "Department", value: `${studentData.department} • ${studentData.degreeCode}` },
-      { icon: Calendar, label: "Batch", value: studentData.batchYear },
-      { icon: Target, label: "Roll No", value: studentData.rollNumber },
-      { icon: Award, label: "CGPA", value: `${studentData.cgpa} / ${studentData.cgpaTarget}` },
-    ]
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {infoCards.map((card, i) => {
-            const Icon = card.icon
-            return (
-              <div key={i} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-xl bg-blue-50 text-[#1a365d]">
-                    <Icon size={18} />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{card.label}</span>
-                </div>
-                <p className="text-sm font-bold text-slate-800 ml-[50px]">{card.value || "—"}</p>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Academic History Timeline */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs">
-          <h3 className="font-comfortaa text-lg font-bold text-[#1a365d] mb-4 border-b border-slate-100 pb-2 flex items-center gap-2">
-            <BookOpen size={18} />
-            Academic Timeline
-          </h3>
-          <div className="relative border-l-2 border-slate-100 ml-4 pl-6 space-y-6 py-2">
-            {studentData.academicHistory.map((item, idx) => (
-              <div key={idx} className="relative">
-                <div className="absolute -left-[31px] top-1.5 bg-[#1a365d] rounded-full h-4 w-4 border-2 border-white shadow-3xs"></div>
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
-                    {item.yearOfCompletion} • Grade: {item.grade}
-                  </span>
-                  <h4 className="text-base font-bold text-slate-800 mt-1">{item.degree}</h4>
-                  <p className="text-sm font-semibold text-slate-500">{item.institution}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-['DM_Sans'] text-slate-800">
@@ -332,7 +418,7 @@ export default function Profile() {
             {/* Actions */}
             <div className="flex gap-2">
               <button
-                onClick={() => {setShowResumeModal(true),fetchdata()}}
+                onClick={() => { setShowResumeModal(true), fetchdata() }}
                 className="flex items-center gap-2 px-5 py-2.5 bg-[#1a365d] hover:bg-[#002045] text-white rounded-xl font-semibold text-sm transition-all shadow-md shadow-[#1a365d]/20 active:scale-95"
               >
                 <FileText size={18} />
@@ -345,53 +431,10 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Section Cards Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6">
-          <button
-            onClick={() => navigate('/student/profile')}
-            className={`flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all ${activeView === 'Overview'
-                ? 'bg-[#1a365d] text-white border-[#1a365d] shadow-md'
-                : 'bg-white text-slate-700 border-slate-200 hover:border-[#1a365d]/30 hover:shadow-sm'
-              }`}
-          >
-            <div className={`p-2.5 rounded-xl ${activeView === 'Overview' ? 'bg-white/15' : 'bg-slate-50'
-              }`}>
-              <User size={22} />
-            </div>
-            <span className="font-bold text-xs">Overview</span>
-          </button>
-
-          {Object.entries(credentialTypes).map(([label, pathValue]) => {
-            const IconComp = sectionIcon[label] || User;
-                  const countKey = PATH_TO_COUNTS_KEY[pathValue] || pathValue;
-                  const count = counts[countKey] ?? 0;
-            return (
-              <button
-                key={label}
-                onClick={() => navigate(`/student/profile/${pathValue}`)}
-                className={`flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all relative ${activeView === pathValue
-                    ? 'bg-[#1a365d] text-white border-[#1a365d] shadow-md'
-                    : 'bg-white text-slate-700 border-slate-200 hover:border-[#1a365d]/30 hover:shadow-sm'
-                  }`}
-              >
-                <span className={`absolute top-1.5 right-1.5 text-[9px] px-1.5 py-0.5 rounded-full font-bold ${activeView === pathValue ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
-                  }`}>
-                  {count}
-                </span>
-                <div className={`p-2.5 rounded-xl ${activeView === pathValue ? 'bg-white/15' : 'bg-slate-50'
-                  }`}>
-                  <IconComp size={22} />
-                </div>
-                <span className="font-bold text-xs text-center leading-tight">{label}</span>
-              </button>
-            );
-          })}
-        </div>
-
         {/* Explorer-style Breadcrumbs */}
         <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-3xs mb-6 select-none">
           <span className="material-symbols-outlined text-[20px] text-slate-400">folder_open</span>
-          <span className="hover:text-[#1a365d] cursor-pointer" onClick={() => navigate('/student/profile')}>student</span>
+          <span className="hover:text-[#1a365d] " >student</span>
           <span className="text-slate-300">/</span>
           <span className="hover:text-[#1a365d] cursor-pointer" onClick={() => navigate('/student/profile')}>profile</span>
           {activeView !== 'Overview' && (
@@ -404,9 +447,40 @@ export default function Profile() {
           )}
         </div>
 
+        {location.pathname === '/student/profile' &&
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6">
+
+            {Object.entries(credentialTypes).map(([label, pathValue]) => {
+              const IconComp = sectionIcon[label] || User;
+              const countKey = PATH_TO_COUNTS_KEY[pathValue] || pathValue;
+              const count = counts[countKey] ?? 0;
+              const hasDefinedContent = location === "/student/profile";
+              return (
+                <button
+                  key={label}
+                  onClick={() => !hasDefinedContent && navigate(`/student/profile/${pathValue}`)}
+                  className={`flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all relative ${activeView === pathValue
+                    ? 'bg-[#1a365d] text-white border-[#1a365d] shadow-md'
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-[#1a365d]/30 hover:shadow-sm'
+                    } ${hasDefinedContent ? 'opacity-70 cursor-not-allowed' : ''}`}
+                >
+                  <span className={`absolute top-1.5 right-1.5 text-[9px] px-1.5 py-0.5 rounded-full font-bold ${activeView === pathValue ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                    }`}>
+                    {count}
+                  </span>
+                  <div className={`p-2.5 rounded-xl ${activeView === pathValue ? 'bg-white/15' : 'bg-slate-50'
+                    }`}>
+                    <IconComp size={22} />
+                  </div>
+                  <span className="font-bold text-xs text-center leading-tight">{label}</span>
+                </button>
+              );
+            })}
+
+          </div>}
+
         {/* Routes for sub-components */}
         <Routes>
-          <Route path="/" element={<Overview />} />
           <Route path="/internship" element={<Internship items={sectionData.internship || []} />} />
           <Route path="/competition" element={<Competitions items={sectionData.competition || []} />} />
           <Route path="/placement" element={<Placement items={sectionData.placement || []} />} />
@@ -421,6 +495,22 @@ export default function Profile() {
           <Route path="/patent" element={<Patent items={sectionData.patent || []} />} />
           <Route path="/scholarship" element={<Scholarships items={sectionData.scholarship || []} />} />
           <Route path="/entranceExam" element={<EntranceExaminations items={sectionData.entranceExam || []} />} />
+
+          {/* Add Routes */}
+          <Route path="/addinternship" element={<AddInternship/>} />
+          <Route path="/addcompetition" element={<AddCompetitions/> } />
+          <Route path="/addplacement" element={<AddPlacement/> } />
+          <Route path="/addproject" element={<AddProjects/> } />
+          <Route path="/addcertification" element={<AddCertification/> } />
+          <Route path="/addextraCurricular" element={<AddExtraCurricularActivities/>} />
+          <Route path="/addcoCurricular" element={<AddCoCurricularActivities/> } />
+          <Route path="/addprofessionalBody" element={<AddProfessionalBodies/> } />
+          <Route path="/addskills" element={<AddSkills/>} />
+          <Route path="/addjournalPublication" element={<AddJournalPublication/> } />
+          <Route path="/addconferencePaper" element={<AddConferencePaper/> } />
+          <Route path="/addpatent" element={<AddPatent/> } />
+          <Route path="/addscholarship" element={<AddScholarships/> } />
+          <Route path="/addentranceExam" element={<AddEntranceExaminations/> } />
         </Routes>
       </main>
 

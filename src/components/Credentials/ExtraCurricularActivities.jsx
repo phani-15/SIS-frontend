@@ -7,6 +7,7 @@ export default function ExtraCurricularActivities({ items = [] }) {
     <CredentialCategoryLayout
       title="Extra Curricular Activities"
       items={items}
+      addPath="/student/profile/addextraCurricular"
       badgeText={(item) => item.prizeRecieved === 'Yes' ? item.prizeNameIfYes || 'Winner' : 'Participant'}
       renderCardContent={(item) => (
         <>

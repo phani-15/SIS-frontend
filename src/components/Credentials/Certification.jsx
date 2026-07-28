@@ -7,6 +7,7 @@ export default function Certification({ items = [] }) {
     <CredentialCategoryLayout
       title="Certifications"
       items={items}
+      addPath="/student/profile/addcertification"
       badgeText={(item) => item.typeOfCertification || 'Professional'}
       renderCardContent={(item) => (
         <>

@@ -7,6 +7,7 @@ export default function CoCurricularActivities({ items = [] }) {
     <CredentialCategoryLayout
       title="Co-Curricular Activities"
       items={items}
+      addPath="/student/profile/addcoCurricular"
       badgeText={(item) => item.awardRecieved === 'Yes' ? item.awardName || 'Winner' : 'Participant'}
       renderCardContent={(item) => (
         <>

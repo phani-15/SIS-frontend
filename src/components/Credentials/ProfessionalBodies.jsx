@@ -7,6 +7,7 @@ export default function ProfessionalBodies({ items = [] }) {
     <CredentialCategoryLayout
       title="Professional Bodies"
       items={items}
+      addPath="/student/profile/addprofessionalBody"
       certificateKey="membershipCertificate"
       badgeText={(item) => item.membershipId ? `ID: ${item.membershipId}` : 'Member'}
       renderCardContent={(item) => (

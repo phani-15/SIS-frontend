@@ -7,6 +7,7 @@ export default function Projects({ items = [] }) {
     <CredentialCategoryLayout
       title="Projects"
       items={items}
+      addPath="/student/profile/addproject"
       badgeText={(item) => item.projectStatus || item.status || 'Completed'}
       renderCardContent={(item) => (
         <>

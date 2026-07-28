@@ -7,6 +7,7 @@ export default function JournalPublication({ items = [] }) {
     <CredentialCategoryLayout
       title="Journal Publications"
       items={items}
+      addPath="/student/profile/addjournalPublication"
       certificateKey="firstPageOfJournal"
       badgeText={(item) => item.scope || 'International'}
       renderCardContent={(item) => (

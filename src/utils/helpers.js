@@ -1,14 +1,15 @@
+
 export const FILE_FIELDS = {
-  internship:        ["certificate"],
-  placement:         ["offerLetter"],
-  certification:     ["certificate"],
-  extraCurricular:   ["certificate"],
-  coCurricular:      ["certificate"],
-  competition:       ["certificate"],
-  project:           ["certificate"],
-  professionalBody:  ["membershipCertificate"],
-  conferencePaper:   ["conferenceCertificate", "conferencePaperFirstPage"],
-  patent:            ["document"],
+  internship: ["certificate"],
+  placement: ["offerLetter"],
+  certification: ["certificate"],
+  extraCurricular: ["certificate"],
+  coCurricular: ["certificate"],
+  competition: ["certificate"],
+  project: ["certificate"],
+  professionalBody: ["membershipCertificate"],
+  conferencePaper: ["conferenceCertificate", "conferencePaperFirstPage"],
+  patent: ["document"],
 }
 
 export const PORTFOLIO_TYPES = [

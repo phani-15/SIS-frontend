@@ -7,6 +7,7 @@ export default function Placement({ items = [] }) {
     <CredentialCategoryLayout
       title="Placements"
       items={items}
+      addPath="/student/profile/addplacement"
       certificateKey="offerLetter"
       badgeText={(item) => item.package ? `${item.package}` : 'Selected'}
       renderCardContent={(item) => (

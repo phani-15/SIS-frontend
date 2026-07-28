@@ -7,6 +7,7 @@ export default function Competitions({ items = [] }) {
     <CredentialCategoryLayout
       title="Competitions"
       items={items}
+      addPath="/student/profile/addcompetition"
       badgeText={(item) => item.awardRecieved === 'Yes' ? item.awardName || 'Winner' : 'Participant'}
       renderCardContent={(item) => (
         <>

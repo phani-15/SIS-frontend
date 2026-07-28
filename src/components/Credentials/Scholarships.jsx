@@ -7,6 +7,7 @@ export default function Scholarships({ items = [] }) {
     <CredentialCategoryLayout
       title="Scholarships"
       items={items}
+      addPath="/student/profile/addscholarship"
       badgeText={(item) => item.academicYear || item.year || 'N/A'}
       renderCardContent={(item) => (
         <>

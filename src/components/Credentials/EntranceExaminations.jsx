@@ -7,6 +7,7 @@ export default function EntranceExaminations({ items = [] }) {
     <CredentialCategoryLayout
       title="Entrance Examinations"
       items={items}
+      addPath="/student/profile/addentranceExam"
       badgeText={(item) => item.yearOfExamination || item.year || 'N/A'}
       renderCardContent={(item) => (
         <>

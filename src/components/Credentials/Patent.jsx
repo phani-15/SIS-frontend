@@ -7,6 +7,7 @@ export default function Patent({ items = [] }) {
     <CredentialCategoryLayout
       title="Patents"
       items={items}
+      addPath="/student/profile/addpatent"
       certificateKey="document"
       badgeText={(item) => item.publishedGranted || item.status || 'Published'}
       renderCardContent={(item) => (
