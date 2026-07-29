@@ -3,10 +3,10 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function ProfessionalBodies({ onAdd }) {
+export default function ProfessionalBodies() {
   const [professionalBodies, setProfessionalBodies] = useState({
     nameOfProfessionalBody: "",
-    otherName:"",
+    otherName: "",
     membershipId: "",
     validTill: "",
     membershipCertificate: null,
@@ -27,13 +27,36 @@ export default function ProfessionalBodies({ onAdd }) {
     }
   };
 
+  const handleAdd = async (payload) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not found. Please log in first.");
+      }
+
+      const typeKey = "professionalBodies";
+
+      await addCredential(userId, typeKey, payload);
+      setMessage({ type: "success", text: "professionalBodies details added successfully!" });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: err.message || "Failed to add professionalBodies information." });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const validate = () => {
     const newErrors = {};
 
     if (!professionalBodies.nameOfProfessionalBody) {
       newErrors.nameOfProfessionalBody = "Professional body name is required";
-    }else{
-      if(professionalBodies.nameOfProfessionalBody==='others' && !professionalBodies.otherName.trim()){
+    } else {
+      if (professionalBodies.nameOfProfessionalBody === 'others' && !professionalBodies.otherName.trim()) {
         newErrors.otherName = " Name of the Professional Body is required"
       }
     }
@@ -86,8 +109,8 @@ export default function ProfessionalBodies({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (onAdd) {
-      onAdd(payload);
+    if (handleAdd) {
+      handleAdd(payload);
     } else {
       console.log("ProfessionalBodies payload:", payload);
     }
@@ -102,7 +125,7 @@ export default function ProfessionalBodies({ onAdd }) {
       </h2>
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          
+
           <SelectField
             label="Name of Professional Body"
             name="nameOfProfessionalBody"
@@ -113,14 +136,14 @@ export default function ProfessionalBodies({ onAdd }) {
           />
 
           {professionalBodies.nameOfProfessionalBody === 'others' &&
-          
-          <InputField
-            label="Name of the Professional Body(others)"
-            name="otherName"
-            value={professionalBodies.otherName}
-            onChange={handleChange}
-            error={errors.otherName}
-          />
+
+            <InputField
+              label="Name of the Professional Body(others)"
+              name="otherName"
+              value={professionalBodies.otherName}
+              onChange={handleChange}
+              error={errors.otherName}
+            />
           }
 
           <InputField

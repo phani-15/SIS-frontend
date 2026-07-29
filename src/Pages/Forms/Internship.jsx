@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 
-export default function Internship({ onAdd }) {
+export default function Internship() {
   const [internship, setInternship] = useState({
     title: "",
     organizationCompanyName: "",
@@ -19,6 +19,29 @@ export default function Internship({ onAdd }) {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+
+  const handleAdd = async (payload) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not found. Please log in first.");
+      }
+
+      const typeKey = "internship";
+
+      await addCredential(userId, typeKey, payload);
+      setMessage({ type: "success", text: "Internship details added successfully!" });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: err.message || "Failed to add credential information." });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
@@ -126,9 +149,8 @@ export default function Internship({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (onAdd) {
-      console.log(payload);
-      onAdd(payload);
+    if (handleAdd) {
+      handleAdd(payload);
     } else {
       console.log("Internship payload:", Object.fromEntries(payload.entries()));
     }

@@ -49,26 +49,6 @@ export default function AddCreds() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const handleAdd = async (payload) => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const typeKey = credentialTypes[type];
-      if (typeKey === "skills") {
-        await addSkills([payload.skill]);
-      } else {
-        await addEntry(typeKey, [payload]);
-      }
-      setMessage({ type: "success", text: `${type} details added successfully!` });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add credential information." });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="sis-page-shell flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-6xl overflow-hidden rounded-4xl sis-panel">
@@ -132,20 +112,20 @@ export default function AddCreds() {
 
             {!loading && (
               <>
-                {type === "Internship" && <Internship onAdd={handleAdd} />}
-                {type === "Competitions" && <Competitions onAdd={handleAdd} />}
-                {type === "Placement" && <Placement onAdd={handleAdd} />}
-                {type === "Certification" && <Certification onAdd={handleAdd} />}
-                {type === "Extra Curricular Activities" && <ExtraCurricularActivities onAdd={handleAdd} />}
-                {type === "Co-Curricular Activities" && <CoCurricularActivities onAdd={handleAdd} />}
-                {type === "Professional Bodies" && <ProfessionalBodies onAdd={handleAdd} />}
-                {type === "Skills" && <Skills onAdd={handleAdd} />}
-                {type === "Journal Publication" && <JournalPublication onAdd={handleAdd} />}
-                {type === "Conference Paper" && <ConferencePaper onAdd={handleAdd} />}
-                {type === "Patent" && <Patent onAdd={handleAdd} />}
-                {type === "Scholarships" && <Scholarships onAdd={handleAdd} />}
-                {type === "Entrance Examinations" && <EntranceExaminations onAdd={handleAdd} />}
-                {type === "Projects" && <Projects onAdd={handleAdd} />}
+                {type === "Internship" && <Internship   />}
+                {type === "Competitions" && <Competitions   />}
+                {type === "Placement" && <Placement   />}
+                {type === "Certification" && <Certification   />}
+                {type === "Extra Curricular Activities" && <ExtraCurricularActivities   />}
+                {type === "Co-Curricular Activities" && <CoCurricularActivities   />}
+                {type === "Professional Bodies" && <ProfessionalBodies   />}
+                {type === "Skills" && <Skills   />}
+                {type === "Journal Publication" && <JournalPublication   />}
+                {type === "Conference Paper" && <ConferencePaper   />}
+                {type === "Patent" && <Patent   />}
+                {type === "Scholarships" && <Scholarships   />}
+                {type === "Entrance Examinations" && <EntranceExaminations   />}
+                {type === "Projects" && <Projects   />}
 
                 {!type && (
                   <div className="text-center py-10 text-gray-500 font-medium bg-white border border-dashed border-gray-200 rounded-2xl">

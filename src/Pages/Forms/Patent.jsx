@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function Patent({ onAdd }) {
+export default function Patent() {
   const [patent, setPatent] = useState({
     patentNumber: "",
     titleOfThePatent: "",
@@ -14,6 +14,29 @@ export default function Patent({ onAdd }) {
   });
 
   const [errors, setErrors] = useState({});
+
+  const handleAdd = async (payload) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not found. Please log in first.");
+      }
+
+      const typeKey = "patent";
+
+      await addCredential(userId, typeKey, payload);
+      setMessage({ type: "success", text: "patent details added successfully!" });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: err.message || "Failed to add patent information." });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
@@ -101,8 +124,8 @@ export default function Patent({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (onAdd) {
-      onAdd(payload);
+    if (handleAdd) {
+      handleAdd(payload);
     } else {
       console.log("Patent payload:", payload);
     }

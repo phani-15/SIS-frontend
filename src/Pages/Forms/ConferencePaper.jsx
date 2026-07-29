@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function ConferencePaper({ onAdd }) {
+export default function ConferencePaper() {
   const [conferencePaper, setConferencePaper] = useState({
     titleOfThePaper: "",
     nameOfTheConference: "",
@@ -241,6 +241,29 @@ export default function ConferencePaper({ onAdd }) {
     setErrors({});
   };
 
+  const handleAdd = async (payload) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not found. Please log in first.");
+      }
+
+      const typeKey = "conferencePaper";
+
+      await addCredential(userId, typeKey, payload);
+      setMessage({ type: "success", text: "entranceExaminations details added successfully!" });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: err.message || "Failed to add entranceExaminations information." });
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -248,8 +271,8 @@ export default function ConferencePaper({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (onAdd) {
-      onAdd(payload);
+    if (handleAdd) {
+      handleAdd(payload);
     } else {
       console.log("ConferencePaper payload:", payload);
     }

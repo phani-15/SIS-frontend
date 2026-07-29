@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
+import { useNavigate } from "react-router-dom";
 
-export default function Certification({ onAdd }) {
+export default function Certification() {
   const [certification, setCertification] = useState({
     typeOfCertification: "",
     domain: "",
@@ -87,6 +88,33 @@ export default function Certification({ onAdd }) {
     return Object.keys(newErrors).length === 0;
   };
 
+  const[loading,setLoading] = useState(true)
+  const [message,setMessage] = useState(null)
+
+   const handleAdd = async (payload) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not found. Please log in first.");
+      }
+
+      const typeKey = "certification";
+
+      await addCredential(userId, typeKey, payload);
+      setMessage({ type: "success", text: "Certification details added successfully!" });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      navigate('/profile/navigate/certification')
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: err.message || "Failed to add Certification information." });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const buildPayload = () => ({
     typeOfCertification: certification.typeOfCertification === 'others' ? certification.otherType : certification.typeOfCertification,
     domainSkillArea: certification.domain.trim(),
@@ -97,6 +125,8 @@ export default function Certification({ onAdd }) {
     dateOfCompletion: certification.dateOfCompletion,
     certificate: certification.certificate,
   });
+
+  const navigate = useNavigate()
 
   const resetForm = () => {
     setCertification({
@@ -119,8 +149,9 @@ export default function Certification({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (onAdd) {
-      onAdd(payload);
+    if (handleAdd) {
+      handleAdd(payload);
+
     } else {
       console.log("Certification payload:", payload);
     }

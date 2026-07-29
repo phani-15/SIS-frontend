@@ -3,7 +3,7 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function coCurricular({ onAdd }) {
+export default function coCurricular() {
   const [coCurricular, setcoCurricular] = useState({
     activityType: "",
     otherType: "",
@@ -15,6 +15,29 @@ export default function coCurricular({ onAdd }) {
     awardName: "",
     certificate: null,
   });
+
+  const handleAdd = async (payload) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not found. Please log in first.");
+      }
+
+      const typeKey = "coCurricular";
+
+      await addCredential(userId, typeKey, payload);
+      setMessage({ type: "success", text: "coCurricularActivities details added successfully!" });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: err.message || "Failed to add coCurricularActivities information." });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [errors, setErrors] = useState({});
 
@@ -123,8 +146,8 @@ export default function coCurricular({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (onAdd) {
-      onAdd(payload);
+    if (handleAdd) {
+      handleAdd(payload);
     } else {
       console.log("coCurricular payload:", payload);
     }

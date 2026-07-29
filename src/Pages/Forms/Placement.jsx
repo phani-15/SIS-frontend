@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 
-export default function Placement({ onAdd }) {
+export default function Placement() {
   const [placement, setPlacement] = useState({
     jobRole: "",
     companyEmployerName: "",
@@ -76,7 +76,28 @@ export default function Placement({ onAdd }) {
     offerLetter: placement.offerLetter,
   });
 
-  
+  const handleAdd = async (payload) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not found. Please log in first.");
+      }
+
+      const typeKey = "placement";
+
+      await addCredential(userId, typeKey, payload);
+      setMessage({ type: "success", text: "Placement details added successfully!" });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: err.message || "Failed to add Placement information." });
+    } finally {
+      setLoading(false);
+    }
+  };  
 
   const resetForm = () => {
     setPlacement({
@@ -97,8 +118,8 @@ export default function Placement({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (onAdd) {
-      onAdd(payload);
+    if (handleAdd) {
+      handleAdd(payload);
     } else {
       console.log("Placement payload:", payload);
     }

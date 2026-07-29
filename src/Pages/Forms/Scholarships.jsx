@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import InputField from "../FormComponents/InputField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function Scholarships({ onAdd }) {
+export default function Scholarships() {
   const [scholarships, setScholarships] = useState({
     nameOfScholarship: "",
     otherName: "",
@@ -10,6 +10,28 @@ export default function Scholarships({ onAdd }) {
     academicYear: "",
   });
 
+  const handleAdd = async (payload) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not found. Please log in first.");
+      }
+
+      const typeKey = "scholarships";
+
+      await addCredential(userId, typeKey, payload);
+      setMessage({ type: "success", text: "scholarships details added successfully!" });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: err.message || "Failed to add scholarships information." });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [errors, setErrors] = useState({});
 
@@ -31,8 +53,8 @@ export default function Scholarships({ onAdd }) {
 
     if (!scholarships.nameOfScholarship) {
       newErrors.nameOfScholarship = "Scholarship name is required";
-    }else{
-      if(scholarships.nameOfScholarship === 'others' && !scholarships.otherName){
+    } else {
+      if (scholarships.nameOfScholarship === 'others' && !scholarships.otherName) {
         newErrors.otherName = "Scholarship name is required"
       }
     }
@@ -105,8 +127,8 @@ export default function Scholarships({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (onAdd) {
-      onAdd(payload);
+    if (handleAdd) {
+      handleAdd(payload);
     } else {
       console.log("Scholarships payload:", payload);
     }

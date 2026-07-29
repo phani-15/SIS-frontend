@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import InputField from "../FormComponents/InputField";
 import SelectField from "../FormComponents/SelectField";
 
-export default function EntranceExaminations({ onAdd }) {
+export default function EntranceExaminations() {
   const [entranceExaminations, setEntranceExaminations] = useState({
     examName: "",
     otherName:"",
@@ -28,6 +28,28 @@ export default function EntranceExaminations({ onAdd }) {
     }
   };
 
+  const handleAdd = async (payload) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not found. Please log in first.");
+      }
+
+      const typeKey = "entranceExaminations";
+
+      await addCredential(userId, typeKey, payload);
+      setMessage({ type: "success", text: "entranceExaminations details added successfully!" });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: err.message || "Failed to add entranceExaminations information." });
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const validate = () => {
     const newErrors = {};
@@ -107,8 +129,8 @@ export default function EntranceExaminations({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (onAdd) {
-      onAdd(payload);
+    if (handleAdd) {
+      handleAdd(payload);
     } else {
       console.log("EntranceExaminations payload:", payload);
     }

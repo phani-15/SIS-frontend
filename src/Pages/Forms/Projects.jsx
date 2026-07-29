@@ -4,7 +4,7 @@ import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 import { credentialTypes } from "../AddCreds";
 
-export default function Projects({ onAdd }) {
+export default function Projects() {
   const [projects, setProjects] = useState({
     projectType: "",
     otherType: "",
@@ -42,6 +42,29 @@ export default function Projects({ onAdd }) {
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handleAdd = async (payload) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not found. Please log in first.");
+      }
+
+      const typeKey = "scholarships";
+
+      await addCredential(userId, typeKey, payload);
+      setMessage({ type: "success", text: "scholarships details added successfully!" });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: err.message || "Failed to add scholarships information." });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -300,8 +323,8 @@ export default function Projects({ onAdd }) {
 
     const payload = buildPayload();
 
-    if (onAdd) {
-      onAdd(payload);
+    if (handleAdd) {
+      handleAdd(payload);
     } else {
       console.log("Projects payload:", payload);
     }
