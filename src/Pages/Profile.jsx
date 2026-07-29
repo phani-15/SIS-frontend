@@ -30,7 +30,6 @@ import {
 } from "lucide-react";
 import { fetchMyProfile, fetchPortfolioCounts, getEntries } from "../core/user";
 import { credentialTypes } from "./AddCreds";
-import { PATH_TO_COUNTS_KEY } from "../utils/helpers";
 import CredDataJson from "../assets/CredData.json";
 
 // Import Credentials Display Components
@@ -452,7 +451,7 @@ export default function Profile() {
 
             {Object.entries(credentialTypes).map(([label, pathValue]) => {
               const IconComp = sectionIcon[label] || User;
-              const countKey = PATH_TO_COUNTS_KEY[pathValue] || pathValue;
+              const countKey = pathValue;
               const count = counts[countKey] ?? 0;
               const hasDefinedContent = location === "/student/profile";
               return (
