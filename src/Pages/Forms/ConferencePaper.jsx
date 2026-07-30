@@ -17,11 +17,13 @@ export default function ConferencePaper() {
     toDate: "",
     modeOfConference: "",
     venue: "",
-    isbnNumber: "",
+    doYouHaveIsbnNumber: "",
+    isbnNumberForProceedings: "",
     conferenceProceedingsTitle: "",
     publisherName: "",
     indexingType: "",
-    doi: "",
+    doYouHaveDoi: "",
+    doiIfYes: "",
     pageNumbersFromTo: "",
     noOfAuthors: "",
     authorsList: "",
@@ -136,11 +138,16 @@ export default function ConferencePaper() {
       newErrors.publisherName = "Publisher Name is required"
     }
 
-    if (conferencePaper.isbnNumber) {
-      const isbn = conferencePaper.isbnNumber.replace(/[-\s]/g, ""); // Remove hyphens/spaces if allowed
-
-      if (!(isbn.length === 10 || isbn.length === 13)) {
-        newErrors.isbnNumber = "ISBN must be 10 or 13 digits";
+    if (!conferencePaper.doYouHaveIsbnNumber) {
+      newErrors.doYouHaveIsbnNumber = "Please specify if you have an ISBN number";
+    } else if (conferencePaper.doYouHaveIsbnNumber === "true") {
+      if (!conferencePaper.isbnNumberForProceedings.trim()) {
+        newErrors.isbnNumberForProceedings = "ISBN number is required";
+      } else {
+        const isbn = conferencePaper.isbnNumberForProceedings.replace(/[-\s]/g, "");
+        if (!(isbn.length === 10 || isbn.length === 13)) {
+          newErrors.isbnNumberForProceedings = "ISBN must be 10 or 13 digits";
+        }
       }
     }
 
@@ -165,6 +172,14 @@ export default function ConferencePaper() {
           newErrors.pageNumbersFromTo =
             "End page cannot be less than the start page";
         }
+      }
+    }
+
+    if (!conferencePaper.doYouHaveDoi) {
+      newErrors.doYouHaveDoi = "Please specify if you have a DOI";
+    } else if (conferencePaper.doYouHaveDoi === "true") {
+      if (!conferencePaper.doiIfYes.trim()) {
+        newErrors.doiIfYes = "DOI is required";
       }
     }
 
@@ -208,11 +223,13 @@ export default function ConferencePaper() {
     dateOfConferenceTo: conferencePaper.toDate,
     modeOfConference: conferencePaper.modeOfConference,
     venue: conferencePaper.venue.trim(),
-    isbnNumberForProceedings: conferencePaper.isbnNumber.trim(),
+    doYouHaveIsbnNumber: conferencePaper.doYouHaveIsbnNumber === "true",
+    isbnNumberForProceedings: conferencePaper.doYouHaveIsbnNumber === "true" ? conferencePaper.isbnNumberForProceedings.trim() : "",
     conferenceProceedingsTitle: conferencePaper.conferenceProceedingsTitle.trim(),
     publisherName: conferencePaper.publisherName.trim(),
     indexingType: conferencePaper.indexingType.trim(),
-    doYouHaveDoi: conferencePaper.doi,
+    doYouHaveDoi: conferencePaper.doYouHaveDoi === "true",
+    doiIfYes: conferencePaper.doYouHaveDoi === "true" ? conferencePaper.doiIfYes.trim() : "",
     pageNumbersFromTo: conferencePaper.pageNumbersFromTo.trim(),
     authorsList: conferencePaper.authorsList.trim(),
     affiliationOfAuthors: conferencePaper.affiliationOfAuthors.trim(),
@@ -231,7 +248,8 @@ export default function ConferencePaper() {
       toDate: "",
       modeOfConference: "",
       venue: "",
-      isbnNumber: "",
+      doYouHaveIsbnNumber: "",
+      isbnNumberForProceedings: "",
       conferenceProceedingsTitle: "",
       publisherName: "",
       indexingType: "",
@@ -378,14 +396,47 @@ export default function ConferencePaper() {
             error={errors.venue}
           />
 
-          <InputField
-            label="ISBN Number (for Proceedings)"
-            name="isbnNumber"
-            value={conferencePaper.isbnNumber}
-            onChange={handleChange}
-            placeholder="Eg: 1234-1234-12345"
-            error={errors.isbnNumber}
-          />
+          <div className="flex flex-col text-left space-y-2">
+            <label className="text-gray-700 font-medium">Do you have ISBN Number?</label>
+            <div className="flex gap-6 mt-1">
+              <label className="flex items-center gap-2 cursor-pointer text-sm">
+                <input
+                  type="radio"
+                  name="doYouHaveIsbnNumber"
+                  value="true"
+                  checked={conferencePaper.doYouHaveIsbnNumber === "true"}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
+                />
+                <span>Yes</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer text-sm">
+                <input
+                  type="radio"
+                  name="doYouHaveIsbnNumber"
+                  value="false"
+                  checked={conferencePaper.doYouHaveIsbnNumber === "false"}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
+                />
+                <span>No</span>
+              </label>
+            </div>
+            {errors.doYouHaveIsbnNumber && (
+              <small className="text-red-600 text-sm mt-1">{errors.doYouHaveIsbnNumber}</small>
+            )}
+          </div>
+
+          {conferencePaper.doYouHaveIsbnNumber === "true" && (
+            <InputField
+              label="ISBN Number (for Proceedings)"
+              name="isbnNumberForProceedings"
+              value={conferencePaper.isbnNumberForProceedings}
+              onChange={handleChange}
+              placeholder="Eg: 1234-1234-12345"
+              error={errors.isbnNumberForProceedings}
+            />
+          )}
 
           <InputField
             label="Conference Proceedings Title"
@@ -412,13 +463,46 @@ export default function ConferencePaper() {
             error = {errors.indexingType}
           />
 
-          <InputField
-            label="DOI"
-            name="doi"
-            value={conferencePaper.doi}
-            onChange={handleChange}
-            error={errors.doi}
-          />
+          <div className="flex flex-col text-left space-y-2">
+            <label className="text-gray-700 font-medium">Do you have DOI?</label>
+            <div className="flex gap-6 mt-1">
+              <label className="flex items-center gap-2 cursor-pointer text-sm">
+                <input
+                  type="radio"
+                  name="doYouHaveDoi"
+                  value="true"
+                  checked={conferencePaper.doYouHaveDoi === "true"}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
+                />
+                <span>Yes</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer text-sm">
+                <input
+                  type="radio"
+                  name="doYouHaveDoi"
+                  value="false"
+                  checked={conferencePaper.doYouHaveDoi === "false"}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
+                />
+                <span>No</span>
+              </label>
+            </div>
+            {errors.doYouHaveDoi && (
+              <small className="text-red-600 text-sm mt-1">{errors.doYouHaveDoi}</small>
+            )}
+          </div>
+
+          {conferencePaper.doYouHaveDoi === "true" && (
+            <InputField
+              label="DOI"
+              name="doiIfYes"
+              value={conferencePaper.doiIfYes}
+              onChange={handleChange}
+              error={errors.doiIfYes}
+            />
+          )}
 
           <InputField
             label="Page Numbers (from-to)"

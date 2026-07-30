@@ -138,7 +138,7 @@ export default function Projects() {
       }
     }
 
-    if (projects.patentFiled === 'Yes') {
+    if (projects.patentFiled === "true") {
 
       if (!patent.patentNumber.trim()) {
         newErrors.patentNumber = "Patent number is required";
@@ -199,7 +199,7 @@ export default function Projects() {
 
     if (!projects.industrySponsored) {
       newErrors.industrySponsored = "Please specify if the project is industry sponsored";
-    } else if (projects.industrySponsored === "yes") {
+    } else if (projects.industrySponsored === "true") {
       if (!projects.industryName.trim()) {
         newErrors.industryName = "Industry name is required";
       }
@@ -229,7 +229,7 @@ export default function Projects() {
 
     if (!projects.awardRecieved) {
       newErrors.awardRecieved = "Please specify if an award was received";
-    } else if (projects.awardRecieved === "Yes") {
+    } else if (projects.awardRecieved === "true") {
       if (!projects.awardName.trim()) {
         newErrors.awardName = "Award name is required";
       }
@@ -261,21 +261,21 @@ export default function Projects() {
       teamSize: projects.teamSize,
       facultyGuide: projects.facultyGuide.trim(),
       externalMentor: projects.externalMentor.trim(),
-      industrySponsored: projects.industrySponsored,
-      industryName: projects.industrySponsored === "yes" ? projects.industryName.trim() : "",
-      fundingAgency: projects.industrySponsored === "yes" ? projects.fundingAgency.trim() : "",
-      amountSanctioned: projects.industrySponsored === "yes" ? projects.amountSanctioned.trim() : "",
+      industrySponsored: projects.industrySponsored === "true",
+      industryName: projects.industrySponsored === "true" ? projects.industryName.trim() : "",
+      fundingAgency: projects.industrySponsored === "true" ? projects.fundingAgency.trim() : "",
+      amountSanctioned: projects.industrySponsored === "true" ? projects.amountSanctioned.trim() : "",
       startDate: projects.startDate,
       endDate: projects.endDate,
       technologiesUsed: projects.technologiesUsed.trim(),
-      prototypeDeveloped: projects.prototypeDeveloped,
-      patentFiled: projects.patentFiled,
-      publicationGenerated: projects.publicationGenerated,
-      awardReceived: projects.awardRecieved,
-      awardName: projects.awardRecieved === "Yes" ? projects.awardName.trim() : "",
+      prototypeDeveloped: projects.prototypeDeveloped === "true",
+      patentFiled: projects.patentFiled === "true",
+      publicationGenerated: projects.publicationGenerated === "true",
+      awardReceived: projects.awardRecieved === "true",
+      awardName: projects.awardRecieved === "true" ? projects.awardName.trim() : "",
       certificate: projects.certificate,
     };
-    if (projects.patentFiled === 'Yes') {
+    if (projects.patentFiled === "true") {
       obj.patent = {
         patentNumber: patent.patentNumber.trim(),
         titleOfThePatent: patent.titleOfThePatent.trim(),
@@ -475,8 +475,8 @@ export default function Projects() {
                 <input
                   type="radio"
                   name="industrySponsored"
-                  value="yes"
-                  checked={projects.industrySponsored === "yes"}
+                  value="true"
+                  checked={projects.industrySponsored === "true"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -486,8 +486,8 @@ export default function Projects() {
                 <input
                   type="radio"
                   name="industrySponsored"
-                  value="No"
-                  checked={projects.industrySponsored === "No"}
+                  value="false"
+                  checked={projects.industrySponsored === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -499,7 +499,7 @@ export default function Projects() {
             )}
           </div>
 
-          {projects.industrySponsored === "yes" && (
+          {projects.industrySponsored === "true" && (
             <>
               <InputField
                 label="Industry Name"
@@ -560,8 +560,8 @@ export default function Projects() {
                 <input
                   type="radio"
                   name="prototypeDeveloped"
-                  value="Yes"
-                  checked={projects.prototypeDeveloped === "Yes"}
+                  value="true"
+                  checked={projects.prototypeDeveloped === "true"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -571,8 +571,8 @@ export default function Projects() {
                 <input
                   type="radio"
                   name="prototypeDeveloped"
-                  value="No"
-                  checked={projects.prototypeDeveloped === "No"}
+                  value="false"
+                  checked={projects.prototypeDeveloped === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -591,8 +591,8 @@ export default function Projects() {
                 <input
                   type="radio"
                   name="patentFiled"
-                  value="Yes"
-                  checked={projects.patentFiled === "Yes"}
+                  value="true"
+                  checked={projects.patentFiled === "true"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -602,8 +602,8 @@ export default function Projects() {
                 <input
                   type="radio"
                   name="patentFiled"
-                  value="No"
-                  checked={projects.patentFiled === "No"}
+                  value="false"
+                  checked={projects.patentFiled === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -615,7 +615,7 @@ export default function Projects() {
             )}
           </div>
 
-          {projects.patentFiled === 'Yes' && <>
+          {projects.patentFiled === "true" && <>
 
               <InputField
                 label="Patent Number"
@@ -679,8 +679,8 @@ export default function Projects() {
                 <input
                   type="radio"
                   name="publicationGenerated"
-                  value="Yes"
-                  checked={projects.publicationGenerated === "Yes"}
+                  value="true"
+                  checked={projects.publicationGenerated === "true"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -690,8 +690,8 @@ export default function Projects() {
                 <input
                   type="radio"
                   name="publicationGenerated"
-                  value="No"
-                  checked={projects.publicationGenerated === "No"}
+                  value="false"
+                  checked={projects.publicationGenerated === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -710,8 +710,8 @@ export default function Projects() {
                 <input
                   type="radio"
                   name="awardRecieved"
-                  value="Yes"
-                  checked={projects.awardRecieved === "Yes"}
+                  value="true"
+                  checked={projects.awardRecieved === "true"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -721,8 +721,8 @@ export default function Projects() {
                 <input
                   type="radio"
                   name="awardRecieved"
-                  value="No"
-                  checked={projects.awardRecieved === "No"}
+                  value="false"
+                  checked={projects.awardRecieved === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -734,7 +734,7 @@ export default function Projects() {
             )}
           </div>
 
-          {projects.awardRecieved === "Yes" && (
+          {projects.awardRecieved === "true" && (
             <div className="md:col-span-2">
               <InputField
                 label="Award Name"

@@ -90,7 +90,7 @@ export default function Competitions() {
         newErrors.otherCategory = "Other Category is required"
     }
 
-    if (competitions.awardRecieved === "Yes") {
+    if (competitions.awardRecieved === "true") {
       if (!competitions.awardName.trim()) newErrors.awardName = "Award name is required";
       if (!competitions.rankSecured.trim()) newErrors.rankSecured = "Rank secured is required";
     }
@@ -138,10 +138,10 @@ export default function Competitions() {
       presentedProjectIdeaTitle: competitions.presentedProjectIdeaTitle.trim(),
       abstractSummary: competitions.abstractSummary.trim(),
       participationStatus: competitions.participationStatus,
-      awardReceived: competitions.awardRecieved,
-      awardName: competitions.awardRecieved === "Yes" ? competitions.awardName.trim() : "",
-      prizeMoney: competitions.awardRecieved === "Yes" ? competitions.prizeMoney.trim() : "",
-      rankSecured: competitions.awardRecieved === "Yes" ? competitions.rankSecured.trim() : "",
+      awardReceived: competitions.awardRecieved === "true",
+      awardName: competitions.awardRecieved === "true" ? competitions.awardName.trim() : "",
+      prizeMoney: competitions.awardRecieved === "true" ? competitions.prizeMoney.trim() : "",
+      rankSecured: competitions.awardRecieved === "true" ? competitions.rankSecured.trim() : "",
       outcomeAchieved: competitions.outcomeAchieved.trim(),
       certificate: competitions.certificate,
     };
@@ -428,19 +428,19 @@ export default function Competitions() {
                 <input
                   type="radio"
                   name="awardRecieved"
-                  value="Yes"
-                  checked={competitions.awardRecieved === "Yes"}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
-                />
-                <span>Yes</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer text-sm">
-                <input
-                  type="radio"
-                  name="awardRecieved"
-                  value="No"
-                  checked={competitions.awardRecieved === "No"}
+                    value="true"
+                    checked={competitions.awardRecieved === "true"}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
+                  />
+                  <span>Yes</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-sm">
+                  <input
+                    type="radio"
+                    name="awardRecieved"
+                    value="false"
+                    checked={competitions.awardRecieved === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -452,7 +452,7 @@ export default function Competitions() {
             )}
           </div>
 
-          {competitions.awardRecieved === "Yes" && (
+          {competitions.awardRecieved === "true" && (
             <>
               <InputField
                 label="Award Name"

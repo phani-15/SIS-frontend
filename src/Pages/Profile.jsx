@@ -234,7 +234,6 @@ export default function Profile() {
 
     fetchPortfolioCounts().then((res) => {
       if (res.data) {
-        console.log(res.data)
         setCounts(res.data);
       }
     }).catch(() => { });
@@ -253,8 +252,6 @@ export default function Profile() {
         const nextItems = Array.isArray(res?.data) && res.data.length > 0
           ? res.data
           : (FALLBACK_SECTION_DATA[view] || []);
-
-        console.log(res.data)
 
         setSectionData((prev) => ({ ...prev, [view]: nextItems }));
       })

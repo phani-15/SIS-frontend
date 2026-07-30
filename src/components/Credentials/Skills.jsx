@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Cpu, Plus, Sparkles, X } from "lucide-react";
 import { addSkills } from "../../core/user";
 
@@ -7,6 +8,15 @@ export default function Skills({ items = [], onSkillAdded }) {
   const [newSkill, setNewSkill] = useState("");
   const [error, setError] = useState("");
   const [adding, setAdding] = useState(false);
+
+  useEffect(() => {
+    if (showModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [showModal]);
 
   const handleAddSkill = async () => {
     const trimmed = newSkill.trim();
@@ -24,7 +34,7 @@ export default function Skills({ items = [], onSkillAdded }) {
     setAdding(true);
     setError("");
     try {
-      await addSkills([{ skill: trimmed }]);
+      await addSkills(trimmed);
       setNewSkill("");
       setShowModal(false);
       if (onSkillAdded) onSkillAdded();
@@ -89,7 +99,7 @@ export default function Skills({ items = [], onSkillAdded }) {
             <div>
               <h3 className="text-slate-800 font-semibold text-sm">My Expertise</h3>
               <p className="text-slate-500 text-xs mt-0.5">
-                Core technologies and domains of your profile.
+                Core technologies and domains of profile.
               </p>
             </div>
           </div>
@@ -113,11 +123,9 @@ export default function Skills({ items = [], onSkillAdded }) {
         </div>
       )}
 
-      {/* Modal overlay */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm overflow-y-auto p-4">
+      {showModal && createPortal(
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
             <div className="w-full max-w-md mx-4 bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
-              {/* Modal header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-blue-100">
                 <h3 className="text-base font-semibold text-slate-800">Add Skill</h3>
                 <button
@@ -128,8 +136,6 @@ export default function Skills({ items = [], onSkillAdded }) {
                   <X size={18} />
                 </button>
               </div>
-
-              {/* Modal body */}
               <div className="px-5 py-5 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">Skill Name</label>
@@ -149,7 +155,6 @@ export default function Skills({ items = [], onSkillAdded }) {
                     <p className="mt-1.5 text-xs font-medium text-red-600">{error}</p>
                   )}
                 </div>
-
                 <div className="flex items-center gap-3 pt-1">
                   <button
                     type="button"
@@ -169,7 +174,8 @@ export default function Skills({ items = [], onSkillAdded }) {
                 </div>
               </div>
             </div>
-          </div>
+          </div>,
+        document.body
       )}
         </div>
       );

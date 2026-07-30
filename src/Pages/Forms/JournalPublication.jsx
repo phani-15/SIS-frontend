@@ -114,13 +114,13 @@ export default function JournalPublication() {
       newErrors.scope = "Please select scope";
     }
 
-    if (journalPublication.doYouHaveIssnNumber === "Yes") {
+    if (journalPublication.doYouHaveIssnNumber === "true") {
       if (!journalPublication.issnNumberIfYes.trim()) {
         newErrors.issnNumberIfYes = "ISSN number is required";
       }
     }
 
-    if (journalPublication.doYouHaveEIssnNumber === "Yes") {
+    if (journalPublication.doYouHaveEIssnNumber === "true") {
       if (!journalPublication.eIssnNumberIf.trim()) {
         newErrors.eIssnNumberIf = "e-ISSN number is required";
       }
@@ -157,7 +157,7 @@ export default function JournalPublication() {
       }
     }
 
-    if (journalPublication.doYouHaveDoi === "Yes") {
+    if (journalPublication.doYouHaveDoi === "true") {
       if (!journalPublication.doiIf.trim()) {
         newErrors.doiIf = "DOI string is required";
       }
@@ -187,18 +187,18 @@ export default function JournalPublication() {
     volumeNumber: journalPublication.volumeNumber.trim(),
     issueNumber: journalPublication.issueNumber.trim(),
     impactFactor: journalPublication.impactFactor.trim(),
-    isThomsonReuters: journalPublication.isThomsonReuters,
+    isThomsonReuters: journalPublication.isThomsonReuters === "true",
     nationalInternational: journalPublication.scope,
-    doYouHaveIssnNumber: journalPublication.doYouHaveIssnNumber,
-    issnNumberIfYes: journalPublication.doYouHaveIssnNumber === "Yes" ? journalPublication.issnNumberIfYes.trim() : "",
-    doYouHaveEIssnNumber: journalPublication.doYouHaveEIssnNumber,
-    eIssnNumberIf: journalPublication.doYouHaveEIssnNumber === "Yes" ? journalPublication.eIssnNumberIf.trim() : "",
+    doYouHaveIssnNumber: journalPublication.doYouHaveIssnNumber === "true",
+    issnNumberIfYes: journalPublication.doYouHaveIssnNumber === "true" ? journalPublication.issnNumberIfYes.trim() : "",
+    doYouHaveEIssnNumber: journalPublication.doYouHaveEIssnNumber === "true",
+    eIssnNumberIf: journalPublication.doYouHaveEIssnNumber === "true" ? journalPublication.eIssnNumberIf.trim() : "",
     noOfAuthors: journalPublication.noOfAuthors.trim(),
     author: journalPublication.author.trim(),
     indexingPlatform: journalPublication.indexingPlatform.trim(),
     hIndexOfJournal: journalPublication.hIndexOfJournal.trim(),
-    doYouHaveDoi: journalPublication.doYouHaveDoi,
-    doiIf: journalPublication.doYouHaveDoi === "Yes" ? journalPublication.doiIf.trim() : "",
+    doYouHaveDoi: journalPublication.doYouHaveDoi === "true",
+    doiIf: journalPublication.doYouHaveDoi === "true" ? journalPublication.doiIf.trim() : "",
     firstPageOfJournal: journalPublication.firstPageOfJournal,
     remarks: journalPublication.remarks.trim(),
   });
@@ -348,8 +348,8 @@ export default function JournalPublication() {
                 <input
                   type="radio"
                   name="isThomsonReuters"
-                  value="Yes"
-                  checked={journalPublication.isThomsonReuters === "Yes"}
+                  value="true"
+                  checked={journalPublication.isThomsonReuters === "true"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -359,8 +359,8 @@ export default function JournalPublication() {
                 <input
                   type="radio"
                   name="isThomsonReuters"
-                  value="No"
-                  checked={journalPublication.isThomsonReuters === "No"}
+                  value="false"
+                  checked={journalPublication.isThomsonReuters === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -376,8 +376,8 @@ export default function JournalPublication() {
                 <input
                   type="radio"
                   name="doYouHaveIssnNumber"
-                  value="Yes"
-                  checked={journalPublication.doYouHaveIssnNumber === "Yes"}
+                  value="true"
+                  checked={journalPublication.doYouHaveIssnNumber === "true"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -387,8 +387,8 @@ export default function JournalPublication() {
                 <input
                   type="radio"
                   name="doYouHaveIssnNumber"
-                  value="No"
-                  checked={journalPublication.doYouHaveIssnNumber === "No"}
+                  value="false"
+                  checked={journalPublication.doYouHaveIssnNumber === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -397,7 +397,7 @@ export default function JournalPublication() {
             </div>
           </div>
 
-          {journalPublication.doYouHaveIssnNumber === "Yes" && (
+          {journalPublication.doYouHaveIssnNumber === "true" && (
             <InputField
               label="ISSN Number"
               name="issnNumberIfYes"
@@ -414,8 +414,8 @@ export default function JournalPublication() {
                 <input
                   type="radio"
                   name="doYouHaveEIssnNumber"
-                  value="Yes"
-                  checked={journalPublication.doYouHaveEIssnNumber === "Yes"}
+                  value="true"
+                  checked={journalPublication.doYouHaveEIssnNumber === "true"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -425,8 +425,8 @@ export default function JournalPublication() {
                 <input
                   type="radio"
                   name="doYouHaveEIssnNumber"
-                  value="No"
-                  checked={journalPublication.doYouHaveEIssnNumber === "No"}
+                  value="false"
+                  checked={journalPublication.doYouHaveEIssnNumber === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -435,7 +435,7 @@ export default function JournalPublication() {
             </div>
           </div>
 
-          {journalPublication.doYouHaveEIssnNumber === "Yes" && (
+          {journalPublication.doYouHaveEIssnNumber === "true" && (
             <InputField
               label="e-ISSN Number"
               name="eIssnNumberIf"
@@ -485,8 +485,8 @@ export default function JournalPublication() {
                 <input
                   type="radio"
                   name="doYouHaveDoi"
-                  value="Yes"
-                  checked={journalPublication.doYouHaveDoi === "Yes"}
+                  value="true"
+                  checked={journalPublication.doYouHaveDoi === "true"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -496,8 +496,8 @@ export default function JournalPublication() {
                 <input
                   type="radio"
                   name="doYouHaveDoi"
-                  value="No"
-                  checked={journalPublication.doYouHaveDoi === "No"}
+                  value="false"
+                  checked={journalPublication.doYouHaveDoi === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -506,7 +506,7 @@ export default function JournalPublication() {
             </div>
           </div>
 
-          {journalPublication.doYouHaveDoi === "Yes" && (
+          {journalPublication.doYouHaveDoi === "true" && (
             <InputField
               label="DOI"
               name="doiIf"

@@ -95,7 +95,7 @@ export default function coCurricular() {
 
     if (!coCurricular.awardRecieved) {
       newErrors.awardRecieved = "Please specify if an award was received";
-    } else if (coCurricular.awardRecieved === "Yes") {
+    } else if (coCurricular.awardRecieved === "true") {
       if (!coCurricular.awardName.trim()) {
         newErrors.awardName = "Award name is required";
       }
@@ -123,8 +123,8 @@ export default function coCurricular() {
     eventLevel: coCurricular.eventLevel,
     eventDate: coCurricular.eventDate,
     organizationName: coCurricular.organizationName.trim(),
-    awardReceived: coCurricular.awardRecieved,
-    awardName: coCurricular.awardRecieved === "Yes" ? coCurricular.awardName.trim() : "",
+    awardReceived: coCurricular.awardRecieved === "true",
+    awardName: coCurricular.awardRecieved === "true" ? coCurricular.awardName.trim() : "",
     certificate: coCurricular.certificate,
   });
 
@@ -245,8 +245,8 @@ export default function coCurricular() {
                   <input
                     type="radio"
                     name="awardRecieved"
-                    value="Yes"
-                    checked={coCurricular.awardRecieved === "Yes"}
+                    value="true"
+                    checked={coCurricular.awardRecieved === "true"}
                     onChange={handleChange}
                     className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                   />
@@ -256,8 +256,8 @@ export default function coCurricular() {
                   <input
                     type="radio"
                     name="awardRecieved"
-                    value="No"
-                    checked={coCurricular.awardRecieved === "No"}
+                    value="false"
+                    checked={coCurricular.awardRecieved === "false"}
                     onChange={handleChange}
                     className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                   />
@@ -268,7 +268,7 @@ export default function coCurricular() {
                 <small className="text-red-600 text-sm mt-1">{errors.awardRecieved}</small>
               )}
             </div>
-            {coCurricular.awardRecieved === "Yes" && (
+            {coCurricular.awardRecieved === "true" && (
               <div className="">
                 <InputField
                   label="Award Name"

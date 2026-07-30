@@ -95,7 +95,7 @@ export default function extraCurricular() {
 
     if (!extraCurricular.prizeRecieved) {
       newErrors.prizeRecieved = "Please specify if a prize was received";
-    } else if (extraCurricular.prizeRecieved === "Yes") {
+    } else if (extraCurricular.prizeRecieved === "true") {
       if (!extraCurricular.prizeNameIfYes.trim()) {
         newErrors.prizeNameIfYes = "Prize name is required";
       }
@@ -123,8 +123,8 @@ export default function extraCurricular() {
     eventLevel: extraCurricular.eventLevel,
     dateOfEvent: extraCurricular.dateOfEvent,
     organizationName: extraCurricular.organizationName.trim(),
-    prizeReceived: extraCurricular.prizeRecieved,
-    prizeNameIfYes: extraCurricular.prizeRecieved === "Yes" ? extraCurricular.prizeNameIfYes.trim() : "",
+    prizeReceived: extraCurricular.prizeRecieved === "true",
+    prizeNameIfYes: extraCurricular.prizeRecieved === "true" ? extraCurricular.prizeNameIfYes.trim() : "",
     certificate: extraCurricular.certificate,
   });
 
@@ -245,8 +245,8 @@ export default function extraCurricular() {
                   <input
                     type="radio"
                     name="prizeRecieved"
-                    value="Yes"
-                    checked={extraCurricular.prizeRecieved === "Yes"}
+                    value="true"
+                    checked={extraCurricular.prizeRecieved === "true"}
                     onChange={handleChange}
                     className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                   />
@@ -256,8 +256,8 @@ export default function extraCurricular() {
                   <input
                     type="radio"
                     name="prizeRecieved"
-                    value="No"
-                    checked={extraCurricular.prizeRecieved === "No"}
+                    value="false"
+                    checked={extraCurricular.prizeRecieved === "false"}
                     onChange={handleChange}
                     className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                   />
@@ -268,7 +268,7 @@ export default function extraCurricular() {
                 <small className="text-red-600 text-sm mt-1">{errors.prizeRecieved}</small>
               )}
 
-            {extraCurricular.prizeRecieved === "Yes" && (
+            {extraCurricular.prizeRecieved === "true" && (
               <div className="">
                 <InputField
                   label="Prize Name"

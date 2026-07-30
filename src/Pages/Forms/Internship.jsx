@@ -87,7 +87,7 @@ export default function Internship() {
 
     if (!internship.isStipendBased) {
       newErrors.isStipendBased = "Please select if the internship is stipend based";
-    } else if (internship.isStipendBased === "yes") {
+    } else if (internship.isStipendBased === "true") {
       if (!internship.amount.trim()) {
         newErrors.amount = "Stipend amount is required";
       } else {
@@ -121,8 +121,8 @@ export default function Internship() {
     facultyMentor: internship.facultyMentor.trim(),
     startDate: internship.startDate,
     endDate: internship.endDate,
-    isStipendBased: internship.isStipendBased === "yes",
-    amountIfYes: internship.isStipendBased === "yes" ? internship.amount.trim() : "",
+    isStipendBased: internship.isStipendBased === "true",
+    amountIfYes: internship.isStipendBased === "true" ? internship.amount.trim() : "",
     certificate: internship.certificate,
   });
 
@@ -280,8 +280,8 @@ export default function Internship() {
                 <input
                   type="radio"
                   name="isStipendBased"
-                  value="yes"
-                  checked={internship.isStipendBased === "yes"}
+                    value="true"
+                    checked={internship.isStipendBased === "true"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -291,8 +291,8 @@ export default function Internship() {
                 <input
                   type="radio"
                   name="isStipendBased"
-                  value="no"
-                  checked={internship.isStipendBased === "no"}
+                    value="false"
+                    checked={internship.isStipendBased === "false"}
                   onChange={handleChange}
                   className="h-4 w-4 text-blue-900 border-gray-300 focus:ring-blue-900"
                 />
@@ -305,7 +305,7 @@ export default function Internship() {
           </div>
 
           <div
-            className={`grid transition-all duration-300 ease-in-out ${internship.isStipendBased === "yes"
+            className={`grid transition-all duration-300 ease-in-out ${internship.isStipendBased === "true"
                 ? "grid-rows-[1fr] opacity-100"
                 : "grid-rows-[0fr] opacity-0"
               }`}
