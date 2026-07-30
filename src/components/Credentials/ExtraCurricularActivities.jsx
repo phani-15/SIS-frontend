@@ -1,5 +1,6 @@
 import React from 'react';
 import { Award, Calendar, Flag } from 'lucide-react';
+import { formatDate } from '../../utils/helpers';
 import CredentialCategoryLayout from './CredentialCategoryLayout';
 
 export default function ExtraCurricularActivities({ items = [] }) {
@@ -32,7 +33,7 @@ export default function ExtraCurricularActivities({ items = [] }) {
               <span className="text-slate-400 font-medium block text-xs uppercase tracking-wider">Event Date</span>
               <span className="text-slate-700 font-semibold flex items-center gap-1">
                 <Calendar size={14} className="text-slate-400" />
-                {item.dateOfEvent || item.date || "N/A"}
+                {formatDate(item.dateOfEvent || item.date)}
               </span>
             </div>
             <div className="text-sm sm:col-span-2">

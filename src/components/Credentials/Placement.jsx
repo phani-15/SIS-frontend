@@ -1,5 +1,6 @@
 import React from 'react';
 import { Briefcase, Calendar, Award } from 'lucide-react';
+import { formatDate } from '../../utils/helpers';
 import CredentialCategoryLayout from './CredentialCategoryLayout';
 
 export default function Placement({ items = [] }) {
@@ -31,7 +32,7 @@ export default function Placement({ items = [] }) {
               <span className="text-slate-400 font-medium block text-xs uppercase tracking-wider">Date of Selection</span>
               <span className="text-slate-700 font-semibold flex items-center gap-1">
                 <Calendar size={14} className="text-slate-400" />
-                {item.dateOfSelectionAppointmentOffer || item.dateOfSelection || "N/A"}
+                {formatDate(item.dateOfSelectionAppointmentOffer || item.dateOfSelection)}
               </span>
             </div>
             <div className="text-sm sm:col-span-2">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Award, Calendar, BarChart } from 'lucide-react';
+import { formatDate } from '../../utils/helpers';
 import CredentialCategoryLayout from './CredentialCategoryLayout';
 
 export default function Certification({ items = [] }) {
@@ -30,7 +31,7 @@ export default function Certification({ items = [] }) {
               <span className="text-slate-400 font-medium block text-xs uppercase tracking-wider">Completion Date</span>
               <span className="text-slate-700 font-semibold flex items-center gap-1">
                 <Calendar size={14} className="text-slate-400" />
-                {item.dateOfCompletion || item.date || "N/A"}
+                {formatDate(item.dateOfCompletion || item.date)}
               </span>
             </div>
             <div className="text-sm">

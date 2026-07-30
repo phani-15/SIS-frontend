@@ -3,8 +3,12 @@ import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
 import SelectField from "../FormComponents/SelectField";
 import { credentialTypes } from "../AddCreds";
+import { ChevronLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { addEntry } from "../../core/user";
 
 export default function Projects() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState({
     projectType: "",
     otherType: "",
@@ -31,8 +35,19 @@ export default function Projects() {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
 
-    const handlePatentChange = (e) => {
+  const [patent, setPatent] = useState({
+    patentNumber: "",
+    titleOfThePatent: "",
+    publishedGranted: "",
+    yearOfPublishedGranted: "",
+    scope: "",
+    document: null,
+  });
+
+  const handlePatentChange = (e) => {
     const { name, value, files, type } = e.target;
 
     setPatent((prev) => ({
@@ -49,20 +64,16 @@ export default function Projects() {
     setLoading(true);
     setMessage(null);
     try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
+      const typeKey = "project";
 
-      const typeKey = "scholarships";
-
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "scholarships details added successfully!" });
+      await addEntry(typeKey, [payload]);
+      setMessage({ type: "success", text: "Project details added successfully!" });
 
       window.scrollTo({ top: 0, behavior: "smooth" });
+      navigate(-1)
     } catch (err) {
       console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add scholarships information." });
+      setMessage({ type: "error", text: err.message || "Failed to add project information." });
     } finally {
       setLoading(false);
     }
@@ -167,8 +178,6 @@ export default function Projects() {
         }
       }
 
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
     }
 
     if (!projects.projectStatus) {
@@ -279,15 +288,6 @@ export default function Projects() {
     return obj;
   };
 
-  const [patent, setPatent] = useState({
-    patentNumber: "",
-    titleOfThePatent: "",
-    publishedGranted: "",
-    yearOfPublishedGranted: "",
-    scope: "",
-    document: null,
-  });
-
   const resetForm = () => {
     setProjects({
       projectType: "",
@@ -334,9 +334,17 @@ export default function Projects() {
 
   return (
     <div className="bg-white p-6 rounded-2xl border border-blue-100 shadow-sm mt-6">
-      <h2 className="text-xl font-bold text-blue-950 mb-4 pb-2 border-b border-gray-100">
-        Project Details
-      </h2>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-blue-950 transition-colors mb-4 cursor-pointer"
+        >
+          <ChevronLeft size={18} />
+          Back
+        </button>
+        <h2 className="text-xl font-bold text-blue-950 mb-4 pb-2 border-b border-gray-100">
+          Project Details
+        </h2>
       <div className="mb-6 p-4 bg-blue-50/50 border border-blue-100/80 rounded-xl">
         <span className="text-xs font-semibold text-blue-900/70 uppercase tracking-wider block mb-2">Available Credential Types</span>
         <div className="flex flex-wrap gap-2">
@@ -347,6 +355,16 @@ export default function Projects() {
           ))}
         </div>
       </div>
+      {message && (
+        <div
+          className={`mb-4 rounded-lg px-4 py-3 text-sm font-medium transition-all ${message.type === "success"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+            }`}
+        >
+          {message.text}
+        </div>
+      )}
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
@@ -741,9 +759,10 @@ export default function Projects() {
 
         <button
           type="submit"
-          className="mt-6 px-5 py-2.5 rounded-lg bg-blue-950 hover:bg-blue-900 text-white font-medium transition-colors w-full md:w-auto"
+          disabled={loading}
+          className="mt-6 px-5 py-2.5 rounded-lg bg-blue-950 hover:bg-blue-900 disabled:bg-blue-300 disabled:cursor-not-allowed text-white font-medium transition-colors w-full md:w-auto"
         >
-          Add Project
+          {loading ? "Adding..." : "Add Project"}
         </button>
       </form>
     </div>

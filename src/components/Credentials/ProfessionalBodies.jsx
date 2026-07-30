@@ -1,5 +1,6 @@
 import React from 'react';
 import { Award, ShieldAlert, Calendar } from 'lucide-react';
+import { formatDate } from '../../utils/helpers';
 import CredentialCategoryLayout from './CredentialCategoryLayout';
 
 export default function ProfessionalBodies({ items = [] }) {
@@ -29,7 +30,7 @@ export default function ProfessionalBodies({ items = [] }) {
               <span className="text-slate-400 font-medium block text-xs uppercase tracking-wider">Valid Till</span>
               <span className="text-slate-700 font-semibold flex items-center gap-1">
                 <Calendar size={14} className="text-slate-400" />
-                {item.validTill || item.valid_till || "N/A"}
+                {formatDate(item.validTill || item.valid_till)}
               </span>
             </div>
           </div>

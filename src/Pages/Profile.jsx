@@ -4,29 +4,9 @@ import { generateResume } from "../utils/generateResume";
 import ResumeGenerator from '../components/ResumeGenerator';
 import { Route, Routes, useNavigate, useParams, useLocation } from 'react-router-dom';
 import {
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  Award,
-  BookOpen,
-  FileText,
-  Edit2,
-  Download,
-  Share2,
-  User,
-  GraduationCap,
-  ExternalLink,
-  Code,
-  Cpu,
-  Briefcase,
-  Milestone,
-  Target,
-  Users,
-  Scroll,
-  Clipboard,
-  Star,
-  Trophy
+  Mail, Phone, MapPin, Calendar, Award, BookOpen, FileText, Edit2, Download, ChevronRight,
+  Share2, User, GraduationCap, ExternalLink, Code, Cpu, Briefcase, Milestone, Target, Users, Scroll,
+  Clipboard, Star, Trophy
 } from "lucide-react";
 import { fetchMyProfile, fetchPortfolioCounts, getEntries } from "../core/user";
 import { credentialTypes } from "./AddCreds";
@@ -254,6 +234,7 @@ export default function Profile() {
 
     fetchPortfolioCounts().then((res) => {
       if (res.data) {
+        console.log(res.data)
         setCounts(res.data);
       }
     }).catch(() => { });
@@ -264,12 +245,16 @@ export default function Profile() {
     const view = segment === 'profile' ? '' : segment;
 
     if (!view) return;
+    if (view.substring(0, 3).toLocaleLowerCase().includes("add"))
+      return
 
     getEntries(view)
       .then((res) => {
         const nextItems = Array.isArray(res?.data) && res.data.length > 0
           ? res.data
           : (FALLBACK_SECTION_DATA[view] || []);
+
+        console.log(res.data)
 
         setSectionData((prev) => ({ ...prev, [view]: nextItems }));
       })
@@ -336,12 +321,12 @@ export default function Profile() {
       } else {
         await addEntry(typeKey, [payload]);
       }
-      
+
       // Fetch updated profile counts
       fetchPortfolioCounts().then((res) => {
         if (res.data) setCounts(res.data);
-      }).catch(() => {});
-      
+      }).catch(() => { });
+
       // Fetch updated section data
       getEntries(typeKey)
         .then((res) => {
@@ -350,7 +335,7 @@ export default function Profile() {
             : (FALLBACK_SECTION_DATA[typeKey] || []);
           setSectionData((prev) => ({ ...prev, [typeKey]: nextItems }));
         })
-        .catch(() => {});
+        .catch(() => { });
 
       // Navigate back to the specific category display page
       navigate(`/student/profile/${typeKey}`);
@@ -365,6 +350,15 @@ export default function Profile() {
 
   const cgpaPct = Math.round((studentData.cgpa / (studentData.cgpaTarget || 10.0)) * 100);
 
+  const colorRamp = [
+    { bg: "bg-blue-50", text: "text-blue-600", ring: "group-hover:border-blue-300" },
+    { bg: "bg-violet-50", text: "text-violet-600", ring: "group-hover:border-violet-300" },
+    { bg: "bg-amber-50", text: "text-amber-600", ring: "group-hover:border-amber-300" },
+    { bg: "bg-emerald-50", text: "text-emerald-600", ring: "group-hover:border-emerald-300" },
+    { bg: "bg-rose-50", text: "text-rose-600", ring: "group-hover:border-rose-300" },
+  ];
+
+  const hasDefinedContent = location === "/student/profile";
 
   return (
     <div className="min-h-screen bg-slate-50 font-['DM_Sans'] text-slate-800">
@@ -434,7 +428,7 @@ export default function Profile() {
         <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-3xs mb-6 select-none">
           <span className="material-symbols-outlined text-[20px] text-slate-400">folder_open</span>
           <span className="hover:text-[#1a365d] " >student</span>
-          <span className="text-slate-300">/</span>
+          <span className="text-slate-300"><ChevronRight /></span>
           <span className="hover:text-[#1a365d] cursor-pointer" onClick={() => navigate('/student/profile')}>profile</span>
           {activeView !== 'Overview' && (
             <>
@@ -447,36 +441,69 @@ export default function Profile() {
         </div>
 
         {location.pathname === '/student/profile' &&
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
+              {Object.entries(credentialTypes).map(([label, pathValue], i) => {
+                const IconComp = sectionIcon[label] || User;
+                const count = counts[pathValue] ?? 0;
+                const isActive = activeView === pathValue;
+                const isLocked = hasDefinedContent;
+                const color = colorRamp[i % colorRamp.length];
 
-            {Object.entries(credentialTypes).map(([label, pathValue]) => {
-              const IconComp = sectionIcon[label] || User;
-              const countKey = pathValue;
-              const count = counts[countKey] ?? 0;
-              const hasDefinedContent = location === "/student/profile";
-              return (
-                <button
-                  key={label}
-                  onClick={() => !hasDefinedContent && navigate(`/student/profile/${pathValue}`)}
-                  className={`flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all relative ${activeView === pathValue
-                    ? 'bg-[#1a365d] text-white border-[#1a365d] shadow-md'
-                    : 'bg-white text-slate-700 border-slate-200 hover:border-[#1a365d]/30 hover:shadow-sm'
-                    } ${hasDefinedContent ? 'opacity-70 cursor-not-allowed' : ''}`}
-                >
-                  <span className={`absolute top-1.5 right-1.5 text-[9px] px-1.5 py-0.5 rounded-full font-bold ${activeView === pathValue ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
-                    }`}>
-                    {count}
-                  </span>
-                  <div className={`p-2.5 rounded-xl ${activeView === pathValue ? 'bg-white/15' : 'bg-slate-50'
-                    }`}>
-                    <IconComp size={22} />
-                  </div>
-                  <span className="font-bold text-xs text-center leading-tight">{label}</span>
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    disabled={isLocked}
+                    onClick={() => !isLocked && navigate(`/student/profile/${pathValue}`)}
+                    title={isLocked ? "Open the profile page to browse credential types" : undefined}
+                    className={`group relative flex flex-col items-center justify-center gap-2.5 rounded-2xl border p-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1a365d] focus-visible:ring-offset-2 ${isActive
+                      ? "border-[#1a365d] bg-[#1a365d] shadow-lg shadow-[#1a365d]/20"
+                      : isLocked
+                        ? "cursor-not-allowed border-slate-200 bg-slate-50"
+                        : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                      }`}
+                  >
+                    {/* count badge */}
+                    <span
+                      className={`absolute top-2 right-2 rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${isActive
+                        ? "bg-white/20 text-white"
+                        : isLocked
+                          ? "bg-slate-200 text-slate-500"
+                          : "bg-slate-100 text-slate-600"
+                        }`}
+                    >
+                      {count}
+                    </span>
 
-          </div>}
+                    {/* locked indicator, replaces generic dimming */}
+                    {isLocked && (
+                      <Lock size={11} className="absolute top-2 left-2 text-slate-400" />
+                    )}
+
+                    {/* icon tile */}
+                    <div
+                      className={`flex h-11 w-11 items-center justify-center rounded-xl border border-transparent transition-colors ${isActive
+                        ? "bg-white/15 text-white"
+                        : isLocked
+                          ? "bg-slate-100 text-slate-400"
+                          : `${color.bg} ${color.text} border-transparent ${color.ring}`
+                        }`}
+                    >
+                      <IconComp size={20} strokeWidth={2} />
+                    </div>
+
+                    <span
+                      className={`text-xs font-semibold leading-tight ${isActive ? "text-white" : isLocked ? "text-slate-400" : "text-slate-700"
+                        }`}
+                    >
+                      {label}
+                    </span>
+
+                  </button>
+                );
+              })}
+            </div>
+        }
 
         {/* Routes for sub-components */}
         <Routes>
@@ -488,7 +515,17 @@ export default function Profile() {
           <Route path="/extraCurricular" element={<ExtraCurricularActivities items={sectionData.extraCurricular || []} />} />
           <Route path="/coCurricular" element={<CoCurricularActivities items={sectionData.coCurricular || []} />} />
           <Route path="/professionalBody" element={<ProfessionalBodies items={sectionData.professionalBody || []} />} />
-          <Route path="/skills" element={<SkillsDisplay items={sectionData.skills || []} />} />
+          <Route path="/skills" element={
+            <SkillsDisplay
+              items={sectionData.skills || []}
+              onSkillAdded={() => {
+                getEntries('skills').then((res) => {
+                  const skills = Array.isArray(res?.data) ? res.data : [];
+                  setSectionData((prev) => ({ ...prev, skills }));
+                }).catch(() => {});
+              }}
+            />
+          } />
           <Route path="/journalPublication" element={<JournalPublication items={sectionData.journalPublication || []} />} />
           <Route path="/conferencePaper" element={<ConferencePaper items={sectionData.conferencePaper || []} />} />
           <Route path="/patent" element={<Patent items={sectionData.patent || []} />} />
@@ -496,20 +533,20 @@ export default function Profile() {
           <Route path="/entranceExam" element={<EntranceExaminations items={sectionData.entranceExam || []} />} />
 
           {/* Add Routes */}
-          <Route path="/addinternship" element={<AddInternship/>} />
-          <Route path="/addcompetition" element={<AddCompetitions/> } />
-          <Route path="/addplacement" element={<AddPlacement/> } />
-          <Route path="/addproject" element={<AddProjects/> } />
-          <Route path="/addcertification" element={<AddCertification/> } />
-          <Route path="/addextraCurricular" element={<AddExtraCurricularActivities/>} />
-          <Route path="/addcoCurricular" element={<AddCoCurricularActivities/> } />
-          <Route path="/addprofessionalBody" element={<AddProfessionalBodies/> } />
-          <Route path="/addskills" element={<AddSkills/>} />
-          <Route path="/addjournalPublication" element={<AddJournalPublication/> } />
-          <Route path="/addconferencePaper" element={<AddConferencePaper/> } />
-          <Route path="/addpatent" element={<AddPatent/> } />
-          <Route path="/addscholarship" element={<AddScholarships/> } />
-          <Route path="/addentranceExam" element={<AddEntranceExaminations/> } />
+          <Route path="/addinternship" element={<AddInternship />} />
+          <Route path="/addcompetition" element={<AddCompetitions />} />
+          <Route path="/addplacement" element={<AddPlacement />} />
+          <Route path="/addproject" element={<AddProjects />} />
+          <Route path="/addcertification" element={<AddCertification />} />
+          <Route path="/addextraCurricular" element={<AddExtraCurricularActivities />} />
+          <Route path="/addcoCurricular" element={<AddCoCurricularActivities />} />
+          <Route path="/addprofessionalBody" element={<AddProfessionalBodies />} />
+          <Route path="/addskills" element={<AddSkills />} />
+          <Route path="/addjournalPublication" element={<AddJournalPublication />} />
+          <Route path="/addconferencePaper" element={<AddConferencePaper />} />
+          <Route path="/addpatent" element={<AddPatent />} />
+          <Route path="/addscholarship" element={<AddScholarships />} />
+          <Route path="/addentranceExam" element={<AddEntranceExaminations />} />
         </Routes>
       </main>
 

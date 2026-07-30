@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import InputField from "../FormComponents/InputField";
 import FileField from "../FormComponents/FileField";
+import { ChevronLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { addEntry } from "../../core/user";
 
 export default function Internship() {
+  const navigate = useNavigate();
   const [internship, setInternship] = useState({
     title: "",
     organizationCompanyName: "",
@@ -24,17 +28,13 @@ export default function Internship() {
     setLoading(true);
     setMessage(null);
     try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
       const typeKey = "internship";
 
-      await addCredential(userId, typeKey, payload);
+      await addEntry(typeKey, [payload]);
       setMessage({ type: "success", text: "Internship details added successfully!" });
 
       window.scrollTo({ top: 0, behavior: "smooth" });
+      navigate(-1)
     } catch (err) {
       console.error(err);
       setMessage({ type: "error", text: err.message || "Failed to add credential information." });
@@ -160,6 +160,14 @@ export default function Internship() {
 
   return (
     <div className="bg-white p-6 rounded-2xl border border-blue-100 shadow-sm mt-6">
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-blue-950 transition-colors mb-4 cursor-pointer"
+      >
+        <ChevronLeft size={18} />
+        Back
+      </button>
       <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
         <h2 className="text-xl font-bold text-blue-950">
           Internship Information

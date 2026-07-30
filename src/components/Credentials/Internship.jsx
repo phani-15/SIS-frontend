@@ -1,6 +1,6 @@
 import React from 'react';
 import { Briefcase, Calendar, DollarSign, FileText, Plus } from 'lucide-react';
-import { fileUrl } from '../../utils/helpers';
+import { fileUrl, formatDate } from '../../utils/helpers';
 import { useNavigate } from 'react-router-dom';
 
 export default function Internship({ items = [] }) {
@@ -73,7 +73,7 @@ export default function Internship({ items = [] }) {
                       <span className="text-slate-400 font-medium block text-xs uppercase tracking-wider">Duration</span>
                       <span className="text-slate-700 font-semibold flex items-center gap-1">
                         <Calendar size={14} className="text-slate-400" />
-                        {item.startDate} {item.endDate ? `to ${item.endDate}` : '(Ongoing)'}
+                        {formatDate(item.startDate)} {item.endDate ? `to ${formatDate(item.endDate)}` : '(Ongoing)'}
                       </span>
                     </div>
                     <div className="text-sm">

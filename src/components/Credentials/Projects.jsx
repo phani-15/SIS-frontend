@@ -1,5 +1,6 @@
 import React from 'react';
 import { Code, Calendar, Users, Award, ShieldCheck } from 'lucide-react';
+import { formatDate } from '../../utils/helpers';
 import CredentialCategoryLayout from './CredentialCategoryLayout';
 
 export default function Projects({ items = [] }) {
@@ -43,7 +44,7 @@ export default function Projects({ items = [] }) {
               <span className="text-slate-400 font-medium block text-xs uppercase tracking-wider">Duration</span>
               <span className="text-slate-700 font-semibold flex items-center gap-1">
                 <Calendar size={14} className="text-slate-400" />
-                {item.startDate || 'N/A'} {item.endDate ? `to ${item.endDate}` : ''}
+                {formatDate(item.startDate)} {item.endDate ? `to ${formatDate(item.endDate)}` : ''}
               </span>
             </div>
             <div className="text-sm sm:col-span-2">

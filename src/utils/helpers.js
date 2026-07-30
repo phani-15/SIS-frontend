@@ -48,6 +48,20 @@ export function mapFilters(raw) {
   return mapped
 }
 
+export function formatDate(dateStr) {
+  if (!dateStr) return "N/A"
+  try {
+    const d = new Date(dateStr)
+    if (isNaN(d.getTime())) return dateStr
+    const dd = String(d.getDate()).padStart(2, "0")
+    const mm = String(d.getMonth() + 1).padStart(2, "0")
+    const yyyy = d.getFullYear()
+    return `${dd}-${mm}-${yyyy}`
+  } catch {
+    return dateStr
+  }
+}
+
 export function fileUrl(path) {
   if (!path || typeof path !== "string") return null
   if (path.startsWith("http://") || path.startsWith("https://")) return path

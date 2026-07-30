@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Plus } from 'lucide-react';
+import { ChevronLeft, FileText, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { fileUrl } from '../../utils/helpers';
 

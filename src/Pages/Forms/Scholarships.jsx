@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import InputField from "../FormComponents/InputField";
 import SelectField from "../FormComponents/SelectField";
+import { ChevronLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { addEntry } from "../../core/user";
 
 export default function Scholarships() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+
   const [scholarships, setScholarships] = useState({
     nameOfScholarship: "",
     otherName: "",
@@ -14,20 +21,16 @@ export default function Scholarships() {
     setLoading(true);
     setMessage(null);
     try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID is not found. Please log in first.");
-      }
-
       const typeKey = "scholarships";
 
-      await addCredential(userId, typeKey, payload);
-      setMessage({ type: "success", text: "scholarships details added successfully!" });
+      await addEntry(typeKey, [payload]);
+      setMessage({ type: "success", text: "Scholarship details added successfully!" });
 
       window.scrollTo({ top: 0, behavior: "smooth" });
+      navigate(-1)
     } catch (err) {
       console.error(err);
-      setMessage({ type: "error", text: err.message || "Failed to add scholarships information." });
+      setMessage({ type: "error", text: err.message || "Failed to add scholarship information." });
     } finally {
       setLoading(false);
     }
@@ -74,7 +77,7 @@ export default function Scholarships() {
       newErrors.academicYear = "Academic year is required";
     } else if (!/^\d{4}(-\d{4})?$/.test(academicYear)) {
       newErrors.academicYear =
-        "Use format YYYY or YYYY-YYYY (e.g. rounded-4xl2026)";
+        "Use format YYYY or YYYY-YYYY (e.g. 2023-2024)";
     } else {
       const currentYear = new Date().getFullYear();
       const currentAcademicStart =
@@ -138,9 +141,27 @@ export default function Scholarships() {
 
   return (
     <div className="bg-white p-6 rounded-2xl border border-blue-100 shadow-sm mt-6">
-      <h2 className="text-xl font-bold text-blue-950 mb-4 pb-2 border-b border-gray-100">
-        Scholarship Details
-      </h2>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-blue-950 transition-colors mb-4 cursor-pointer"
+        >
+          <ChevronLeft size={18} />
+          Back
+        </button>
+        <h2 className="text-xl font-bold text-blue-950 mb-4 pb-2 border-b border-gray-100">
+          Scholarship Details
+        </h2>
+      {message && (
+        <div
+          className={`mb-4 rounded-lg px-4 py-3 text-sm font-medium transition-all ${message.type === "success"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+            }`}
+        >
+          {message.text}
+        </div>
+      )}
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
@@ -184,9 +205,10 @@ export default function Scholarships() {
 
         <button
           type="submit"
-          className="mt-6 px-5 py-2.5 rounded-lg bg-blue-950 hover:bg-blue-900 text-white font-medium transition-colors w-full md:w-auto"
+          disabled={loading}
+          className="mt-6 px-5 py-2.5 rounded-lg bg-blue-950 hover:bg-blue-900 disabled:bg-blue-300 disabled:cursor-not-allowed text-white font-medium transition-colors w-full md:w-auto"
         >
-          Add Scholarship
+          {loading ? "Adding..." : "Add Scholarship"}
         </button>
       </form>
     </div>

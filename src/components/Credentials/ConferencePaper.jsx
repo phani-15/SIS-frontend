@@ -1,5 +1,6 @@
 import React from 'react';
 import { BookOpen, Calendar, MapPin, Award } from 'lucide-react';
+import { formatDate } from '../../utils/helpers';
 import CredentialCategoryLayout from './CredentialCategoryLayout';
 
 export default function ConferencePaper({ items = [] }) {
@@ -34,7 +35,7 @@ export default function ConferencePaper({ items = [] }) {
               <span className="text-slate-400 font-medium block text-xs uppercase tracking-wider">Date</span>
               <span className="text-slate-700 font-semibold flex items-center gap-1">
                 <Calendar size={14} className="text-slate-400" />
-                {item.fromDate} {item.toDate ? `to ${item.toDate}` : ''}
+                {formatDate(item.fromDate)} {item.toDate ? `to ${formatDate(item.toDate)}` : ''}
               </span>
             </div>
             <div className="text-sm">

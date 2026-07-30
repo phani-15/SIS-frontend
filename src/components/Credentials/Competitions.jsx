@@ -1,5 +1,6 @@
 import React from 'react';
 import { Trophy, Calendar, MapPin, Users } from 'lucide-react';
+import { formatDate } from '../../utils/helpers';
 import CredentialCategoryLayout from './CredentialCategoryLayout';
 
 export default function Competitions({ items = [] }) {
@@ -40,7 +41,7 @@ export default function Competitions({ items = [] }) {
               <span className="text-slate-400 font-medium block text-xs uppercase tracking-wider">Duration / Date</span>
               <span className="text-slate-700 font-semibold flex items-center gap-1">
                 <Calendar size={14} className="text-slate-400" />
-                {item.startDate} {item.endDate ? `to ${item.endDate}` : ''}
+                {formatDate(item.startDate)} {item.endDate ? `to ${formatDate(item.endDate)}` : ''}
               </span>
             </div>
             <div className="text-sm">
